@@ -2,7 +2,7 @@
 
 > **Repository:** [shrinkit-android](https://github.com/dusmamud/shrinkit-android)  
 > **Package / Namespace:** `com.dusrel.shrinkit`  
-> **Tech Stack:** Native Kotlin 2.4.x+, Jetpack Compose Material 3, WorkManager 2.12.0, Version Catalogs, Clean Architecture  
+> **Tech Stack:** Native Kotlin 2.4.x+, Jetpack Compose Material 3, KSP, WorkManager 2.12.0, Version Catalogs, Clean Architecture  
 > **Reference Web App:** [ShrinkIt Web](https://shrinkit.dusrel.com)
 
 ---
@@ -11,7 +11,7 @@
 
 | Phase | Description | Deliverables | Status |
 | :---: | :--- | :--- | :---: |
-| **1** | **Project Scaffolding & Version Catalog** | `gradle/libs.versions.toml`, root & app `build.gradle.kts`, `settings.gradle.kts`, `AndroidManifest.xml` (API 36, Edge-to-Edge, PhotoPicker, Locales, Splash, Foreground Services) | ⏳ Pending |
+| **1** | **Project Scaffolding & Version Catalog** | `gradle/libs.versions.toml`, root & app `build.gradle.kts`, KSP plugin, `settings.gradle.kts`, `AndroidManifest.xml` (API 36, Edge-to-Edge, PhotoPicker, Locales, Splash, Foreground Services) | ⏳ Pending |
 | **2** | **Brand Assets, Splash & Multi-Language (i18n)** | Adaptive launcher icons (`profile-1024.png`), Splash screen theme, `locales_config.xml`, `strings.xml` for English, Hindi (`hi`), Assamese (`as`) | ⏳ Pending |
 | **3** | **Core Image Engine (Domain Layer)** | Units math, Resize Modes (`stretch`, `crop`, `fit`), Binary Search Target KB, Dual Decoder (ImageDecoder + BitmapFactory, AVIF API 31+, HEIF check), EXIF Sanitizer | ⏳ Pending |
 | **4** | **Unit Test Suite (JUnit 4/5)** | Dimension conversions, safety bounds, binary search convergence, aspect ratio math | ⏳ Pending |
@@ -24,9 +24,9 @@
 ## Detailed Task Breakdown
 
 ### Phase 1: Project Scaffolding & Configuration
-- [ ] **Task 1.1:** Author `gradle/libs.versions.toml` with audited 2026 dependency catalog (AGP 9.4.0, Kotlin 2.4.10, Compose BOM 2026.09.00, Coil 3.6.3, Hilt 2.52, WorkManager 2.12.0, Custom Tabs, Core SplashScreen, Play Review, Play App Update).
-- [ ] **Task 1.2:** Setup `settings.gradle.kts` and root `build.gradle.kts` with Compose compiler plugin (`org.jetbrains.kotlin.plugin.compose`).
-- [ ] **Task 1.3:** Configure `app/build.gradle.kts` with `namespace = "com.dusrel.shrinkit"`, `compileSdk = 36`, `targetSdk = 36`, and modern dependency aliases.
+- [ ] **Task 1.1:** Author `gradle/libs.versions.toml` with audited 2026 dependency catalog (AGP 9.4.0, Kotlin 2.4.10, KSP, Compose BOM 2026.09.00, Navigation Compose 2.10.2, Coil 3.6.3, Hilt 2.60.1, WorkManager 2.12.0, Custom Tabs, Core SplashScreen, Play Review, Play App Update).
+- [ ] **Task 1.2:** Setup `settings.gradle.kts` and root `build.gradle.kts` with Compose compiler plugin (`org.jetbrains.kotlin.plugin.compose`) and KSP plugin (`com.google.devtools.ksp`).
+- [ ] **Task 1.3:** Configure `app/build.gradle.kts` with `namespace = "com.dusrel.shrinkit"`, `compileSdk = 36`, `targetSdk = 36`, KSP-based Hilt code generation (`ksp(libs.hilt.compiler)`), and BOM-managed Material 3.
 - [ ] **Task 1.4:** Author `app/src/main/AndroidManifest.xml` with `INTERNET`, `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_DATA_SYNC`, `SystemForegroundService` declaration, and `locales_config`.
 
 ### Phase 2: Brand Assets, Splash Screen & Multi-Language (i18n)

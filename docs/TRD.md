@@ -3,7 +3,7 @@
 > **Reference Engine:** [ShrinkIt Web Engine](https://shrinkit.dusrel.com)  
 > **App Package / Namespace:** `com.dusrel.shrinkit`  
 > **Status:** Approved for Implementation  
-> **Tech Stack:** Kotlin 2.4.x+, Jetpack Compose Material 3, WorkManager 2.12.0, ImageDecoder, Coil 3, Hilt 2.52, Play Review, Play App Update
+> **Tech Stack:** Kotlin 2.4.x+, Jetpack Compose Material 3, KSP, WorkManager 2.12.0, ImageDecoder, Coil 3, Hilt 2.60+, Play Review, Play App Update
 
 ---
 
@@ -62,14 +62,14 @@ flowchart TD
 [versions]
 agp = "9.4.0"
 kotlin = "2.4.10"
+ksp = "2.4.10-1.0.30"
 coreKtx = "1.19.1"
 coreSplashscreen = "1.2.0"
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.9.3"
 composeBom = "2026.09.00"
-material3 = "1.3.1"
-navigationCompose = "2.8.5"
-hilt = "2.52"
+navigationCompose = "2.10.2"
+hilt = "2.60.1"
 hiltNavigationCompose = "1.3.0"
 workManager = "2.12.0"
 coil3 = "3.6.3"
@@ -77,7 +77,7 @@ exifinterface = "1.3.7"
 browser = "1.8.0"
 playReview = "2.0.2"
 playAppUpdate = "2.1.0"
-coroutines = "1.9.0"
+coroutines = "1.11.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -92,7 +92,8 @@ androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+# Material3 managed by Compose BOM - zero version override to prevent binary mismatch
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
@@ -100,7 +101,7 @@ androidx-browser = { group = "androidx.browser", name = "browser", version.ref =
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 coil3-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil3" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
 play-app-update-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "playAppUpdate" }
@@ -110,8 +111,29 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+```
+
+### Compiler Configuration Pattern in `app/build.gradle.kts`:
+```kotlin
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.serialization)
+}
+
+dependencies {
+    // Dagger Hilt Code Generation via KSP (replacing legacy KAPT)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ...
+}
 ```
 
 ---
@@ -120,7 +142,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 ### Codec Availability & Device Checks:
 - **JPEG / PNG / WebP:** Universally supported across all API 24–36 devices.
-- **HEIC / HEIF:** Native support introduced in API 28+, but device hardware/software codec licensing varies. The engine verifies `ImageDecoder.isMimeTypeSupported("image/heif")` and catches `DecodeException`.
+- **HEIC / HEIF:** Native support in API 28+, but device hardware/software codec licensing varies. The engine verifies `ImageDecoder.isMimeTypeSupported("image/heif")` and catches `DecodeException`.
 - **AVIF:** Introduced natively in **Android 12 (API 31+)**. On API 28–30, AVIF cannot be decoded natively by `ImageDecoder` or `BitmapFactory`.
 
 ```kotlin
@@ -131,7 +153,7 @@ object SafeBitmapDecoder {
 
         // Guard against AVIF on unsupported API levels (< 31)
         if (mimeType == "image/avif" && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            return null // Cleanly refuse or prompt user to convert
+            return null // Refuse unsupported codec gracefully without crash
         }
 
         // API 28+ (Android 9 to 16): Native ImageDecoder
@@ -165,6 +187,7 @@ object SafeBitmapDecoder {
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
         val origMax = maxOf(options.outWidth, options.outHeight)
+        if (origMax <= 0) return null // Corrupted / unreadable stream
         options.inSampleSize = calculateSampleSize(origMax, maxSide)
         options.inJustDecodeBounds = false
         options.inPreferredConfig = Bitmap.Config.ARGB_8888
