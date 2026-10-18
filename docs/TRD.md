@@ -62,7 +62,7 @@ flowchart TD
 [versions]
 agp = "9.4.0"
 kotlin = "2.4.10"
-ksp = "2.4.10-1.0.30"
+ksp = "2.3.10"
 coreKtx = "1.19.1"
 coreSplashscreen = "1.2.0"
 lifecycleRuntimeKtx = "2.10.0"
