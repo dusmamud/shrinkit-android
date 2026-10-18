@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ShrinkIt</string>
+    <string name="site_tagline">বিনামূলীয়া, গোপনীয় ছবি ৰিচাইজাৰ আৰু কম্প্ৰেছৰ</string>
+    <string name="zero_upload_badge">১০০% ডিভাইচত · কোনো চাৰ্ভাৰ আপলোড নাই</string>
+
+    <!-- Navigation & Titles -->
+    <string name="title_home">ShrinkIt</string>
+    <string name="title_settings">আকাৰ আৰু ফৰ্মেট ছেটিংছ</string>
+    <string name="title_results">সংকোচনৰ ফলাফল</string>
+    <string name="action_pick_images">ছবি বাছক</string>
+    <string name="action_add_more">আৰু যোগ কৰক</string>
+    <string name="action_clear_all">সকলো আঁতৰাওক</string>
+    <string name="action_process_all">সকলো ছবি সংকুচিত কৰক</string>
+    <string name="action_save_gallery">গেলেৰীত সংৰক্ষণ কৰক</string>
+    <string name="action_share">শ্বেয়াৰ কৰক</string>
+
+    <!-- Settings Controls -->
+    <string name="section_dimensions">নতুন আকাৰ নিৰ্বাচন কৰক</string>
+    <string name="label_width">প্ৰস্থ</string>
+    <string name="label_height">উচ্চতা</string>
+    <string name="label_aspect_lock">অনুপাত লক কৰক</string>
+    <string name="label_unit">একক</string>
+    <string name="unit_pixels">পিক্সেল (px)</string>
+    <string name="unit_percent">শতাংশ (%)</string>
+    <string name="unit_cm">চেণ্টিমিটাৰ (cm)</string>
+    <string name="unit_mm">মিলিমিটাৰ (mm)</string>
+    <string name="unit_inches">ইঞ্চি (in)</string>
+
+    <!-- Resize Modes -->
+    <string name="section_mode">ৰিচাইজ পদ্ধতি</string>
+    <string name="mode_stretch">ষ্ট্ৰেচ (Stretch)</string>
+    <string name="mode_crop">ক্ৰপ (কেন্দ্ৰ)</string>
+    <string name="mode_fit">ফিট (লেটাৰবক্স)</string>
+
+    <!-- Compression Mode -->
+    <string name="section_compression">সংকোচন ম\'ড</string>
+    <string name="mode_quality">গুণমান শ্লাইডাৰ (%)</string>
+    <string name="mode_target_kb">লক্ষ্য আকাৰ (KB)</string>
+    <string name="label_quality">গুণমান</string>
+    <string name="label_target_kb">লক্ষ্য ফাইল আকাৰ (KB)</string>
+    <string name="hint_target_kb">যেনে ২০, ৫০, ১০০</string>
+
+    <!-- Formats -->
+    <string name="section_format">আউটপুট ফৰ্মেট</string>
+    <string name="format_jpg">JPG</string>
+    <string name="format_png">PNG</string>
+    <string name="format_webp">WebP</string>
+    <string name="format_avif">AVIF</string>
+    <string name="format_original">মূল ফৰ্মেট</string>
+
+    <!-- Background Color -->
+    <string name="section_background">পটভূমিৰ ৰং (Fit / JPG)</string>
+    <string name="bg_white">বগা</string>
+    <string name="bg_black">ক\'লা</string>
+
+    <!-- Privacy & Metadata -->
+    <string name="section_privacy">গোপনীয়তা আৰু EXIF</string>
+    <string name="opt_strip_exif">GPS আৰু কেমেৰা ডাটা আঁতৰাওক</string>
+    <string name="opt_strip_exif_desc">পৰামৰ্শ দিয়া হৈছে: অৱস্থান আৰু ডিভাইচ টেগ পৰিষ্কাৰ কৰে</string>
+
+    <!-- Quick Presets -->
+    <string name="preset_header">দ্ৰুত প্ৰিচেট</string>
+    <string name="preset_exam_signature">স্বাক্ষৰ (২০ KB)</string>
+    <string name="preset_passport">পাছপ\'ৰ্ট (৩৫×৪৫ mm)</string>
+    <string name="preset_us_visa">ইউএছ ভিছা (২×২ in)</string>
+    <string name="preset_insta_square">ইনষ্টাগ্ৰাম (১:১)</string>
+    <string name="preset_insta_story">ষ্ট\'ৰি (৯:১৬)</string>
+    <string name="preset_yt_thumb">ইউটিউব (১৬:৯)</string>
+
+    <!-- Results -->
+    <string name="result_saved_to_gallery">Pictures/ShrinkIt ত সংৰক্ষণ কৰা হ\'ল</string>
+    <string name="result_reduction_badge">-%1$d%%</string>
+    <string name="result_size_summary">%1$s → %2$s</string>
+    <string name="status_done">সকলো ছবি সফলতাৰে প্ৰচেছ কৰা হ\'ল!</string>
+    <string name="limit_max_batch">সৰ্বোচ্চ বেচ সীমা %1$d খন ছবি।</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_name">ছবি প্ৰচেছিং সূচনা</string>
+    <string name="notif_channel_desc">ছবি সংকোচনৰ অগ্ৰগতি আৰু সমাপ্তিৰ জাননী</string>
+    <string name="notification_processing_title">ছবি সংকুচিত কৰা হৈছে (%1$d/%2$d)</string>
+    <string name="notification_processing_desc">প্ৰচেছিং: %1$s</string>
+    <string name="notification_done_title">সংকোচন সম্পূৰ্ণ হ\'ল!</string>
+    <string name="notification_done_desc">%1$d খন ছবি সংৰক্ষণ কৰা হ\'ল। মুঠ সংৰক্ষণ: %2$s</string>
+
+    <!-- External Links -->
+    <string name="link_privacy_policy">গোপনীয়তা নীতি</string>
+    <string name="link_terms">সেৱাৰ চৰ্তসমূহ</string>
+    <string name="link_website">ShrinkIt ৱেবছাইটলৈ যাওক</string>
+    <string name="url_privacy">https://shrinkit.dusrel.com/privacy</string>
+    <string name="url_terms">https://shrinkit.dusrel.com/terms</string>
+    <string name="url_website">https://shrinkit.dusrel.com</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिंदी (Hindi)</string>
+    <string name="lang_assamese">অসমীয়া (Assamese)</string>
+
+    <!-- Errors -->
+    <string name="error_no_images">অনুগ্ৰহ কৰি কমেও এখন ছবি নিৰ্বাচন কৰক।</string>
+    <string name="error_decode_failed">ছবি ফাইল ডিকোড কৰাত ব্যৰ্থ।</string>
+    <string name="error_file_too_large">ছবিৰ আকাৰ সুৰক্ষিত সীমা অতিক্ৰম কৰিছে।</string>
+</resources>

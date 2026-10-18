@@ -1,36 +1,34 @@
 # Project Status: ShrinkIt Android
 
-> **Current Milestone:** Phase 1 — Project Scaffolding & Initial Architecture Setup  
+> **Current Milestone:** Phase 6 Complete — Ready for Release Build & Verification  
 > **Package:** `com.dusrel.shrinkit`  
 > **Target SDK:** 36 (Android 16)  
 > **Last Updated:** 2026-10-19  
-> **Health:** 🟢 Green (Google Play API 36 Verification & Modern 2026 Stack Locked)
+> **Health:** 🟢 Green (Architecture, Engine, Tests, UI & Storage Implemented)
 
 ---
 
 ## Active Task
-- **Current Task:** Fixed targetSdk 35 $\to$ 36 (Android 16), updated Version Catalog to 2026 stack (AGP 9.4, Kotlin 2.4, Compose BOM 2026.09, WorkManager 2.12), corrected AVIF API 31+ & HEIC device-codec check, and declared foreground service permissions.
-- **Next Task:** Start Phase 1 code scaffolding (`gradle/libs.versions.toml`, `settings.gradle.kts`, `build.gradle.kts`).
+- **Completed:** 
+  - Phase 1: Gradle version catalog, wrapper, root/app `build.gradle.kts`, `AndroidManifest.xml` (API 36, foreground service, locales config).
+  - Phase 2: Brand assets, adaptive icons, splash screen, string resources in English, Hindi (`hi`), Assamese (`as`).
+  - Phase 3: Core domain engine (`SizeUnits`, `Limits`, `ExifSanitizer`, `SafeBitmapDecoder`, `ResizeEngine`, `BinarySearchCompressor`).
+  - Phase 4: Unit test suite for `SizeUnitsTest` and `LimitsTest`.
+  - Phase 5: Presentation layer (`ShrinkItTheme`, `ShrinkItTopBar`, `PresetChipsRow`, `SettingsPanel`, `ImagePickerSection`, `ResultCard`, `ShrinkItApp`, `ShrinkItViewModel`, `BrowserLauncher`, `InAppReviewManager`, `InAppUpdateManager`).
+  - Phase 6: Scoped storage (`MediaStoreExporter` with atomic `IS_PENDING` writes) & `BatchCompressWorker` (`dataSync` foreground service).
+- **Next Task:** Finalize release pipeline & bundle verification.
 
 ---
 
 ## Milestone Progress
 
 - [x] **Milestone 0: Analysis, Version Audit & Planning**
-  - [x] Analyzed previous Android projects (`D:\01\1\melofy` Jetpack Compose, `KumotDev` Flutter).
-  - [x] Selected Native Kotlin + Jetpack Compose stack.
-  - [x] Researched latest stable 2026 libraries: Kotlin 2.4.10, AGP 9.4.0, Compose BOM 2026.09.00, Coil 3.6.3, Hilt 2.52, WorkManager 2.12.0, Custom Tabs, Core SplashScreen, Play Review, Play App Update.
-  - [x] Audited Android 16 targetSdk 36 invariants: Edge-to-Edge mandatory, Predictive back default-on, Photo Picker, Scoped Storage `IS_PENDING`.
-  - [x] Audited ImageDecoder Dual Engine: AVIF on API 31+, HEIF with `isMimeTypeSupported` check, auto EXIF orientation baking.
-  - [x] Audited Google Play Store policies: Target SDK 36 compliance (August 31, 2026 mandate), 16 KB page-size support (inherently safe, Feb 1, 2027 update deadline), Data Safety questionnaire pre-fill, 12-tester / 14-day closed track.
-  - [x] Updated all durable memory files (`AGENTS.md`, `PRD.md`, `TRD.md`, `PLAN.md`, `STATUS.md`, `MODULE-MAP.md`, `README.md`).
-  - [x] Pushed clean commit to public GitHub repository `shrinkit-android`.
-- [ ] **Milestone 1: Project Scaffolding & Version Catalog**
-- [ ] **Milestone 2: Brand Assets, Splash Screen & Multi-Language (EN, HI, AS)**
-- [ ] **Milestone 3: Core Domain Engine & Web Parity Algorithms**
-- [ ] **Milestone 4: Automated Unit Testing**
-- [ ] **Milestone 5: Presentation & Jetpack Compose UI**
-- [ ] **Milestone 6: Background Processing & MediaStore Export**
+- [x] **Milestone 1: Project Scaffolding & Version Catalog**
+- [x] **Milestone 2: Brand Assets, Splash Screen & Multi-Language (EN, HI, AS)**
+- [x] **Milestone 3: Core Domain Engine & Web Parity Algorithms**
+- [x] **Milestone 4: Automated Unit Testing**
+- [x] **Milestone 5: Presentation & Jetpack Compose UI**
+- [x] **Milestone 6: Background Processing & MediaStore Export**
 - [ ] **Milestone 7: Production Verification & Google Play AAB Assembly**
 
 ---

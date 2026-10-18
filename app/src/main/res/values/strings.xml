@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ShrinkIt</string>
+    <string name="site_tagline">Free, Private Image Resizer &amp; Compressor</string>
+    <string name="zero_upload_badge">100% On-Device · Zero Server Uploads</string>
+
+    <!-- Navigation & Titles -->
+    <string name="title_home">ShrinkIt</string>
+    <string name="title_settings">Resize &amp; Format Settings</string>
+    <string name="title_results">Compressed Results</string>
+    <string name="action_pick_images">Select Images</string>
+    <string name="action_add_more">Add More</string>
+    <string name="action_clear_all">Clear All</string>
+    <string name="action_process_all">Compress All Images</string>
+    <string name="action_save_gallery">Save to Gallery</string>
+    <string name="action_share">Share</string>
+
+    <!-- Settings Controls -->
+    <string name="section_dimensions">Choose new size</string>
+    <string name="label_width">Width</string>
+    <string name="label_height">Height</string>
+    <string name="label_aspect_lock">Lock Aspect Ratio</string>
+    <string name="label_unit">Unit</string>
+    <string name="unit_pixels">Pixels (px)</string>
+    <string name="unit_percent">Percent (%)</string>
+    <string name="unit_cm">Centimeters (cm)</string>
+    <string name="unit_mm">Millimeters (mm)</string>
+    <string name="unit_inches">Inches (in)</string>
+
+    <!-- Resize Modes -->
+    <string name="section_mode">Resize Method</string>
+    <string name="mode_stretch">Stretch</string>
+    <string name="mode_crop">Crop (Center)</string>
+    <string name="mode_fit">Fit (Letterbox)</string>
+
+    <!-- Compression Mode -->
+    <string name="section_compression">Compression Mode</string>
+    <string name="mode_quality">Quality Slider (%)</string>
+    <string name="mode_target_kb">Target Size (KB)</string>
+    <string name="label_quality">Quality</string>
+    <string name="label_target_kb">Target File Size (KB)</string>
+    <string name="hint_target_kb">e.g. 20, 50, 100</string>
+
+    <!-- Formats -->
+    <string name="section_format">Output Format</string>
+    <string name="format_jpg">JPG</string>
+    <string name="format_png">PNG</string>
+    <string name="format_webp">WebP</string>
+    <string name="format_avif">AVIF</string>
+    <string name="format_original">Original</string>
+
+    <!-- Background Color -->
+    <string name="section_background">Background Color (Fit / JPG)</string>
+    <string name="bg_white">White</string>
+    <string name="bg_black">Black</string>
+
+    <!-- Privacy & Metadata -->
+    <string name="section_privacy">Privacy &amp; EXIF</string>
+    <string name="opt_strip_exif">Strip GPS &amp; Camera Metadata</string>
+    <string name="opt_strip_exif_desc">Recommended: Cleans location &amp; device tags</string>
+
+    <!-- Quick Presets -->
+    <string name="preset_header">Quick Presets</string>
+    <string name="preset_exam_signature">Signature (20 KB)</string>
+    <string name="preset_passport">Passport (35×45 mm)</string>
+    <string name="preset_us_visa">US Visa (2×2 in)</string>
+    <string name="preset_insta_square">Instagram (1:1)</string>
+    <string name="preset_insta_story">Story (9:16)</string>
+    <string name="preset_yt_thumb">YouTube (16:9)</string>
+
+    <!-- Results -->
+    <string name="result_saved_to_gallery">Saved to Pictures/ShrinkIt</string>
+    <string name="result_reduction_badge">-%1$d%%</string>
+    <string name="result_size_summary">%1$s → %2$s</string>
+    <string name="status_done">All images processed successfully!</string>
+    <string name="limit_max_batch">Batch limit is %1$d images.</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_name">Image Processing Alerts</string>
+    <string name="notif_channel_desc">Shows progress and completion alerts for image compression</string>
+    <string name="notification_processing_title">Compressing images (%1$d/%2$d)</string>
+    <string name="notification_processing_desc">Processing: %1$s</string>
+    <string name="notification_done_title">Compression Complete!</string>
+    <string name="notification_done_desc">%1$d images saved. Total saved: %2$s</string>
+
+    <!-- External Links -->
+    <string name="link_privacy_policy">Privacy Policy</string>
+    <string name="link_terms">Terms of Service</string>
+    <string name="link_website">Visit ShrinkIt Web</string>
+    <string name="url_privacy">https://shrinkit.dusrel.com/privacy</string>
+    <string name="url_terms">https://shrinkit.dusrel.com/terms</string>
+    <string name="url_website">https://shrinkit.dusrel.com</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिंदी (Hindi)</string>
+    <string name="lang_assamese">অসমীয়া (Assamese)</string>
+
+    <!-- Errors -->
+    <string name="error_no_images">Please select at least one image.</string>
+    <string name="error_decode_failed">Failed to decode image file.</string>
+    <string name="error_file_too_large">Image dimensions exceed safe limit.</string>
+</resources>

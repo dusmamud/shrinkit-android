@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ShrinkIt</string>
+    <string name="site_tagline">मुफ़्त, सुरक्षित इमेज रिसाइज़र और कंप्रेसर</string>
+    <string name="zero_upload_badge">100% ऑन-डिवाइस · ज़ीरो सर्वर अपलोड</string>
+
+    <!-- Navigation & Titles -->
+    <string name="title_home">ShrinkIt</string>
+    <string name="title_settings">रिसाइज़ और फॉर्मेट सेटिंग्स</string>
+    <string name="title_results">कंप्रेस परिणाम</string>
+    <string name="action_pick_images">फ़ोटो चुनें</string>
+    <string name="action_add_more">और जोड़ें</string>
+    <string name="action_clear_all">सब हटाएं</string>
+    <string name="action_process_all">सभी इमेज कंप्रेस करें</string>
+    <string name="action_save_gallery">गैलरी में सेव करें</string>
+    <string name="action_share">शेयर करें</string>
+
+    <!-- Settings Controls -->
+    <string name="section_dimensions">नया आकार चुनें</string>
+    <string name="label_width">चौड़ाई</string>
+    <string name="label_height">ऊंचाई</string>
+    <string name="label_aspect_lock">अनुपात लॉक करें</string>
+    <string name="label_unit">इकाई</string>
+    <string name="unit_pixels">पिक्सेल (px)</string>
+    <string name="unit_percent">प्रतिशत (%)</string>
+    <string name="unit_cm">सेंटीमीटर (cm)</string>
+    <string name="unit_mm">मिलीमीटर (mm)</string>
+    <string name="unit_inches">इंच (in)</string>
+
+    <!-- Resize Modes -->
+    <string name="section_mode">रिसाइज़ तरीका</string>
+    <string name="mode_stretch">स्ट्रेच (Stretch)</string>
+    <string name="mode_crop">क्रॉप (सेंटर)</string>
+    <string name="mode_fit">फिट (लेटरबॉक्स)</string>
+
+    <!-- Compression Mode -->
+    <string name="section_compression">कंप्रेशन मोड</string>
+    <string name="mode_quality">क्वालिटी स्लाइडर (%)</string>
+    <string name="mode_target_kb">टारगेट साइज़ (KB)</string>
+    <string name="label_quality">क्वालिटी</string>
+    <string name="label_target_kb">टारगेट फ़ाइल साइज़ (KB)</string>
+    <string name="hint_target_kb">जैसे 20, 50, 100</string>
+
+    <!-- Formats -->
+    <string name="section_format">आउटपुट फॉर्मेट</string>
+    <string name="format_jpg">JPG</string>
+    <string name="format_png">PNG</string>
+    <string name="format_webp">WebP</string>
+    <string name="format_avif">AVIF</string>
+    <string name="format_original">मूल फॉर्मेट</string>
+
+    <!-- Background Color -->
+    <string name="section_background">बैकग्राउंड रंग (Fit / JPG)</string>
+    <string name="bg_white">सफ़ेद</string>
+    <string name="bg_black">काला</string>
+
+    <!-- Privacy & Metadata -->
+    <string name="section_privacy">प्राइवेसी और EXIF</string>
+    <string name="opt_strip_exif">GPS और कैमरा डेटा हटाएं</string>
+    <string name="opt_strip_exif_desc">सुझाव: स्थान और डिवाइस टैग्स को साफ़ करता है</string>
+
+    <!-- Quick Presets -->
+    <string name="preset_header">त्वरित प्रीसेट</string>
+    <string name="preset_exam_signature">हस्ताक्षर (20 KB)</string>
+    <string name="preset_passport">पासपोर्ट (35×45 mm)</string>
+    <string name="preset_us_visa">यूएस वीज़ा (2×2 in)</string>
+    <string name="preset_insta_square">इंस्टाग्राम (1:1)</string>
+    <string name="preset_insta_story">स्टोरी (9:16)</string>
+    <string name="preset_yt_thumb">यूट्यूब (16:9)</string>
+
+    <!-- Results -->
+    <string name="result_saved_to_gallery">Pictures/ShrinkIt में सेव हो गया</string>
+    <string name="result_reduction_badge">-%1$d%%</string>
+    <string name="result_size_summary">%1$s → %2$s</string>
+    <string name="status_done">सभी इमेज सफलतापूर्वक प्रोसेस हो गईं!</string>
+    <string name="limit_max_batch">अधिकतम बैच सीमा %1$d इमेज है।</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_name">इमेज प्रोसेसिंग सूचनाएं</string>
+    <string name="notif_channel_desc">इमेज कंप्रेस करने की प्रगति और समाप्ति सूचनाएं</string>
+    <string name="notification_processing_title">इमेज कंप्रेस हो रही हैं (%1$d/%2$d)</string>
+    <string name="notification_processing_desc">प्रोसेसिंग: %1$s</string>
+    <string name="notification_done_title">कंप्रेशन पूरा हुआ!</string>
+    <string name="notification_done_desc">%1$d इमेज सुरक्षित की गईं। कुल बचत: %2$s</string>
+
+    <!-- External Links -->
+    <string name="link_privacy_policy">गोपनीयता नीति</string>
+    <string name="link_terms">सेवा की शर्तें</string>
+    <string name="link_website">ShrinkIt वेब पर जाएं</string>
+    <string name="url_privacy">https://shrinkit.dusrel.com/privacy</string>
+    <string name="url_terms">https://shrinkit.dusrel.com/terms</string>
+    <string name="url_website">https://shrinkit.dusrel.com</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिंदी (Hindi)</string>
+    <string name="lang_assamese">অসমীয়া (Assamese)</string>
+
+    <!-- Errors -->
+    <string name="error_no_images">कृपया कम से कम एक इमेज चुनें।</string>
+    <string name="error_decode_failed">इमेज फ़ाइल डिकोड करने में विफल।</string>
+    <string name="error_file_too_large">इमेज का आकार सुरक्षित सीमा से अधिक है।</string>
+</resources>

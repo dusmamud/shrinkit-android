@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <!-- Squeezed Image Base (ShrinkIt Brand Mark) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 210,152 L 814,152 Q 862,152 862,200 C 862,300 780,400 732,512 C 780,624 862,724 862,824 Q 862,872 814,872 L 210,872 Q 162,872 162,824 C 162,724 244,624 292,512 C 244,400 162,300 162,200 Q 162,152 210,152 Z" />
+    <!-- Blue Inner Mountain -->
+    <path
+        android:fillColor="#007BFF"
+        android:pathData="M 280,722 L 475,500 C 495,472 529,472 549,500 L 744,722 Z" />
+</vector>

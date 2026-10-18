@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Privacy-first: Do not backup sensitive local cached images -->
+        <exclude domain="file" path="images/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="images/" />
+    </device-transfer>
+</data-extraction-rules>

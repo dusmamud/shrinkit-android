@@ -1,0 +1,399 @@
+package com.dusrel.shrinkit.presentation
+
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.data.storage.MediaStoreExporter
+import com.dusrel.shrinkit.data.worker.BatchCompressWorker
+import com.dusrel.shrinkit.domain.engine.BinarySearchCompressor
+import com.dusrel.shrinkit.domain.engine.DimensionField
+import com.dusrel.shrinkit.domain.engine.ExifSanitizer
+import com.dusrel.shrinkit.domain.engine.Limits
+import com.dusrel.shrinkit.domain.engine.ResizeEngine
+import com.dusrel.shrinkit.domain.engine.SafeBitmapDecoder
+import com.dusrel.shrinkit.domain.engine.SizeUnits
+import com.dusrel.shrinkit.domain.model.BackgroundColor
+import com.dusrel.shrinkit.domain.model.CompressMode
+import com.dusrel.shrinkit.domain.model.ImageItem
+import com.dusrel.shrinkit.domain.model.ImagePreset
+import com.dusrel.shrinkit.domain.model.ProcessingOptions
+import com.dusrel.shrinkit.domain.model.ProcessingStatus
+import com.dusrel.shrinkit.domain.model.ResizeMode
+import com.dusrel.shrinkit.domain.model.SizeUnit
+import com.dusrel.shrinkit.domain.model.TargetFormat
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
+import javax.inject.Inject
+
+data class ShrinkItUiState(
+    val images: List<ImageItem> = emptyList(),
+    val options: ProcessingOptions = ProcessingOptions(),
+    val selectedPresetId: String? = null,
+    val isProcessing: Boolean = false,
+    val currentProgress: Int = 0,
+    val totalProgress: Int = 0,
+    val totalSavedBytes: Long = 0L,
+    val userMessage: String? = null
+)
+
+@HiltViewModel
+class ShrinkItViewModel @Inject constructor(
+    private val application: Application
+) : AndroidViewModel(application) {
+
+    private val _uiState = MutableStateFlow(ShrinkItUiState())
+    val uiState: StateFlow<ShrinkItUiState> = _uiState.asStateFlow()
+
+    private val workManager = WorkManager.getInstance(application)
+
+    fun addImages(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentCount = _uiState.value.images.size
+            val availableSlots = Limits.MAX_BATCH - currentCount
+            val urisToAdd = uris.take(availableSlots.coerceAtLeast(0))
+
+            val newItems = urisToAdd.map { uri ->
+                val bounds = SafeBitmapDecoder.decodeBounds(application, uri)
+                val fileSize = application.contentResolver.openFileDescriptor(uri, "r")?.use {
+                    it.statSize
+                } ?: 0L
+
+                val displayName = queryDisplayName(uri) ?: "image_${System.currentTimeMillis()}.jpg"
+
+                ImageItem(
+                    id = UUID.randomUUID().toString(),
+                    uri = uri,
+                    filename = displayName,
+                    originalSizeBytes = fileSize,
+                    originalWidth = bounds.width,
+                    originalHeight = bounds.height,
+                    mimeType = bounds.mimeType
+                )
+            }
+
+            _uiState.update { current ->
+                current.copy(
+                    images = current.images + newItems,
+                    userMessage = if (uris.size > availableSlots) {
+                        application.getString(R.string.limit_max_batch, Limits.MAX_BATCH)
+                    } else null
+                )
+            }
+        }
+    }
+
+    fun removeImage(id: String) {
+        _uiState.update { current ->
+            current.copy(images = current.images.filterNot { it.id == id })
+        }
+    }
+
+    fun clearAllImages() {
+        _uiState.update { it.copy(images = emptyList(), isProcessing = false) }
+    }
+
+    fun applyPreset(preset: ImagePreset) {
+        _uiState.update { current ->
+            current.copy(
+                options = preset.options,
+                selectedPresetId = preset.id
+            )
+        }
+    }
+
+    fun updateWidth(newWidth: Float) {
+        _uiState.update { current ->
+            val opts = current.options
+            val newHeight = if (opts.keepAspectRatio && current.images.isNotEmpty()) {
+                val first = current.images.first()
+                SizeUnits.calculateProportionalDimension(
+                    changedField = DimensionField.WIDTH,
+                    newValue = newWidth,
+                    unit = opts.unit,
+                    origW = first.originalWidth,
+                    origH = first.originalHeight
+                )
+            } else {
+                opts.height
+            }
+            current.copy(
+                options = opts.copy(width = newWidth, height = newHeight),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateHeight(newHeight: Float) {
+        _uiState.update { current ->
+            val opts = current.options
+            val newWidth = if (opts.keepAspectRatio && current.images.isNotEmpty()) {
+                val first = current.images.first()
+                SizeUnits.calculateProportionalDimension(
+                    changedField = DimensionField.HEIGHT,
+                    newValue = newHeight,
+                    unit = opts.unit,
+                    origW = first.originalWidth,
+                    origH = first.originalHeight
+                )
+            } else {
+                opts.width
+            }
+            current.copy(
+                options = opts.copy(width = newWidth, height = newHeight),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateUnit(unit: SizeUnit) {
+        _uiState.update { current ->
+            val first = current.images.firstOrNull()
+            val (defW, defH) = SizeUnits.getDefaultDimensionsForUnit(
+                unit = unit,
+                origW = first?.originalWidth ?: 1920,
+                origH = first?.originalHeight ?: 1080,
+                dpi = current.options.dpi
+            )
+            current.copy(
+                options = current.options.copy(unit = unit, width = defW, height = defH),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun toggleKeepAspectRatio() {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(keepAspectRatio = !current.options.keepAspectRatio),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateResizeMode(mode: ResizeMode) {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(resizeMode = mode),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateFormat(format: TargetFormat) {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(format = format),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateCompressMode(mode: CompressMode) {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(compressMode = mode),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateQuality(quality: Int) {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(quality = quality),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateTargetKb(targetKb: Int) {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(targetKb = targetKb),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    fun updateBackgroundColor(bgColor: BackgroundColor) {
+        _uiState.update { current ->
+            current.copy(options = current.options.copy(backgroundColor = bgColor))
+        }
+    }
+
+    fun toggleStripExif() {
+        _uiState.update { current ->
+            current.copy(options = current.options.copy(stripExif = !current.options.stripExif))
+        }
+    }
+
+    fun dismissUserMessage() {
+        _uiState.update { it.copy(userMessage = null) }
+    }
+
+    /**
+     * Executes the batch compression pipeline directly on Dispatchers.Default / IO
+     * with real-time UI updates for each image.
+     */
+    fun processBatch() {
+        val currentImages = _uiState.value.images
+        if (currentImages.isEmpty() || _uiState.value.isProcessing) return
+
+        val opts = _uiState.value.options
+
+        _uiState.update {
+            it.copy(
+                isProcessing = true,
+                currentProgress = 0,
+                totalProgress = currentImages.size,
+                totalSavedBytes = 0L
+            )
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            var cumulativeSavedBytes = 0L
+
+            val updatedList = currentImages.toMutableList()
+
+            for (index in updatedList.indices) {
+                val item = updatedList[index]
+                _uiState.update {
+                    it.copy(
+                        currentProgress = index + 1,
+                        images = updatedList.mapIndexed { i, itm ->
+                            if (i == index) itm.copy(status = ProcessingStatus.PROCESSING) else itm
+                        }
+                    )
+                }
+
+                try {
+                    val decoded = SafeBitmapDecoder.decode(application, item.uri)
+                    val (targetW, targetH) = SizeUnits.toPixels(
+                        widthVal = opts.width,
+                        heightVal = opts.height,
+                        unit = opts.unit,
+                        dpi = opts.dpi,
+                        origW = decoded.width,
+                        origH = decoded.height
+                    )
+
+                    val format = if (opts.format == TargetFormat.ORIGINAL) {
+                        when {
+                            decoded.mimeType.contains("png") -> TargetFormat.PNG
+                            decoded.mimeType.contains("webp") -> TargetFormat.WEBP
+                            decoded.mimeType.contains("avif") -> TargetFormat.AVIF
+                            else -> TargetFormat.JPEG
+                        }
+                    } else {
+                        opts.format
+                    }
+
+                    val resized = ResizeEngine.resize(
+                        source = decoded.bitmap,
+                        targetWidth = targetW,
+                        targetHeight = targetH,
+                        mode = opts.resizeMode,
+                        backgroundColor = opts.backgroundColor,
+                        keepAlpha = format.supportsAlpha
+                    )
+
+                    val compressionResult = if (opts.compressMode == CompressMode.TARGET_KB) {
+                        BinarySearchCompressor.compressToTargetKb(resized, format, opts.targetKb)
+                    } else {
+                        BinarySearchCompressor.compressWithQuality(resized, format, opts.quality)
+                    }
+
+                    if (resized != decoded.bitmap) {
+                        resized.recycle()
+                    }
+                    decoded.bitmap.recycle()
+
+                    val baseName = item.filename.substringBeforeLast(".")
+                    val outFileName = "shrinkit_${baseName}.${format.extension}"
+
+                    // Save to Pictures/ShrinkIt in MediaStore
+                    val savedUri = MediaStoreExporter.saveToPictures(
+                        context = application,
+                        data = compressionResult.data,
+                        filename = outFileName,
+                        mimeType = format.mimeType
+                    )
+
+                    // Save local cached file for quick preview / share intent
+                    val cachedFile = MediaStoreExporter.saveToInternalCache(
+                        context = application,
+                        data = compressionResult.data,
+                        filename = outFileName
+                    )
+
+                    if (opts.stripExif && format == TargetFormat.JPEG) {
+                        ExifSanitizer.sanitize(cachedFile)
+                    }
+
+                    val outBytes = compressionResult.data.size.toLong()
+                    val savedBytes = (item.originalSizeBytes - outBytes).coerceAtLeast(0L)
+                    cumulativeSavedBytes += savedBytes
+
+                    val reduction = if (item.originalSizeBytes > 0) {
+                        (((item.originalSizeBytes - outBytes).toDouble() / item.originalSizeBytes.toDouble()) * 100.0).toInt()
+                    } else 0
+
+                    updatedList[index] = item.copy(
+                        status = ProcessingStatus.COMPLETED,
+                        processedUri = savedUri,
+                        processedSizeBytes = outBytes,
+                        processedWidth = compressionResult.finalWidth,
+                        processedHeight = compressionResult.finalHeight,
+                        reductionPercent = reduction
+                    )
+                } catch (e: Exception) {
+                    updatedList[index] = item.copy(
+                        status = ProcessingStatus.ERROR,
+                        errorMessage = e.localizedMessage ?: "Processing failed"
+                    )
+                }
+
+                _uiState.update {
+                    it.copy(
+                        images = updatedList.toList(),
+                        totalSavedBytes = cumulativeSavedBytes
+                    )
+                }
+            }
+
+            _uiState.update {
+                it.copy(
+                    isProcessing = false,
+                    userMessage = application.getString(R.string.status_done)
+                )
+            }
+        }
+    }
+
+    private fun queryDisplayName(uri: Uri): String? {
+        return try {
+            application.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                if (nameIndex != -1 && cursor.moveToFirst()) {
+                    cursor.getString(nameIndex)
+                } else null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+}
