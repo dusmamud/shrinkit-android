@@ -1,9 +1,9 @@
 # Technical Requirements Document (TRD) — ShrinkIt Android
 
-> **Reference Engine:** [ShrinkIt Web Engine](file:///d:/0/1/shrinkit/src/lib/image/engine.ts)  
+> **Reference Engine:** [ShrinkIt Web Engine](https://shrinkit.dusrel.com)  
 > **App Package / Namespace:** `com.dusrel.shrinkit`  
 > **Status:** Approved for Implementation  
-> **Tech Stack:** Kotlin 2.0.21+, Jetpack Compose Material 3, WorkManager, ImageDecoder, Coil 3, Hilt 2.52, Play Review, Play App Update
+> **Tech Stack:** Kotlin 2.4.x+, Jetpack Compose Material 3, WorkManager 2.12.0, ImageDecoder, Coil 3, Hilt 2.52, Play Review, Play App Update
 
 ---
 
@@ -60,19 +60,19 @@ flowchart TD
 
 ```toml
 [versions]
-agp = "8.8.2"
-kotlin = "2.0.21"
-coreKtx = "1.15.0"
+agp = "9.4.0"
+kotlin = "2.4.10"
+coreKtx = "1.19.1"
 coreSplashscreen = "1.2.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
-composeBom = "2024.12.01"
+composeBom = "2026.09.00"
 material3 = "1.3.1"
 navigationCompose = "2.8.5"
 hilt = "2.52"
 hiltNavigationCompose = "1.3.0"
-workManager = "2.10.0"
-coil3 = "3.0.4"
+workManager = "2.12.0"
+coil3 = "3.6.3"
 exifinterface = "1.3.7"
 browser = "1.8.0"
 playReview = "2.0.2"
@@ -118,31 +118,46 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 ## 3. Image Decoding Strategy: ImageDecoder + BitmapFactory Dual Engine
 
-### The Problem with BitmapFactory Alone:
-Modern phone cameras (Samsung, Pixel, iPhone) default to **HEIC / HEIF** and **AVIF**. `BitmapFactory` returns `null` or fails to decode them on many Android devices and ignores EXIF orientation.
+### Codec Availability & Device Checks:
+- **JPEG / PNG / WebP:** Universally supported across all API 24–36 devices.
+- **HEIC / HEIF:** Native support introduced in API 28+, but device hardware/software codec licensing varies. The engine verifies `ImageDecoder.isMimeTypeSupported("image/heif")` and catches `DecodeException`.
+- **AVIF:** Introduced natively in **Android 12 (API 31+)**. On API 28–30, AVIF cannot be decoded natively by `ImageDecoder` or `BitmapFactory`.
 
-### Dual Engine Solution:
 ```kotlin
 object SafeBitmapDecoder {
     fun decode(context: Context, uri: Uri, maxSide: Int = 4096): Bitmap? {
-        // API 28+ (Android 9 to 15): Native ImageDecoder handles HEIC, AVIF, WebP, JPEG and auto-rotates EXIF
+        val resolver = context.contentResolver
+        val mimeType = resolver.getType(uri) ?: ""
+
+        // Guard against AVIF on unsupported API levels (< 31)
+        if (mimeType == "image/avif" && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return null // Cleanly refuse or prompt user to convert
+        }
+
+        // API 28+ (Android 9 to 16): Native ImageDecoder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // Guard for device-optional HEIF codec
+            if (mimeType == "image/heif" || mimeType == "image/heic") {
+                if (!ImageDecoder.isMimeTypeSupported("image/heif")) {
+                    return decodeWithBitmapFactory(context, uri, maxSide)
+                }
+            }
+
             return try {
-                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                val source = ImageDecoder.createSource(resolver, uri)
                 ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
-                    // Set downsampling to prevent OOM
                     val origMax = maxOf(info.size.width, info.size.height)
                     if (origMax > maxSide) {
                         decoder.setTargetSampleSize(calculateSampleSize(origMax, maxSide))
                     }
-                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE // Allow Canvas mutation
+                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
                 }
             } catch (e: Exception) {
-                // Fallback to BitmapFactory if ImageDecoder throws
                 decodeWithBitmapFactory(context, uri, maxSide)
             }
         }
-        // API 24–27 (Android 7.0–8.1): BitmapFactory with inJustDecodeBounds
+
+        // Fallback for API 24–27
         return decodeWithBitmapFactory(context, uri, maxSide)
     }
 
@@ -168,24 +183,42 @@ object SafeBitmapDecoder {
 
 ---
 
-## 4. Background Resilience: WorkManager (`androidx.work:work-runtime-ktx`)
+## 4. Background Processing: WorkManager & Foreground Service Configuration
 
-For batch processing (10–50+ images), relying strictly on ViewModel coroutines causes termination if the user locks their device or switches to another app.
+For batch processing, WorkManager provides resilient, best-effort background execution.
 
-**WorkManager Integration:**
-- `BatchCompressWorker : CoroutineWorker`
-- Uses `setForeground(createForegroundInfo())` for ongoing progress notifications.
-- Guarantees batch completion even across system low-memory pressure.
+### Android 14+ (API 34+) Foreground Service Declaration:
+In `AndroidManifest.xml`:
+```xml
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+<service
+    android:name="androidx.work.impl.foreground.SystemForegroundService"
+    android:foregroundServiceType="dataSync"
+    tools:node="merge" />
+```
+
+Inside `BatchCompressWorker : CoroutineWorker`:
+```kotlin
+override suspend fun doWork(): Result = withContext(Dispatchers.Default) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        setForeground(createForegroundInfo(progress = 0, total = inputUris.size))
+    }
+    // Process images sequentially...
+    Result.success()
+}
+```
 
 ---
 
-## 5. Google Play Store 2026 Compliance Checklist
+## 5. Google Play Store Compliance & Publishing Checklist
 
-1. **Target SDK Policy:** `targetSdk = 35` (Android 15) strictly satisfies Google Play's mandatory target API level timeline.
-2. **16 KB Memory Page Size Support:** Pure Kotlin/Java runtime with 100% AndroidX and Google Play dependencies (zero native C/C++ `.so` files). Fully 16 KB page-size safe out of the box with zero ELF alignment issues.
+1. **Target SDK Policy:** `compileSdk = 36` and `targetSdk = 36` (Android 16), strictly satisfying Google Play's mandatory August 31, 2026 requirement.
+2. **16 KB Memory Page Size Support:** Pure Kotlin/Java runtime with 100% AndroidX dependencies (zero native C/C++ `.so` files). Verified inherently 16 KB-safe. (Enforcement date on Google Play: February 1, 2027).
 3. **Data Safety Form Pre-Fill:**
    - *Does your app collect or share any user data?* $\to$ **NO**.
-   - *Is all user data processed ephemerally?* $\to$ **YES** (Bitmaps discarded after save).
+   - *Is all user data processed ephemerally?* $\to$ **YES**.
    - *Privacy Policy URL:* `https://shrinkit.dusrel.com/privacy`
 4. **Closed Testing Track Requirement:**
    - For Personal Accounts created after Nov 13, 2023: Minimum **12 testers opted-in for 14 continuous days** before Production access.
