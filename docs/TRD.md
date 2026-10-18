@@ -3,7 +3,7 @@
 > **Reference Engine:** [ShrinkIt Web Engine](file:///d:/0/1/shrinkit/src/lib/image/engine.ts)  
 > **App Package / Namespace:** `com.dusrel.shrinkit`  
 > **Status:** Approved for Implementation  
-> **Tech Stack:** Kotlin 2.0.21+, Jetpack Compose Material 3, Coroutines, Coil 3, Hilt 2.52, ExifInterface, AndroidX Custom Tabs, Play Review
+> **Tech Stack:** Kotlin 2.0.21+, Jetpack Compose Material 3, WorkManager, ImageDecoder, Coil 3, Hilt 2.52, Play Review, Play App Update
 
 ---
 
@@ -14,23 +14,26 @@ flowchart TD
     subgraph UI_Layer [Presentation Layer - Jetpack Compose & Material 3]
         A[MainActivity - enableEdgeToEdge] --> SP[SplashScreen API androidx.core:core-splashscreen]
         A --> B[ShrinkItNavHost - TypeSafe Routes]
-        B --> C[HomeScreen / PhotoPicker]
+        B --> C[HomeScreen / PhotoPicker & DragAndDropTarget]
         B --> D[SettingsPanel Component]
         B --> E[PresetRow Component]
         B --> F[ResultScreen / ComparisonView]
         B --> G[ExternalBrowserLauncher CustomTabs]
         B --> REV[InAppReviewPrompt Play Review API]
+        B --> UPD[InAppUpdateChecker Play App Update API]
     end
 
     subgraph ViewModel_Layer [State & Orchestration]
         VM[ShrinkItViewModel] -->|StateFlow<UiState>| UI_Layer
-        VM -->|Events / Actions| UC[ProcessImagesUseCase]
+        VM -->|Foreground Processing| UC[ProcessImagesUseCase]
+        VM -->|Background Batch Processing| WM[WorkManager BatchCompressWorker]
         VM -->|Language Switch| LM[LocaleHelper / Android 13 LocaleManager]
     end
 
     subgraph Domain_Engine [Core Processing Engine]
         UC --> PE[ImageProcessorEngine]
-        PE --> DCD[SafeBitmapDecoder with inJustDecodeBounds & inSampleSize]
+        WM --> PE
+        PE --> DCD[DualDecoder: ImageDecoder API 28+ with BitmapFactory Fallback]
         PE --> RES[Bitmap Scaler - Stretch / Crop / Fit]
         PE --> CMP[BinarySearchCompressor - Max 8 iterations]
         PE --> EXF[ExifSanitizer via ExifInterface]
@@ -40,13 +43,15 @@ flowchart TD
         NOTIF[NotificationHelper - POST_NOTIFICATIONS Channel]
         BROWSER[CustomTabsIntent / ACTION_VIEW Intent]
         EX[MediaStoreExporter - Scoped Storage IS_PENDING]
-        PLAY[ReviewManager - Play In-App Review]
+        PLAY_REV[ReviewManager - Play In-App Review]
+        PLAY_UPD[AppUpdateManager - Play In-App Updates]
     end
 
     Domain_Engine --> NOTIF
     Domain_Engine --> EX
     UI_Layer --> BROWSER
-    UI_Layer --> PLAY
+    UI_Layer --> PLAY_REV
+    UI_Layer --> PLAY_UPD
 ```
 
 ---
@@ -66,10 +71,12 @@ material3 = "1.3.1"
 navigationCompose = "2.8.5"
 hilt = "2.52"
 hiltNavigationCompose = "1.3.0"
+workManager = "2.10.0"
 coil3 = "3.0.4"
 exifinterface = "1.3.7"
 browser = "1.8.0"
 playReview = "2.0.2"
+playAppUpdate = "2.1.0"
 coroutines = "1.9.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -88,6 +95,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 coil3-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil3" }
@@ -95,6 +103,7 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
+play-app-update-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "playAppUpdate" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 [plugins]
@@ -107,163 +116,83 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 ---
 
-## 3. Google Play Store Publishing & Compliance Manifesto
+## 3. Image Decoding Strategy: ImageDecoder + BitmapFactory Dual Engine
 
-### 3.1. Target SDK & 16 KB Page Size Compatibility
-- **Target API Level:** `targetSdk = 35` (Android 15) complying strictly with Google Play's mandatory target API timeline.
-- **16 KB Memory Page Size Support:** Pure Kotlin/Java runtime with 100% AndroidX and Google Play dependencies (no native C/C++ `.so` files). Fully 16 KB page-size safe out of the box with zero ELF alignment issues.
+### The Problem with BitmapFactory Alone:
+Modern phone cameras (Samsung, Pixel, iPhone) default to **HEIC / HEIF** and **AVIF**. `BitmapFactory` returns `null` or fails to decode them on many Android devices and ignores EXIF orientation.
 
-### 3.2. Google Play Data Safety Pre-Fill
-Because ShrinkIt is 100% on-device and collects zero analytics, the Play Console Data Safety questionnaire is answered as follows:
-- *Does your app collect or share any user data?* $\to$ **NO**.
-- *Is all user data processed ephemerally?* $\to$ **YES** (Bitmaps discarded after save).
-- *Is data transferred over a secure connection?* $\to$ **N/A** (No user data transmitted).
-- *Privacy Policy URL:* `https://shrinkit.dusrel.com/privacy`
-
-### 3.3. ProGuard / R8 Optimization & Release Config
-In `app/build.gradle.kts`:
+### Dual Engine Solution:
 ```kotlin
-buildTypes {
-    release {
-        isMinifyEnabled = true
-        isShrinkResources = true
-        proguardFiles(
-            getDefaultProguardFile("proguard-android-optimize.txt"),
-            "proguard-rules.pro"
-        )
-        signingConfig = signingConfigs.getByName("release")
-    }
-}
-```
-ProGuard rules retain:
-- Hilt generated components.
-- AndroidX ExifInterface reflection targets.
-- Kotlinx Serialization routes for Navigation Compose.
-
-### 3.4. Splash Screen API (`androidx.core:core-splashscreen`)
-Guarantees clean startup branding without white flash on cold boot:
-```kotlin
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        ...
-    }
-}
-```
-
----
-
-## 4. Core Architectural Patterns & Critical Day 1 Invariants
-
-### 4.1. Android 15 Edge-to-Edge Mandatory Handling
-In `MainActivity.kt`:
-```kotlin
-override fun onCreate(savedInstanceState: Bundle?) {
-    installSplashScreen()
-    super.onCreate(savedInstanceState)
-    enableEdgeToEdge()
-    setContent {
-        ShrinkItTheme {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .safeDrawingPadding()
-            ) { innerPadding ->
-                ShrinkItNavHost(modifier = Modifier.padding(innerPadding))
+object SafeBitmapDecoder {
+    fun decode(context: Context, uri: Uri, maxSide: Int = 4096): Bitmap? {
+        // API 28+ (Android 9 to 15): Native ImageDecoder handles HEIC, AVIF, WebP, JPEG and auto-rotates EXIF
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            return try {
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
+                    // Set downsampling to prevent OOM
+                    val origMax = maxOf(info.size.width, info.size.height)
+                    if (origMax > maxSide) {
+                        decoder.setTargetSampleSize(calculateSampleSize(origMax, maxSide))
+                    }
+                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE // Allow Canvas mutation
+                }
+            } catch (e: Exception) {
+                // Fallback to BitmapFactory if ImageDecoder throws
+                decodeWithBitmapFactory(context, uri, maxSide)
             }
         }
-    }
-}
-```
-
-### 4.2. OutOfMemory (OOM) Protection: Safe Bitmap Decoding
-Prevents memory exhaustion on 50MP–108MP phone camera photos:
-```kotlin
-fun decodeSampledBitmapFromUri(
-    context: Context,
-    uri: Uri,
-    reqWidth: Int,
-    reqHeight: Int
-): Bitmap? {
-    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    context.contentResolver.openInputStream(uri)?.use {
-        BitmapFactory.decodeStream(it, null, options)
+        // API 24–27 (Android 7.0–8.1): BitmapFactory with inJustDecodeBounds
+        return decodeWithBitmapFactory(context, uri, maxSide)
     }
 
-    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-    options.inJustDecodeBounds = false
-    options.inPreferredConfig = Bitmap.Config.ARGB_8888
-
-    return context.contentResolver.openInputStream(uri)?.use {
-        BitmapFactory.decodeStream(it, null, options)
+    private fun decodeWithBitmapFactory(context: Context, uri: Uri, maxSide: Int): Bitmap? {
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+        val origMax = maxOf(options.outWidth, options.outHeight)
+        options.inSampleSize = calculateSampleSize(origMax, maxSide)
+        options.inJustDecodeBounds = false
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888
+        return context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
     }
-}
-```
 
-### 4.3. Scoped Storage Atomic Writes (`IS_PENDING` Flag)
-Guarantees zero corrupted/half-written images in the user's gallery:
-```kotlin
-suspend fun saveToGallery(context: Context, bytes: ByteArray, mimeType: String, fileName: String): Uri? = withContext(Dispatchers.IO) {
-    val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-        put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
-        put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/ShrinkIt")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            put(MediaStore.MediaColumns.IS_PENDING, 1) // Mark as pending
+    private fun calculateSampleSize(origMax: Int, maxSide: Int): Int {
+        var sampleSize = 1
+        while (origMax / (sampleSize * 2) >= maxSide) {
+            sampleSize *= 2
         }
+        return sampleSize
     }
-
-    val resolver = context.contentResolver
-    val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues) ?: return@withContext null
-
-    resolver.openOutputStream(uri)?.use { stream ->
-        stream.write(bytes)
-        stream.flush()
-    }
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        contentValues.clear()
-        contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0) // Flip to ready
-        resolver.update(uri, contentValues, null, null)
-    }
-    uri
 }
 ```
-
-### 4.4. Multi-Language Resource Directories & Locales Config
-`res/xml/locales_config.xml`:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
-    <locale android:name="en"/>
-    <locale android:name="hi"/>
-    <locale android:name="as"/>
-</locale-config>
-```
-Registered in `AndroidManifest.xml` via `android:localeConfig="@xml/locales_config"`.
 
 ---
 
-## 5. UI Theme & Design Tokens Parity ([global.css](file:///d:/0/1/shrinkit/src/styles/global.css))
+## 4. Background Resilience: WorkManager (`androidx.work:work-runtime-ktx`)
 
-```kotlin
-object ShrinkItColors {
-    val BrandBlue = Color(0xFF007BFF)
-    val BrandBlueDark = Color(0xFF0257BF)
-    val AccentTeal = Color(0xFF42C3AC)
-    val InkLight = Color(0xFF1D2939)
-    val MutedLight = Color(0xFF667085)
-    val SurfaceLight = Color(0xFFFFFFFF)
-    val SurfaceBandLight = Color(0xFFFAFCFF)
-    val BorderLight = Color(0xFFE2E8F0)
-    
-    // Graphite Dark
-    val SurfaceDark = Color(0xFF121417)
-    val SurfaceCardDark = Color(0xFF1E2228)
-    val InkDark = Color(0xFFF1F5F9)
-    val MutedDark = Color(0xFF94A3B8)
-    val BorderDark = Color(0xFF2E353F)
-}
-```
+For batch processing (10–50+ images), relying strictly on ViewModel coroutines causes termination if the user locks their device or switches to another app.
+
+**WorkManager Integration:**
+- `BatchCompressWorker : CoroutineWorker`
+- Uses `setForeground(createForegroundInfo())` for ongoing progress notifications.
+- Guarantees batch completion even across system low-memory pressure.
+
+---
+
+## 5. Google Play Store 2026 Compliance Checklist
+
+1. **Target SDK Policy:** `targetSdk = 35` (Android 15) strictly satisfies Google Play's mandatory target API level timeline.
+2. **16 KB Memory Page Size Support:** Pure Kotlin/Java runtime with 100% AndroidX and Google Play dependencies (zero native C/C++ `.so` files). Fully 16 KB page-size safe out of the box with zero ELF alignment issues.
+3. **Data Safety Form Pre-Fill:**
+   - *Does your app collect or share any user data?* $\to$ **NO**.
+   - *Is all user data processed ephemerally?* $\to$ **YES** (Bitmaps discarded after save).
+   - *Privacy Policy URL:* `https://shrinkit.dusrel.com/privacy`
+4. **Closed Testing Track Requirement:**
+   - For Personal Accounts created after Nov 13, 2023: Minimum **12 testers opted-in for 14 continuous days** before Production access.
+   - For Organization Accounts (DUNS verified): Direct production release.
+5. **Release Build Artifact:**
+   - Android App Bundle (`.aab`) generated with `./gradlew bundleRelease`.
+   - ProGuard/R8 minification and resource shrinking enabled (`isMinifyEnabled = true`, `isShrinkResources = true`).
+6. **In-App Review & Update:**
+   - Play In-App Review prompts after 5 successful compression jobs.
+   - Play In-App Update checks for flexible updates on startup.
