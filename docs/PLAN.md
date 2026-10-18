@@ -11,30 +11,31 @@
 
 | Phase | Description | Deliverables | Status |
 | :---: | :--- | :--- | :---: |
-| **1** | **Project Scaffolding & Version Catalog** | `gradle/libs.versions.toml`, root & app `build.gradle.kts`, `settings.gradle.kts`, `AndroidManifest.xml` (Edge-to-Edge, PhotoPicker, Locales) | ⏳ Pending |
-| **2** | **Brand Assets & Multi-Language (i18n)** | Adaptive launcher icons (`profile-1024.png`), `locales_config.xml`, `strings.xml` for English, Hindi (`hi`), Assamese (`as`) | ⏳ Pending |
+| **1** | **Project Scaffolding & Version Catalog** | `gradle/libs.versions.toml`, root & app `build.gradle.kts`, `settings.gradle.kts`, `AndroidManifest.xml` (Edge-to-Edge, PhotoPicker, Locales, Splash) | ⏳ Pending |
+| **2** | **Brand Assets, Splash & Multi-Language (i18n)** | Adaptive launcher icons (`profile-1024.png`), Splash screen theme, `locales_config.xml`, `strings.xml` for English, Hindi (`hi`), Assamese (`as`) | ⏳ Pending |
 | **3** | **Core Image Engine (Domain Layer)** | Units math, Resize Modes (`stretch`, `crop`, `fit`), Binary Search Target KB, OOM safe decoder, EXIF Sanitizer | ⏳ Pending |
 | **4** | **Unit Test Suite (JUnit 4/5)** | Dimension conversions, safety bounds, binary search convergence, aspect ratio math | ⏳ Pending |
-| **5** | **Presentation Layer & Navigation** | Compose Material 3 Theme, Home Screen, Presets, Settings, Notification Helper, Browser Launcher (Custom Tabs) | ⏳ Pending |
+| **5** | **Presentation Layer & Navigation** | Compose Material 3 Theme, Home Screen, Presets, Settings, Notification Helper, Browser Launcher, In-App Review | ⏳ Pending |
 | **6** | **Result & Gallery Export (Scoped Storage)** | Result Card, MediaStore saving to `Pictures/ShrinkIt` with `IS_PENDING` atomic writes, ShareSheet | ⏳ Pending |
-| **7** | **Quality Gates, Lint & Build Verification** | `./gradlew test`, `./gradlew lintDebug`, `./gradlew assembleDebug` | ⏳ Pending |
+| **7** | **Quality Gates, R8 & Production AAB** | `./gradlew test`, `./gradlew lintDebug`, R8 ProGuard shrink, `./gradlew bundleRelease` (AAB) | ⏳ Pending |
 
 ---
 
 ## Detailed Task Breakdown
 
 ### Phase 1: Project Scaffolding & Configuration
-- [ ] **Task 1.1:** Author `gradle/libs.versions.toml` with audited 2026 dependency catalog (AGP 8.8+, Kotlin 2.0.21, Compose BOM, Coil 3, Hilt 2.52, Custom Tabs).
+- [ ] **Task 1.1:** Author `gradle/libs.versions.toml` with audited 2026 dependency catalog (AGP 8.8+, Kotlin 2.0.21, Compose BOM, Coil 3, Hilt 2.52, Custom Tabs, Core SplashScreen, Play Review).
 - [ ] **Task 1.2:** Setup `settings.gradle.kts` and root `build.gradle.kts` with Compose compiler plugin (`org.jetbrains.kotlin.plugin.compose`).
-- [ ] **Task 1.3:** Configure `app/build.gradle.kts` with `namespace = "com.dusrel.shrinkit"`, `compileSdk = 35`, and modern dependency aliases.
+- [ ] **Task 1.3:** Configure `app/build.gradle.kts` with `namespace = "com.dusrel.shrinkit"`, `compileSdk = 35`, `targetSdk = 35`, and modern dependency aliases.
 - [ ] **Task 1.4:** Author `app/src/main/AndroidManifest.xml` with `INTERNET`, `POST_NOTIFICATIONS`, `enableOnBackInvokedCallback="true"`, and `locales_config`.
 
-### Phase 2: Brand Assets & Multi-Language (i18n)
+### Phase 2: Brand Assets, Splash Screen & Multi-Language (i18n)
 - [ ] **Task 2.1:** Process [ShrinkIt 1024x1024 Master Icon](file:///d:/0/1/shrinkit/chrome-extension/icons/profile-1024.png) into Android Adaptive Icon layers (`ic_launcher`, `ic_launcher_round`, `ic_launcher_foreground`, `ic_launcher_monochrome`) across `mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`.
-- [ ] **Task 2.2:** Author default English strings in `res/values/strings.xml`.
-- [ ] **Task 2.3:** Author Hindi translations in `res/values-hi/strings.xml`.
-- [ ] **Task 2.4:** Author Assamese translations in `res/values-as/strings.xml`.
-- [ ] **Task 2.5:** Create `res/xml/locales_config.xml` and `LocaleHelper.kt` supporting in-app switching and Android 13+ `LocaleManager`.
+- [ ] **Task 2.2:** Setup `Theme.ShrinkIt.Splash` using `androidx.core:core-splashscreen` to eliminate blank screen cold boots.
+- [ ] **Task 2.3:** Author default English strings in `res/values/strings.xml`.
+- [ ] **Task 2.4:** Author Hindi translations in `res/values-hi/strings.xml`.
+- [ ] **Task 2.5:** Author Assamese translations in `res/values-as/strings.xml`.
+- [ ] **Task 2.6:** Create `res/xml/locales_config.xml` and `LocaleHelper.kt` supporting in-app switching and Android 13+ `LocaleManager`.
 
 ### Phase 3: Core Domain Engine (`com.dusrel.shrinkit.domain.engine`)
 - [ ] **Task 3.1:** Implement `SizeUnits.kt` mirroring [src/lib/image/units.ts](file:///d:/0/1/shrinkit/src/lib/image/units.ts) (px, %, cm, mm, inches at 300 DPI).
@@ -57,13 +58,15 @@
 - [ ] **Task 5.4:** Build `PresetChipsRow.kt` for one-tap selection (Passport 35x45mm, Signature 20KB, Instagram, YouTube).
 - [ ] **Task 5.5:** Build `SettingsPanel.kt` with numeric inputs, unit dropdown, aspect lock toggle, and Target KB / Quality slider toggle.
 - [ ] **Task 5.6:** Build `ImagePickerSection.kt` utilizing the modern zero-permission Android Photo Picker (`ActivityResultContracts.PickMultipleVisualMedia`).
+- [ ] **Task 5.7:** Integrate `InAppReviewManager.kt` via `com.google.android.play:review-ktx` triggered after successful batches.
 
 ### Phase 6: Result & Gallery Export
 - [ ] **Task 6.1:** Build `ResultCard.kt` displaying original vs processed size badges and percent reduction badge.
 - [ ] **Task 6.2:** Implement `MediaStoreExporter.kt` using `IS_PENDING` atomic writes to save processed bitmaps to `Pictures/ShrinkIt` without file corruption.
 - [ ] **Task 6.3:** Build native Android Share Intent integration.
 
-### Phase 7: Production Verification
+### Phase 7: Quality Gates & Google Play Production Release
 - [ ] **Task 7.1:** Run `./gradlew test` to verify all unit tests pass with exit code 0.
 - [ ] **Task 7.2:** Run `./gradlew lintDebug` and resolve any compiler warnings.
-- [ ] **Task 7.3:** Assemble debug APK (`./gradlew assembleDebug`) and verify clean build artifact creation.
+- [ ] **Task 7.3:** Configure release build with ProGuard/R8 code shrinking and resource shrinking (`isMinifyEnabled = true`, `isShrinkResources = true`).
+- [ ] **Task 7.4:** Assemble production Android App Bundle (`./gradlew bundleRelease`) ready for Google Play Console upload.

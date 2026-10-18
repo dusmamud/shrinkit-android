@@ -3,7 +3,7 @@
 > **Reference Engine:** [ShrinkIt Web Engine](file:///d:/0/1/shrinkit/src/lib/image/engine.ts)  
 > **App Package / Namespace:** `com.dusrel.shrinkit`  
 > **Status:** Approved for Implementation  
-> **Tech Stack:** Kotlin 2.0.21+, Jetpack Compose Material 3, Coroutines, Coil 3, Hilt, ExifInterface, AndroidX Custom Tabs
+> **Tech Stack:** Kotlin 2.0.21+, Jetpack Compose Material 3, Coroutines, Coil 3, Hilt 2.52, ExifInterface, AndroidX Custom Tabs, Play Review
 
 ---
 
@@ -12,12 +12,14 @@
 ```mermaid
 flowchart TD
     subgraph UI_Layer [Presentation Layer - Jetpack Compose & Material 3]
-        A[MainActivity - enableEdgeToEdge] --> B[ShrinkItNavHost - TypeSafe Routes]
+        A[MainActivity - enableEdgeToEdge] --> SP[SplashScreen API androidx.core:core-splashscreen]
+        A --> B[ShrinkItNavHost - TypeSafe Routes]
         B --> C[HomeScreen / PhotoPicker]
         B --> D[SettingsPanel Component]
         B --> E[PresetRow Component]
         B --> F[ResultScreen / ComparisonView]
         B --> G[ExternalBrowserLauncher CustomTabs]
+        B --> REV[InAppReviewPrompt Play Review API]
     end
 
     subgraph ViewModel_Layer [State & Orchestration]
@@ -34,15 +36,17 @@ flowchart TD
         PE --> EXF[ExifSanitizer via ExifInterface]
     end
 
-    subgraph System_Services [Android OS Services]
+    subgraph System_Services [Android OS Services & Google Play]
         NOTIF[NotificationHelper - POST_NOTIFICATIONS Channel]
         BROWSER[CustomTabsIntent / ACTION_VIEW Intent]
         EX[MediaStoreExporter - Scoped Storage IS_PENDING]
+        PLAY[ReviewManager - Play In-App Review]
     end
 
     Domain_Engine --> NOTIF
     Domain_Engine --> EX
     UI_Layer --> BROWSER
+    UI_Layer --> PLAY
 ```
 
 ---
@@ -54,6 +58,7 @@ flowchart TD
 agp = "8.8.2"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
+coreSplashscreen = "1.2.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.12.01"
@@ -64,6 +69,7 @@ hiltNavigationCompose = "1.3.0"
 coil3 = "3.0.4"
 exifinterface = "1.3.7"
 browser = "1.8.0"
+playReview = "2.0.2"
 coroutines = "1.9.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -71,6 +77,7 @@ espressoCore = "3.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -87,6 +94,7 @@ coil3-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 [plugins]
@@ -99,12 +107,61 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 ---
 
-## 3. Core Architectural Patterns & Critical Day 1 Invariants
+## 3. Google Play Store Publishing & Compliance Manifesto
 
-### 3.1. Android 15 Edge-to-Edge Mandatory Handling
+### 3.1. Target SDK & 16 KB Page Size Compatibility
+- **Target API Level:** `targetSdk = 35` (Android 15) complying strictly with Google Play's mandatory target API timeline.
+- **16 KB Memory Page Size Support:** Pure Kotlin/Java runtime with 100% AndroidX and Google Play dependencies (no native C/C++ `.so` files). Fully 16 KB page-size safe out of the box with zero ELF alignment issues.
+
+### 3.2. Google Play Data Safety Pre-Fill
+Because ShrinkIt is 100% on-device and collects zero analytics, the Play Console Data Safety questionnaire is answered as follows:
+- *Does your app collect or share any user data?* $\to$ **NO**.
+- *Is all user data processed ephemerally?* $\to$ **YES** (Bitmaps discarded after save).
+- *Is data transferred over a secure connection?* $\to$ **N/A** (No user data transmitted).
+- *Privacy Policy URL:* `https://shrinkit.dusrel.com/privacy`
+
+### 3.3. ProGuard / R8 Optimization & Release Config
+In `app/build.gradle.kts`:
+```kotlin
+buildTypes {
+    release {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        proguardFiles(
+            getDefaultProguardFile("proguard-android-optimize.txt"),
+            "proguard-rules.pro"
+        )
+        signingConfig = signingConfigs.getByName("release")
+    }
+}
+```
+ProGuard rules retain:
+- Hilt generated components.
+- AndroidX ExifInterface reflection targets.
+- Kotlinx Serialization routes for Navigation Compose.
+
+### 3.4. Splash Screen API (`androidx.core:core-splashscreen`)
+Guarantees clean startup branding without white flash on cold boot:
+```kotlin
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        ...
+    }
+}
+```
+
+---
+
+## 4. Core Architectural Patterns & Critical Day 1 Invariants
+
+### 4.1. Android 15 Edge-to-Edge Mandatory Handling
 In `MainActivity.kt`:
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
+    installSplashScreen()
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
@@ -121,7 +178,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 ```
 
-### 3.2. OutOfMemory (OOM) Protection: Safe Bitmap Decoding
+### 4.2. OutOfMemory (OOM) Protection: Safe Bitmap Decoding
 Prevents memory exhaustion on 50MP–108MP phone camera photos:
 ```kotlin
 fun decodeSampledBitmapFromUri(
@@ -145,7 +202,7 @@ fun decodeSampledBitmapFromUri(
 }
 ```
 
-### 3.3. Scoped Storage Atomic Writes (`IS_PENDING` Flag)
+### 4.3. Scoped Storage Atomic Writes (`IS_PENDING` Flag)
 Guarantees zero corrupted/half-written images in the user's gallery:
 ```kotlin
 suspend fun saveToGallery(context: Context, bytes: ByteArray, mimeType: String, fileName: String): Uri? = withContext(Dispatchers.IO) {
@@ -175,7 +232,7 @@ suspend fun saveToGallery(context: Context, bytes: ByteArray, mimeType: String, 
 }
 ```
 
-### 3.4. Multi-Language Resource Directories & Locales Config
+### 4.4. Multi-Language Resource Directories & Locales Config
 `res/xml/locales_config.xml`:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -189,7 +246,7 @@ Registered in `AndroidManifest.xml` via `android:localeConfig="@xml/locales_conf
 
 ---
 
-## 4. UI Theme & Design Tokens Parity ([global.css](file:///d:/0/1/shrinkit/src/styles/global.css))
+## 5. UI Theme & Design Tokens Parity ([global.css](file:///d:/0/1/shrinkit/src/styles/global.css))
 
 ```kotlin
 object ShrinkItColors {
