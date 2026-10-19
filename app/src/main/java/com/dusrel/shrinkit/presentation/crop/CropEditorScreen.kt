@@ -56,7 +56,6 @@ import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.RelativeCropRect
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
-import com.dusrel.shrinkit.presentation.theme.BrandBlue
 import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 
 private data class CropAspect(val labelRes: Int, val ratio: Float?)
