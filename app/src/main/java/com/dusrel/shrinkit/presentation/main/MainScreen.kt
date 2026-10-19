@@ -1,6 +1,8 @@
 package com.dusrel.shrinkit.presentation.main
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
