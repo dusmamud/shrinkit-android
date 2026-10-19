@@ -90,7 +90,7 @@ fun HomeScreen(
                 onError = {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.error_camera_failed),
+                        stringResource(R.string.error_camera_failed),
                         Toast.LENGTH_SHORT
                     ).show()
                 },
@@ -99,7 +99,7 @@ fun HomeScreen(
         } else {
             Toast.makeText(
                 context,
-                context.getString(R.string.error_camera_permission),
+                stringResource(R.string.error_camera_permission),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -162,7 +162,7 @@ fun HomeScreen(
                                 onError = {
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.error_camera_failed),
+                                        stringResource(R.string.error_camera_failed),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 },

@@ -146,7 +146,7 @@ fun ShrinkItTopBar(
                         )
                     },
                     onClick = {
-                        BrowserLauncher.openUrl(context, context.getString(R.string.url_website))
+                        BrowserLauncher.openUrl(context, stringResource(R.string.url_website))
                         showMenu = false
                     }
                 )
@@ -160,14 +160,14 @@ fun ShrinkItTopBar(
                         )
                     },
                     onClick = {
-                        BrowserLauncher.openUrl(context, context.getString(R.string.url_privacy))
+                        BrowserLauncher.openUrl(context, stringResource(R.string.url_privacy))
                         showMenu = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.link_terms)) },
                     onClick = {
-                        BrowserLauncher.openUrl(context, context.getString(R.string.url_terms))
+                        BrowserLauncher.openUrl(context, stringResource(R.string.url_terms))
                         showMenu = false
                     }
                 )
