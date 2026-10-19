@@ -82,7 +82,7 @@ fun ResultCard(
                         .size(68.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(LocalDropzoneBg.current)
-                )
+                ) {
                     AsyncImage(
                         model = item.processedUri ?: item.uri,
                         contentDescription = item.filename,
