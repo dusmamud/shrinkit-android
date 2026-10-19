@@ -262,6 +262,18 @@ class ShrinkItViewModel @Inject constructor(
      * CROPPED dimensions so later width/height edits can't break it.
      * Also snaps width/height to the cropped pixel size.
      */
+    /**
+     * Prepares a fresh KB-tool session. Called ONCE when the user opens the
+     * tool from the hub (navigation time) — NOT in the composable, because
+     * Navigation Compose recreates the screen when returning from the
+     * crop editor, which would wipe the selected image.
+     */
+    fun prepareKbTool(toolId: String) {
+        clearAllImages()
+        applyTargetKb(if (toolId == "kb20") 20 else 50)
+        setBlackWhite(false)
+    }
+
     fun applyCropAspectLock(imageId: String) {
         val item = getImage(imageId) ?: return
         _uiState.update { current ->

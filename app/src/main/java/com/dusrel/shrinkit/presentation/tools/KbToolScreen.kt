@@ -77,18 +77,23 @@ fun KbToolScreen(
     val item = images.images.firstOrNull()
     val options = images.options
 
-    // Fresh single-image tool state on entry.
-    LaunchedEffect(toolId) {
-        toolViewModel.clearAllImages()
-        toolViewModel.applyTargetKb(defaultKb)
-        toolViewModel.setBlackWhite(false)
-    }
+    // NOTE: fresh tool state is prepared at navigation time
+    // (prepareKbTool in NavHost). No clearing here — the screen is
+    // recreated when returning from the crop editor, and clearing
+    // would wipe the selected (cropped) image.
 
-    // Navigate to the result screen once the batch finishes.
-    LaunchedEffect(item?.status) {
-        if (item?.status == ProcessingStatus.COMPLETED) {
+    // Navigate to the result screen once, on the completing transition.
+    // (Keyed on isProcessing with a wasProcessing guard so returning
+    // from the result screen doesn't re-trigger navigation.)
+    var wasProcessing by remember { mutableStateOf(false) }
+    val isProcessingNow = images.isProcessing
+    LaunchedEffect(isProcessingNow) {
+        if (wasProcessing && !isProcessingNow &&
+            item?.status == ProcessingStatus.COMPLETED
+        ) {
             onProcessComplete()
         }
+        wasProcessing = isProcessingNow
     }
 
     // Cropped preview (decoded + cropped bitmap) when a crop is set.
