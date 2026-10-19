@@ -23,6 +23,7 @@ import com.dusrel.shrinkit.presentation.settings.AppearanceScreen
 import com.dusrel.shrinkit.presentation.settings.DefaultsScreen
 import com.dusrel.shrinkit.presentation.tools.ToolDetailScreen
 import com.dusrel.shrinkit.presentation.tools.ToolsHubScreen
+import com.dusrel.shrinkit.presentation.results.ResultScreen
 
 private const val TRANSITION_MS = 300
 
@@ -89,8 +90,19 @@ fun ShrinkItNavHost(
             ShrinkItApp(
                 viewModel = toolViewModel,
                 onNavigateBack = { navController.popBackStack() },
+                onProcessComplete = { navController.navigate(Destinations.RESULTS) },
                 defaultQuality = prefs.defaultQuality,
                 defaultFormatName = prefs.defaultFormatName
+            )
+        }
+
+        composable(Destinations.RESULTS) {
+            ResultScreen(
+                toolViewModel = toolViewModel,
+                onBack = { navController.popBackStack() },
+                onDone = {
+                    navController.popBackStack(Destinations.TOOL, inclusive = false)
+                }
             )
         }
 

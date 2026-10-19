@@ -57,6 +57,7 @@ import com.dusrel.shrinkit.domain.model.ProcessingOptions
 fun ShrinkItApp(
     viewModel: ShrinkItViewModel = viewModel(),
     onNavigateBack: (() -> Unit)? = null,
+    onProcessComplete: (() -> Unit)? = null,
     defaultQuality: Int? = null,
     defaultFormatName: String? = null,
     /** Focused tool id (kb50/kb20/passport/social/compare) — applies its config on entry. */
@@ -100,10 +101,12 @@ fun ShrinkItApp(
         }
     }
 
-    // Trigger review flow when batch successfully finishes
+    // Trigger review flow + results navigation when batch successfully finishes.
+    // Results get their own screen (best practice) — they never replace inputs.
     LaunchedEffect(isProcessing) {
         if (!isProcessing && images.isNotEmpty() && images.all { it.status == ProcessingStatus.COMPLETED }) {
             activity?.let { InAppReviewManager.requestReview(it) }
+            onProcessComplete?.invoke()
         }
     }
 

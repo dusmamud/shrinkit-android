@@ -14,6 +14,11 @@
     <string name="action_clear_all">Clear All</string>
     <string name="action_process_all">Compress All Images</string>
     <string name="action_save_gallery">Save to Gallery</string>
+    <string name="badge_done">Done</string>
+    <string name="results_title">Results (%1$d)</string>
+    <string name="results_summary">%1$d images \u00b7 %2$s saved</string>
+    <string name="results_new_batch">New batch</string>
+    <string name="action_done">Done</string>
     <string name="toast_saved_gallery">Saved to Pictures / ShrinkIt</string>
     <string name="action_share">Share</string>
 

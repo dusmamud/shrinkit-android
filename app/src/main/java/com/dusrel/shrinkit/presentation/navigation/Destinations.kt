@@ -18,6 +18,7 @@ object Destinations {
     const val SETTINGS_ABOUT = "settings/about"
     const val TOOLS = "tools"
     const val TOOL_DETAIL = "tools/{toolId}"
+    const val RESULTS = "results"
 
     fun cropEditor(imageId: String): String = "crop/$imageId"
 

@@ -14,6 +14,11 @@
     <string name="action_clear_all">সকলো আঁতৰাওক</string>
     <string name="action_process_all">সকলো ছবি সংকুচিত কৰক</string>
     <string name="action_save_gallery">গেলেৰীত সংৰক্ষণ কৰক</string>
+    <string name="badge_done">হৈ গল</string>
+    <string name="results_title">ফলাফল (%1$d)</string>
+    <string name="results_summary">%1$d ছবি \u00b7 %2$s ৰাহি</string>
+    <string name="results_new_batch">নতুন বেচ</string>
+    <string name="action_done">হৈ গল</string>
     <string name="toast_saved_gallery">Pictures / ShrinkIt ত সাঁচিলে</string>
     <string name="action_share">শ্বেয়াৰ কৰক</string>
 
