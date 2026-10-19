@@ -12,7 +12,7 @@ object Destinations {
     const val ONBOARDING = "onboarding"
     const val MAIN = "main"
     const val TOOL = "tool"
-    const val CROP_EDITOR = "crop/{imageId}"
+    const val CROP_EDITOR = "crop/{imageId}?lockedRatio={lockedRatio}&lockedLabel={lockedLabel}"
     const val SETTINGS_APPEARANCE = "settings/appearance"
     const val SETTINGS_DEFAULTS = "settings/defaults"
     const val SETTINGS_ABOUT = "settings/about"
@@ -20,5 +20,12 @@ object Destinations {
     const val TOOL_DETAIL = "tools/{toolId}"
 
     fun cropEditor(imageId: String): String = "crop/$imageId"
+
+    /**
+     * Crop editor with a locked aspect ratio (passport/social wizards).
+     * lockedRatio = width/height float, lockedLabel = display label (e.g. "35:45").
+     */
+    fun cropEditorLocked(imageId: String, lockedRatio: Float, lockedLabel: String): String =
+        "crop/$imageId?lockedRatio=$lockedRatio&lockedLabel=$lockedLabel"
     fun toolDetail(toolId: String): String = "tools/$toolId"
 }

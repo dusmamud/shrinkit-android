@@ -35,4 +35,16 @@ data class ImageItem(
     val rotationDegrees: Int = 0,
     /** Custom crop from the crop editor; null = no custom crop. */
     val cropRect: RelativeCropRect? = null
-)
+) {
+    /**
+     * Dimensions after the custom crop (if any). Used for aspect-lock math:
+     * after a crop, width/height edits must preserve the CROPPED ratio,
+     * not the original bitmap ratio.
+     */
+    val effectiveWidth: Int
+        get() = cropRect?.let { ((it.right - it.left) * originalWidth).toInt().coerceAtLeast(1) }
+            ?: originalWidth
+    val effectiveHeight: Int
+        get() = cropRect?.let { ((it.bottom - it.top) * originalHeight).toInt().coerceAtLeast(1) }
+            ?: originalHeight
+}

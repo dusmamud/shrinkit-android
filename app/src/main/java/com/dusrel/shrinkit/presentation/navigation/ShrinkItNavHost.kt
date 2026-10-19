@@ -96,14 +96,32 @@ fun ShrinkItNavHost(
 
         composable(
             route = Destinations.CROP_EDITOR,
-            arguments = listOf(navArgument("imageId") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("imageId") { type = NavType.StringType },
+                navArgument("lockedRatio") {
+                    type = NavType.FloatType
+                    defaultValue = -1f
+                },
+                navArgument("lockedLabel") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
         ) { backStackEntry ->
             val imageId = backStackEntry.arguments?.getString("imageId").orEmpty()
+            val lockedRatio = backStackEntry.arguments?.getFloat("lockedRatio") ?: -1f
+            val lockedLabel = backStackEntry.arguments?.getString("lockedLabel").orEmpty()
             CropEditorScreen(
                 imageId = imageId,
                 toolViewModel = toolViewModel,
-                onDone = { navController.popBackStack() },
-                onCancel = { navController.popBackStack() }
+                onDone = {
+                    // Force-lock aspect to the cropped result for tool wizards.
+                    toolViewModel.applyCropAspectLock(imageId)
+                    navController.popBackStack()
+                },
+                onCancel = { navController.popBackStack() },
+                lockedAspectRatio = lockedRatio.takeIf { it > 0 },
+                lockedAspectLabel = lockedLabel.ifEmpty { null }
             )
         }
 
@@ -137,8 +155,12 @@ fun ShrinkItNavHost(
                 toolId = toolId,
                 toolViewModel = toolViewModel,
                 onBack = { navController.popBackStack() },
-                defaultQuality = prefs.defaultQuality,
-                defaultFormatName = prefs.defaultFormatName
+                onOpenCrop = { imageId ->
+                    navController.navigate(Destinations.cropEditor(imageId))
+                },
+                onOpenCropLocked = { imageId, ratio, label ->
+                    navController.navigate(Destinations.cropEditorLocked(imageId, ratio, label))
+                }
             )
         }
     }

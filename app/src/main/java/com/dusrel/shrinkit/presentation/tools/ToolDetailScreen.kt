@@ -1,143 +1,63 @@
 package com.dusrel.shrinkit.presentation.tools
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.dusrel.shrinkit.R
-import com.dusrel.shrinkit.domain.model.ImagePreset
-import com.dusrel.shrinkit.presentation.ShrinkItApp
+import androidx.compose.ui.platform.LocalContext
+import com.dusrel.shrinkit.data.storage.MediaStoreExporter
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
-import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 
 /**
- * Focused single-purpose tool page (web parity: the /tools pages).
- * Reuses the full workspace engine with the tool's config pre-applied.
+ * Router for the 5 dedicated tool screens (Phase 2).
+ * Each tool has its own flow; the generic workspace is no longer reused here.
  */
 @Composable
 fun ToolDetailScreen(
     toolId: String,
     toolViewModel: ShrinkItViewModel,
     onBack: () -> Unit,
-    defaultQuality: Int,
-    defaultFormatName: String,
+    onOpenCrop: (imageId: String) -> Unit,
+    onOpenCropLocked: (imageId: String, ratio: Float, label: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val tool = ALL_TOOLS.firstOrNull { it.id == toolId }
-
-    ShrinkItApp(
-        viewModel = toolViewModel,
-        onNavigateBack = onBack,
-        defaultQuality = defaultQuality,
-        defaultFormatName = defaultFormatName,
-        initialToolId = toolId,
-        topBar = {
-            ScreenTopBar(
-                title = tool?.let { stringResource(it.titleRes) }
-                    ?: stringResource(R.string.tools_title),
-                onBackClick = onBack
-            )
-        },
-        headerContent = {
-            if (tool != null) {
-                ToolHeader(
-                    tool = tool,
-                    viewModel = toolViewModel,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                )
-            }
-        },
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun ToolHeader(
-    tool: ToolEntry,
-    viewModel: ShrinkItViewModel,
-    modifier: Modifier = Modifier
-) {
-    val selectedPresetId by remember { viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = null)
-
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(tool.descRes),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+    val context = LocalContext.current
+    when (toolId) {
+        "kb50", "kb20" -> KbToolScreen(
+            toolId = toolId,
+            toolViewModel = toolViewModel,
+            onBack = onBack,
+            onOpenCrop = onOpenCrop,
+            modifier = modifier
         )
-        Spacer(Modifier.height(8.dp))
-        when (tool.id) {
-            "kb50", "kb20" -> {
-                val kb = if (tool.id == "kb50") 50 else 20
-                Text(
-                    text = stringResource(R.string.tool_target_upto, kb),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+        "passport" -> PassportToolScreen(
+            toolViewModel = toolViewModel,
+            onBack = onBack,
+            onOpenCropLocked = onOpenCropLocked,
+            modifier = modifier
+        )
+        "social" -> SocialToolScreen(
+            toolViewModel = toolViewModel,
+            onBack = onBack,
+            onOpenCropLocked = onOpenCropLocked,
+            modifier = modifier
+        )
+        "compare" -> CompareToolScreen(
+            onBack = onBack,
+            onSaveBytes = { bytes, filename ->
+                MediaStoreExporter.saveToPictures(
+                    context = context,
+                    data = bytes,
+                    filename = filename,
+                    mimeType = "image/jpeg"
                 )
-            }
-            "passport" -> {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("passport_in", "passport_us").forEach { presetId ->
-                        val preset = ImagePreset.ALL.firstOrNull { it.id == presetId }
-                            ?: return@forEach
-                        FilterChip(
-                            selected = selectedPresetId == presetId,
-                            onClick = { viewModel.applyPreset(preset) },
-                            label = {
-                                Text(
-                                    stringResource(
-                                        if (presetId == "passport_in")
-                                            R.string.preset_passport
-                                        else R.string.preset_us_visa
-                                    )
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-            "social" -> {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("instagram_post", "instagram_story", "youtube_thumb")
-                        .forEach { presetId ->
-                            val preset = ImagePreset.ALL.firstOrNull { it.id == presetId }
-                                ?: return@forEach
-                            FilterChip(
-                                selected = selectedPresetId == presetId,
-                                onClick = { viewModel.applyPreset(preset) },
-                                label = {
-                                    Text(
-                                        stringResource(
-                                            when (presetId) {
-                                                "instagram_post" -> R.string.preset_insta_square
-                                                "instagram_story" -> R.string.preset_insta_story
-                                                else -> R.string.preset_yt_thumb
-                                            }
-                                        )
-                                    )
-                                }
-                            )
-                        }
-                }
-            }
-            // "compare": no extra config — compare toggle lives on each result.
-        }
-        Spacer(Modifier.height(4.dp))
+            },
+            modifier = modifier
+        )
+        else -> KbToolScreen(
+            toolId = "kb50",
+            toolViewModel = toolViewModel,
+            onBack = onBack,
+            onOpenCrop = onOpenCrop,
+            modifier = modifier
+        )
     }
 }

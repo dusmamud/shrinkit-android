@@ -191,6 +191,13 @@
     <string name="crop_ratio_3_4">3:4</string>
     <string name="crop_ratio_16_9">16:9</string>
     <string name="crop_ratio_original">মূল</string>
+    <string name="crop_ratio_free">ফ্ৰী</string>
+    <string name="crop_ratio_3_2">3:2</string>
+    <string name="crop_ratio_9_16">9:16</string>
+    <string name="crop_ratio_2_3">2:3</string>
+    <string name="crop_ratio_4_1">4:1</string>
+    <string name="crop_ratio_custom">কাষ্টম</string>
+    <string name="crop_ratio_locked">অনুপাত লকড</string>
 
     <!-- Result card -->
     <string name="badge_cropped">ক্ৰপ কৰা</string>
@@ -257,4 +264,25 @@
     <string name="home_how_step1">1 · এবাৰত 50 খন ছবি বাছক</string>
     <string name="home_how_step2">2 · প্ৰিছেট বাছক বা আকাৰ নিজে ঠিক কৰক</string>
     <string name="home_how_step3">3 · প্ৰচেছ কৰক — ফাইল Pictures / ShrinkIt ত জমা হʼব</string>
+    <string name="tool_select_image">ছবি বাছক</string>
+    <string name="tool_cropped_badge">ক্ৰপ কৰা</string>
+    <string name="tool_target_size">লক্ষ্য আকাৰ</string>
+    <string name="tool_target_size_kb">লক্ষ্য আকাৰ</string>
+    <string name="tool_privacy">গোপনীয়তা</string>
+    <string name="tool_bw_title">ব্লেক &amp; হোৱাইট</string>
+    <string name="tool_bw_desc">স্বাক্ষৰ আৰু স্কেনৰ বাবে স্পষ্ট কনট্ৰাষ্ট</string>
+    <string name="tool_compress_action">%1$d KB লৈ কম্প্ৰেছ কৰক</string>
+    <string name="tool_saved_percent">%1$d%% ৰাহি</string>
+    <string name="status_processing_simple">প্ৰচেছ হৈ আছে\u2026</string>
+    <string name="wizard_choose_preset">প্ৰিছেট বাছক</string>
+    <string name="wizard_cropped_ratio">ক্ৰপ কৰা \u00b7 %1$s লকড</string>
+    <string name="wizard_crop_hint">লকড অনুপাতেৰে ফ্ৰেম কৰিবলৈ ক্ৰপ টিপক</string>
+    <string name="wizard_output_size">আউটপুট আকাৰ</string>
+    <string name="wizard_process_action">প্ৰচেছ কৰক</string>
+    <string name="wizard_saved">Pictures / ShrinkIt ত সাঁচিলে</string>
+    <string name="tool_compare_quality">গুণমান: %1$d%%</string>
+    <string name="tool_compare_before">আগত</string>
+    <string name="tool_compare_after">পিছত</string>
+    <string name="tool_compare_save">কম্প্ৰেছড সাঁচক</string>
+    <string name="tool_compare_change">আন ফটো বাছক</string>
 </resources>

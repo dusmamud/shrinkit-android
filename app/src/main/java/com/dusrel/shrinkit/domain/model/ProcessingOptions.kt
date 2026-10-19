@@ -12,5 +12,7 @@ data class ProcessingOptions(
     val targetKb: Int = 200,
     val dpi: Int = 72,
     val backgroundColor: BackgroundColor = BackgroundColor.WHITE,
-    val stripExif: Boolean = true
+    val stripExif: Boolean = true,
+    /** Grayscale + contrast boost for signatures/scans (20KB tool). */
+    val blackWhite: Boolean = false
 )

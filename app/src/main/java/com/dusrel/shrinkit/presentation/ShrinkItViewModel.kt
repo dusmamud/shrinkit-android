@@ -222,8 +222,8 @@ class ShrinkItViewModel @Inject constructor(
                     changedField = DimensionField.WIDTH,
                     newValue = newWidth,
                     unit = opts.unit,
-                    origW = first.originalWidth,
-                    origH = first.originalHeight
+                    origW = first.effectiveWidth,
+                    origH = first.effectiveHeight
                 )
             } else {
                 opts.height
@@ -244,14 +244,34 @@ class ShrinkItViewModel @Inject constructor(
                     changedField = DimensionField.HEIGHT,
                     newValue = newHeight,
                     unit = opts.unit,
-                    origW = first.originalWidth,
-                    origH = first.originalHeight
+                    origW = first.effectiveWidth,
+                    origH = first.effectiveHeight
                 )
             } else {
                 opts.width
             }
             current.copy(
                 options = opts.copy(width = newWidth, height = newHeight),
+                selectedPresetId = null
+            )
+        }
+    }
+
+    /**
+     * Call after a crop is applied: force-locks the aspect ratio to the
+     * CROPPED dimensions so later width/height edits can't break it.
+     * Also snaps width/height to the cropped pixel size.
+     */
+    fun applyCropAspectLock(imageId: String) {
+        val item = getImage(imageId) ?: return
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(
+                    keepAspectRatio = true,
+                    unit = SizeUnit.PIXELS,
+                    width = item.effectiveWidth.toFloat(),
+                    height = item.effectiveHeight.toFloat()
+                ),
                 selectedPresetId = null
             )
         }
@@ -348,6 +368,12 @@ class ShrinkItViewModel @Inject constructor(
         }
     }
 
+    fun setBlackWhite(enabled: Boolean) {
+        _uiState.update { current ->
+            current.copy(options = current.options.copy(blackWhite = enabled))
+        }
+    }
+
     fun dismissUserMessage() {
         _uiState.update { it.copy(userMessage = null) }
     }
@@ -413,6 +439,11 @@ class ShrinkItViewModel @Inject constructor(
                     }
                     if (item.rotationDegrees != 0) {
                         workBitmap = applyRotation(workBitmap, item.rotationDegrees)
+                    }
+                    if (opts.blackWhite) {
+                        val gray = applyGrayscale(workBitmap)
+                        if (gray != workBitmap) workBitmap.recycle()
+                        workBitmap = gray
                     }
 
                     val format = if (opts.format == TargetFormat.ORIGINAL) {
@@ -588,6 +619,36 @@ class ShrinkItViewModel @Inject constructor(
             val rotated = Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
             if (rotated != source) source.recycle()
             rotated
+        } catch (_: Exception) {
+            source
+        }
+    }
+
+    /**
+     * Grayscale + contrast boost for signatures/scans (web parity: the
+     * 20KB tool's Black & White toggle).
+     */
+    private fun applyGrayscale(source: Bitmap): Bitmap {
+        return try {
+            val result = Bitmap.createBitmap(source.width, source.height, Bitmap.Config.ARGB_8888)
+            val canvas = android.graphics.Canvas(result)
+            val paint = android.graphics.Paint()
+            val matrix = android.graphics.ColorMatrix().apply {
+                setSaturation(0f)
+            }
+            // Contrast boost so signatures stay sharp after grayscale.
+            val contrast = android.graphics.ColorMatrix(
+                floatArrayOf(
+                    1.2f, 0f, 0f, 0f, -25f,
+                    0f, 1.2f, 0f, 0f, -25f,
+                    0f, 0f, 1.2f, 0f, -25f,
+                    0f, 0f, 0f, 1f, 0f
+                )
+            )
+            contrast.preConcat(matrix)
+            paint.colorFilter = android.graphics.ColorMatrixColorFilter(contrast)
+            canvas.drawBitmap(source, 0f, 0f, paint)
+            result
         } catch (_: Exception) {
             source
         }
