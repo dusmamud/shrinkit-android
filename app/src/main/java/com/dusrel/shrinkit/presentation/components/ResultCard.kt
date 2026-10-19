@@ -50,7 +50,6 @@ import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.domain.model.ImageItem
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
-import com.dusrel.shrinkit.presentation.theme.SuccessGreen
 import java.text.DecimalFormat
 
 @Composable
@@ -177,13 +176,13 @@ fun ResultCard(
                         if (item.status == ProcessingStatus.COMPLETED && item.reductionPercent > 0) {
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
-                                color = SuccessGreen.copy(alpha = 0.15f)
+                                color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
                             ) {
                                 Text(
                                     text = "-${item.reductionPercent}%",
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = SuccessGreen,
+                                    color = MaterialTheme.colorScheme.tertiary,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                 )
                             }

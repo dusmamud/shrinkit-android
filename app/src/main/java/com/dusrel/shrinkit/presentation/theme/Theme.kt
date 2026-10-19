@@ -17,44 +17,48 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = BrandBlue,
+    primary = AccentDark,            // #0a84ff (web --t-accent)
     onPrimary = Color.White,
-    primaryContainer = BrandBlueDark,
-    onPrimaryContainer = Color.White,
-    secondary = AccentTeal,
+    primaryContainer = AccentSoftDark,
+    onPrimaryContainer = AccentDark,
+    secondary = TealDark,            // #2dd4bf (web --t-teal dark)
     onSecondary = Color.Black,
-    secondaryContainer = Color(0xFF1E3A34),
-    onSecondaryContainer = Color(0xFFA7F3D0),
-    background = SurfaceDark,
-    onBackground = InkDark,
-    surface = SurfaceDark,
+    secondaryContainer = Color(0xFF14351F),
+    onSecondaryContainer = SuccessDark,
+    tertiary = SuccessDark,          // #34d399 (web --t-success-text dark)
+    onTertiary = Color.Black,
+    background = PageDark,           // #121214 (web --t-page)
+    onBackground = InkDark,          // #e5e5ea (web --t-ink)
+    surface = SurfaceDark,           // #1c1c1e (web --t-surface)
     onSurface = InkDark,
-    surfaceVariant = SurfaceCardDark,
-    onSurfaceVariant = MutedDark,
+    surfaceVariant = SurfaceCardDark, // #232326 (web --t-surface-2)
+    onSurfaceVariant = MutedDark,    // #98989f (web --t-muted)
     outline = BorderDark,
     outlineVariant = InputBorderDark,
-    error = ErrorRed,
+    error = ErrorDark,               // #ff7a7a (web --t-error dark)
     onError = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = BrandBlue,
+    primary = AccentLight,           // #016df0 (web --t-accent)
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFE0EFFF),
-    onPrimaryContainer = BrandBlueDark,
-    secondary = AccentTeal,
+    primaryContainer = AccentSoftLight,
+    onPrimaryContainer = AccentLight,
+    secondary = TealLight,           // #42c3ac (web --t-teal)
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE6F8F5),
-    onSecondaryContainer = Color(0xFF0F5145),
-    background = SurfaceBandLight,
-    onBackground = InkLight,
-    surface = SurfaceLight,
+    secondaryContainer = Color(0xFFE6F4EA),
+    onSecondaryContainer = SuccessLight,
+    tertiary = SuccessLight,         // #0a7d4f (web --t-success-text)
+    onTertiary = Color.White,
+    background = PageLight,          // #ffffff (web --t-page)
+    onBackground = InkLight,         // #000000 (web --t-ink)
+    surface = SurfaceLight,          // #ffffff (web --t-surface)
     onSurface = InkLight,
-    surfaceVariant = Color(0xFFF1F5F9),
-    onSurfaceVariant = MutedLight,
-    outline = BorderLight,
-    outlineVariant = InputBorderLight,
-    error = ErrorRed,
+    surfaceVariant = Surface2Light,  // #f6faff (web --t-surface-2)
+    onSurfaceVariant = MutedLight,   // #667085 (web --t-muted)
+    outline = BorderLight,           // #e2e8f0 (web --t-border)
+    outlineVariant = InputBorderLight, // #cbd5e1 (web --t-input-border)
+    error = ErrorLight,              // #d33 (web --t-error)
     onError = Color.White
 )
 

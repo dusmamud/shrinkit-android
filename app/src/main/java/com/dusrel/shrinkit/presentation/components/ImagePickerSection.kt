@@ -37,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dusrel.shrinkit.R
-import com.dusrel.shrinkit.presentation.theme.AccentTeal
 import com.dusrel.shrinkit.presentation.theme.BrandBlue
 
 @Composable
@@ -120,7 +119,7 @@ fun ImagePickerSection(
 
                 Surface(
                     shape = RoundedCornerShape(20.dp),
-                    color = AccentTeal.copy(alpha = 0.15f)
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -130,7 +129,7 @@ fun ImagePickerSection(
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = null,
-                            tint = AccentTeal,
+                            tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(14.dp)
                         )
                         Text(
