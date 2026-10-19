@@ -4,12 +4,8 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.data.storage.MediaStoreExporter
-import com.dusrel.shrinkit.data.worker.BatchCompressWorker
 import com.dusrel.shrinkit.domain.engine.BinarySearchCompressor
 import com.dusrel.shrinkit.domain.engine.DimensionField
 import com.dusrel.shrinkit.domain.engine.ExifSanitizer
@@ -56,8 +52,6 @@ class ShrinkItViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ShrinkItUiState())
     val uiState: StateFlow<ShrinkItUiState> = _uiState.asStateFlow()
 
-    private val workManager = WorkManager.getInstance(application)
-
     fun addImages(uris: List<Uri>) {
         if (uris.isEmpty()) return
 
@@ -66,31 +60,46 @@ class ShrinkItViewModel @Inject constructor(
             val availableSlots = Limits.MAX_BATCH - currentCount
             val urisToAdd = uris.take(availableSlots.coerceAtLeast(0))
 
-            val newItems = urisToAdd.map { uri ->
+            val newItems = mutableListOf<ImageItem>()
+            var skippedTooLarge = 0
+
+            for (uri in urisToAdd) {
                 val bounds = SafeBitmapDecoder.decodeBounds(application, uri)
+
+                // Enforce memory-safety limits: refuse images that would OOM on decode.
+                if (Limits.checkInputDimensions(bounds.width, bounds.height) is LimitCheck.Error) {
+                    skippedTooLarge++
+                    continue
+                }
+
                 val fileSize = application.contentResolver.openFileDescriptor(uri, "r")?.use {
                     it.statSize
                 } ?: 0L
 
                 val displayName = queryDisplayName(uri) ?: "image_${System.currentTimeMillis()}.jpg"
 
-                ImageItem(
-                    id = UUID.randomUUID().toString(),
-                    uri = uri,
-                    filename = displayName,
-                    originalSizeBytes = fileSize,
-                    originalWidth = bounds.width,
-                    originalHeight = bounds.height,
-                    mimeType = bounds.mimeType
+                newItems.add(
+                    ImageItem(
+                        id = UUID.randomUUID().toString(),
+                        uri = uri,
+                        filename = displayName,
+                        originalSizeBytes = fileSize,
+                        originalWidth = bounds.width,
+                        originalHeight = bounds.height,
+                        mimeType = bounds.mimeType
+                    )
                 )
             }
 
             _uiState.update { current ->
+                val message = when {
+                    skippedTooLarge > 0 -> application.getString(R.string.error_file_too_large)
+                    uris.size > availableSlots -> application.getString(R.string.limit_max_batch, Limits.MAX_BATCH)
+                    else -> null
+                }
                 current.copy(
                     images = current.images + newItems,
-                    userMessage = if (uris.size > availableSlots) {
-                        application.getString(R.string.limit_max_batch, Limits.MAX_BATCH)
-                    } else null
+                    userMessage = message
                 )
             }
         }
@@ -291,6 +300,14 @@ class ShrinkItViewModel @Inject constructor(
                         origH = decoded.height
                     )
 
+                    // Enforce output memory-safety limits before allocating bitmaps.
+                    if (Limits.checkOutputDimensions(targetW, targetH) is LimitCheck.Error) {
+                        decoded.bitmap.recycle()
+                        throw IllegalArgumentException(
+                            application.getString(R.string.error_file_too_large)
+                        )
+                    }
+
                     val format = if (opts.format == TargetFormat.ORIGINAL) {
                         when {
                             decoded.mimeType.contains("png") -> TargetFormat.PNG
@@ -300,7 +317,7 @@ class ShrinkItViewModel @Inject constructor(
                         }
                     } else {
                         opts.format
-                    }
+                    }.encodeSafe()
 
                     val resized = ResizeEngine.resize(
                         source = decoded.bitmap,

@@ -8,7 +8,7 @@ data class ProcessingOptions(
     val resizeMode: ResizeMode = ResizeMode.STRETCH,
     val format: TargetFormat = TargetFormat.ORIGINAL,
     val compressMode: CompressMode = CompressMode.QUALITY,
-    val quality: Int = 85,
+    val quality: Int = 90,
     val targetKb: Int = 200,
     val dpi: Int = 72,
     val backgroundColor: BackgroundColor = BackgroundColor.WHITE,

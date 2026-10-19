@@ -22,7 +22,14 @@ enum class TargetFormat(val extension: String, val mimeType: String, val support
     JPEG("jpg", "image/jpeg", false),
     PNG("png", "image/png", true),
     WEBP("webp", "image/webp", true),
-    AVIF("avif", "image/avif", true)
+    AVIF("avif", "image/avif", true);
+
+    /**
+     * Maps to a format Android can actually encode via Bitmap.compress().
+     * AVIF has no framework encoder, so AVIF input kept as "original" falls
+     * back to WebP to keep the file extension and MIME type truthful.
+     */
+    fun encodeSafe(): TargetFormat = if (this == AVIF) WEBP else this
 }
 
 enum class CompressMode {

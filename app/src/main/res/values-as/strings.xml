@@ -100,4 +100,8 @@
     <string name="error_no_images">অনুগ্ৰহ কৰি কমেও এখন ছবি নিৰ্বাচন কৰক।</string>
     <string name="error_decode_failed">ছবি ফাইল ডিকোড কৰাত ব্যৰ্থ।</string>
     <string name="error_file_too_large">ছবিৰ আকাৰ সুৰক্ষিত সীমা অতিক্ৰম কৰিছে।</string>
+
+    <!-- Status -->
+    <string name="status_processing">প্ৰচেছিং %1$d / %2$d</string>
+    <string name="section_advanced">উন্নত বিকল্প</string>
 </resources>

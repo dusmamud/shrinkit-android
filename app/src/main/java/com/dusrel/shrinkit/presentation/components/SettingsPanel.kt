@@ -270,7 +270,9 @@ fun SettingsPanel(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    TargetFormat.entries.forEach { format ->
+                    // AVIF has no Android framework encoder (Bitmap.compress), so it is
+                    // not offered as an output format. AVIF *input* still decodes on API 31+.
+                    TargetFormat.entries.filter { it != TargetFormat.AVIF }.forEach { format ->
                         val isSelected = options.format == format
                         val label = when (format) {
                             TargetFormat.ORIGINAL -> stringResource(R.string.format_original)
@@ -298,7 +300,7 @@ fun SettingsPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Advanced Options",
+                    text = stringResource(R.string.section_advanced),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary

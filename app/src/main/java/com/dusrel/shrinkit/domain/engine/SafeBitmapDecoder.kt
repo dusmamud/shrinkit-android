@@ -89,9 +89,17 @@ object SafeBitmapDecoder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val isHeic = mime.contains("heic") || mime.contains("heif")
             val canAttemptImageDecoder = if (isHeic) {
-                try {
-                    ImageDecoder.isMimeTypeSupported("image/heif")
-                } catch (_: Exception) {
+                // isMimeTypeSupported() was added in API 29 — calling it on API 28
+                // throws NoSuchMethodError (an Error, not an Exception). Guard it.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    try {
+                        ImageDecoder.isMimeTypeSupported("image/heif")
+                    } catch (_: Exception) {
+                        true
+                    }
+                } else {
+                    // API 28: cannot query codec support; attempt decode and let any
+                    // failure fall through to the BitmapFactory path gracefully.
                     true
                 }
             } else {

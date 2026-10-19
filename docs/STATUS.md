@@ -15,7 +15,8 @@
   - Phase 3: Core domain engine (`SizeUnits`, `Limits`, `ExifSanitizer`, `SafeBitmapDecoder`, `ResizeEngine`, `BinarySearchCompressor`).
   - Phase 4: Unit test suite for `SizeUnitsTest` and `LimitsTest`.
   - Phase 5: Presentation layer (`ShrinkItTheme`, `ShrinkItTopBar`, `PresetChipsRow`, `SettingsPanel`, `ImagePickerSection`, `ResultCard`, `ShrinkItApp`, `ShrinkItViewModel`, `BrowserLauncher`, `InAppReviewManager`, `InAppUpdateManager`).
-  - Phase 6: Scoped storage (`MediaStoreExporter` with atomic `IS_PENDING` writes) & `BatchCompressWorker` (`dataSync` foreground service).
+  - Phase 6: Scoped storage (`MediaStoreExporter` with atomic `IS_PENDING` writes).
+  - **Code Audit Fixes (2026-10-19):** Fixed 2 compile errors (`Bitmap.CompressFormat.AVIF` does not exist in the Android SDK — AVIF output falls back via `encodeSafe()` to WebP and is no longer offered in the format picker; `NotificationHelper` used a wrong channel constant name), fixed an API 28 crash (`ImageDecoder.isMimeTypeSupported` is API 29+ — now guarded), wired `Limits` input/output dimension checks into `addImages`/`processBatch` (were dead code), removed the never-enqueued `BatchCompressWorker` (210 lines of dead pipeline duplication; foreground processing via `ViewModel` is the v1 path — WorkManager infra retained for future use), fixed `androidx.hilt` artifacts to their own `1.4.0` version ref, set default quality to 90 (web parity), localized 2 hardcoded UI strings (EN/HI/AS).
 - **Next Task:** Finalize release pipeline & bundle verification.
 
 ---

@@ -37,7 +37,7 @@ object NotificationHelper {
         val title = context.getString(R.string.notification_processing_title, current, total)
         val text = context.getString(R.string.notification_processing_desc, currentFilename)
 
-        return NotificationCompat.Builder(context, ShrinkItApplication.PROCESSING_CHANNEL_ID)
+        return NotificationCompat.Builder(context, ShrinkItApplication.CHANNEL_ID_PROCESSING)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)
             .setContentText(text)
@@ -77,7 +77,7 @@ object NotificationHelper {
         val title = context.getString(R.string.notification_done_title)
         val text = context.getString(R.string.notification_done_desc, processedCount, totalSavingsFormatted)
 
-        val notification = NotificationCompat.Builder(context, ShrinkItApplication.PROCESSING_CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, ShrinkItApplication.CHANNEL_ID_PROCESSING)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)
             .setContentText(text)

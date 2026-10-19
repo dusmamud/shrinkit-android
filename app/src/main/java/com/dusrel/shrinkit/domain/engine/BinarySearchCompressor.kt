@@ -52,10 +52,12 @@ object BinarySearchCompressor {
                 }
             }
             TargetFormat.AVIF -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    Bitmap.CompressFormat.AVIF
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    // Fallback to WEBP_LOSSY on API 30-33
+                // Android's Bitmap.compress() has NO AVIF encoder (Bitmap.CompressFormat
+                // only defines JPEG/PNG/WEBP/WEBP_LOSSY/WEBP_LOSSLESS). AVIF output would
+                // require a custom MediaCodec route, so fall back to the best available.
+                // Callers must map TargetFormat.AVIF through encodeSafe() first so the
+                // file extension and MIME type stay truthful.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     Bitmap.CompressFormat.WEBP_LOSSY
                 } else {
                     Bitmap.CompressFormat.JPEG

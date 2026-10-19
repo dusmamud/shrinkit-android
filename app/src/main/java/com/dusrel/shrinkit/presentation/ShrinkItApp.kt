@@ -123,7 +123,7 @@ fun ShrinkItApp(
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.size(8.dp))
-                                Text("Processing (${uiState.currentProgress}/${uiState.totalProgress})")
+                                Text(stringResource(R.string.status_processing, uiState.currentProgress, uiState.totalProgress))
                             } else {
                                 Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null)
                                 Spacer(modifier = Modifier.size(8.dp))

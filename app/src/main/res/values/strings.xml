@@ -100,4 +100,8 @@
     <string name="error_no_images">Please select at least one image.</string>
     <string name="error_decode_failed">Failed to decode image file.</string>
     <string name="error_file_too_large">Image dimensions exceed safe limit.</string>
+
+    <!-- Status -->
+    <string name="status_processing">Processing %1$d / %2$d</string>
+    <string name="section_advanced">Advanced Options</string>
 </resources>
