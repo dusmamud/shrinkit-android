@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 
 @Composable
@@ -116,7 +117,7 @@ fun ImagePickerSection(
 
                 Surface(
                     shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+                    color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -126,7 +127,7 @@ fun ImagePickerSection(
                         SymbolIcon(
                             name = "lock",
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary,
+                            tint = MaterialTheme.colorScheme.tertiary,
                             fontSize = 14.sp,
                             modifier = Modifier.size(14.dp)
                         )
@@ -134,7 +135,7 @@ fun ImagePickerSection(
                             text = stringResource(R.string.zero_upload_badge),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                     }
                 }
@@ -147,7 +148,7 @@ fun ImagePickerSection(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    colors = ButtonDefaults.buttonColors(containerColor = LocalButtonContainer.current),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(

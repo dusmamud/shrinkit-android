@@ -9,12 +9,21 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+
+/**
+ * Web parity: solid buttons use --t-btn-a (#016df0 light / #0071e3 dark),
+ * which differs from --t-accent (#0a84ff) in dark mode. M3's primary maps
+ * to --t-accent, so buttons need their own theme-aware container color.
+ */
+val LocalButtonContainer = compositionLocalOf { ButtonLight }
 
 private val DarkColorScheme = darkColorScheme(
     primary = AccentDark,            // #0a84ff (web --t-accent)
@@ -92,6 +101,12 @@ fun ShrinkItTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = {
+            CompositionLocalProvider(
+                LocalButtonContainer provides if (darkTheme) ButtonDark else ButtonLight
+            ) {
+                content()
+            }
+        }
     )
 }

@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import com.dusrel.shrinkit.presentation.components.ImagePickerSection
@@ -119,7 +120,7 @@ fun ShrinkItApp(
                         Button(
                             onClick = { viewModel.processBatch() },
                             enabled = !uiState.isProcessing,
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                            colors = ButtonDefaults.buttonColors(containerColor = LocalButtonContainer.current),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f)
                         ) {

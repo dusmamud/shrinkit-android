@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
@@ -47,6 +48,7 @@ import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.RelativeCropRect
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 import com.dusrel.shrinkit.presentation.theme.BrandBlue
+import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 
 private data class CropAspect(val labelRes: Int, val ratio: Float?)
 
@@ -177,6 +179,7 @@ fun CropEditorScreen(
                             toolViewModel.setCropRect(imageId, computeCropRect())
                             onDone()
                         },
+                        colors = ButtonDefaults.buttonColors(containerColor = LocalButtonContainer.current),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         SymbolIcon(name = "check", contentDescription = null, filled = true)

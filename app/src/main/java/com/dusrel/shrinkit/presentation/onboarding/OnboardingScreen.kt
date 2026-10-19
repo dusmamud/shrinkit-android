@@ -15,6 +15,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import kotlinx.coroutines.launch
 
@@ -160,6 +162,7 @@ fun OnboardingScreen(
                     }
                 }
             },
+            colors = ButtonDefaults.buttonColors(containerColor = LocalButtonContainer.current),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
