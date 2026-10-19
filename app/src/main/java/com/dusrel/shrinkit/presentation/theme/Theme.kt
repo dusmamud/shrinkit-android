@@ -24,6 +24,12 @@ import androidx.core.view.WindowCompat
  * to --t-accent, so buttons need their own theme-aware container color.
  */
 val LocalButtonContainer = compositionLocalOf { ButtonLight }
+/** Web --t-dash: dropzone dashed border (#52a0ff light / #0a84ff dark). */
+val LocalDashColor = compositionLocalOf { DashLight }
+/** Web --t-dropzone-bg / --t-thumb-bg (#fafcff light / #1a1a1c dark). */
+val LocalDropzoneBg = compositionLocalOf { DropzoneLight }
+/** Web --t-success-bg (#e6f4ea light / #14351f dark). */
+val LocalSuccessBg = compositionLocalOf { SuccessBgLight }
 
 private val DarkColorScheme = darkColorScheme(
     primary = AccentDark,            // #0a84ff (web --t-accent)
@@ -103,7 +109,10 @@ fun ShrinkItTheme(
         typography = Typography,
         content = {
             CompositionLocalProvider(
-                LocalButtonContainer provides if (darkTheme) ButtonDark else ButtonLight
+                LocalButtonContainer provides if (darkTheme) ButtonDark else ButtonLight,
+                LocalDashColor provides if (darkTheme) DashDark else DashLight,
+                LocalDropzoneBg provides if (darkTheme) DropzoneDark else DropzoneLight,
+                LocalSuccessBg provides if (darkTheme) SuccessBgDark else SuccessBgLight
             ) {
                 content()
             }

@@ -3,6 +3,7 @@ package com.dusrel.shrinkit.presentation.components
 import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,8 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
+import com.dusrel.shrinkit.presentation.theme.LocalDropzoneBg
+import com.dusrel.shrinkit.presentation.theme.LocalSuccessBg
 import com.dusrel.shrinkit.domain.model.ImageItem
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import java.text.DecimalFormat
@@ -78,7 +81,8 @@ fun ResultCard(
                     modifier = Modifier
                         .size(68.dp)
                         .clip(RoundedCornerShape(12.dp))
-                ) {
+                        .background(LocalDropzoneBg.current)
+                )
                     AsyncImage(
                         model = item.processedUri ?: item.uri,
                         contentDescription = item.filename,
@@ -169,7 +173,7 @@ fun ResultCard(
                         if (item.status == ProcessingStatus.COMPLETED && item.reductionPercent > 0) {
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
-                                color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
+                                color = LocalSuccessBg.current
                             ) {
                                 Text(
                                     text = "-${item.reductionPercent}%",
@@ -353,7 +357,7 @@ fun ResultCard(
 private fun EditBadge(text: String) {
     Surface(
         shape = RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+        color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Text(
             text = text,

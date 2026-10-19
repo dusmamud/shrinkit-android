@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
+import com.dusrel.shrinkit.presentation.theme.LocalDashColor
+import com.dusrel.shrinkit.presentation.theme.LocalDropzoneBg
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 
 @Composable
@@ -61,16 +62,16 @@ fun ImagePickerSection(
             },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+            containerColor = LocalDropzoneBg.current
         )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(20.dp)
+                .dashedBorder(
+                    color = LocalDashColor.current,
+                    strokeWidth = 2.dp,
+                    cornerRadius = 20.dp
                 )
                 .padding(24.dp),
             contentAlignment = Alignment.Center
@@ -79,21 +80,13 @@ fun ImagePickerSection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                    modifier = Modifier.size(64.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        SymbolIcon(
-                            name = "add_photo_alternate",
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            fontSize = 36.sp,
-                            modifier = Modifier.size(36.dp)
-                        )
-                    }
-                }
+                SymbolIcon(
+                    name = "add_photo_alternate",
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    fontSize = 48.sp,
+                    modifier = Modifier.size(48.dp)
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
