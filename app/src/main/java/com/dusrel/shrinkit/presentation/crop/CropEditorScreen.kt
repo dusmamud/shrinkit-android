@@ -2,11 +2,16 @@ package com.dusrel.shrinkit.presentation.crop
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitPointerEvent
+import androidx.compose.foundation.gestures.calculateCentroidSize
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +21,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,6 +52,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,29 +68,33 @@ import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 
 private data class CropAspect(val labelRes: Int, val ratio: Float?)
 
-/** Draggable corner handle for Free-mode crop window. */
+/** Visual corner handle for Free-mode crop window.
+ * Dragging is handled by the parent gesture arena (hit-tests corners
+ * before pan/zoom) — this is visual only. */
 @Composable
 private fun CornerHandle(
     xPx: Float,
     yPx: Float,
-    onDrag: (dx: Float, dy: Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current
+    val touchTarget = 48.dp
     Box(
         modifier = modifier
-            .offset { androidx.compose.ui.unit.IntOffset(xPx.toInt() - 20, yPx.toInt() - 20) }
-            .size(40.dp)
-            .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    change.consume()
-                    onDrag(dragAmount.x, dragAmount.y)
+            .offset {
+                with(density) {
+                    androidx.compose.ui.unit.IntOffset(
+                        (xPx - touchTarget.toPx() / 2f).toInt(),
+                        (yPx - touchTarget.toPx() / 2f).toInt()
+                    )
                 }
-            },
+            }
+            .size(touchTarget),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
-                .size(16.dp)
+                .size(14.dp)
                 .background(Color.White, CircleShape)
         )
     }
@@ -126,12 +138,18 @@ fun CropEditorScreen(
             listOf(
                 CropAspect(R.string.crop_ratio_free, null),
                 CropAspect(R.string.crop_ratio_1_1, 1f),
-                CropAspect(R.string.crop_ratio_4_5, 4f / 5f),
-                CropAspect(R.string.crop_ratio_3_4, 3f / 4f),
+                CropAspect(R.string.crop_ratio_4_3, 4f / 3f),
                 CropAspect(R.string.crop_ratio_3_2, 3f / 2f),
                 CropAspect(R.string.crop_ratio_16_9, 16f / 9f),
-                CropAspect(R.string.crop_ratio_9_16, 9f / 16f),
+                CropAspect(R.string.crop_ratio_16_10, 16f / 10f),
+                CropAspect(R.string.crop_ratio_4_5, 4f / 5f),
+                CropAspect(R.string.crop_ratio_5_4, 5f / 4f),
+                CropAspect(R.string.crop_ratio_3_4, 3f / 4f),
                 CropAspect(R.string.crop_ratio_2_3, 2f / 3f),
+                CropAspect(R.string.crop_ratio_9_16, 9f / 16f),
+                CropAspect(R.string.crop_ratio_1_2, 1f / 2f),
+                CropAspect(R.string.crop_ratio_2_1, 2f),
+                CropAspect(R.string.crop_ratio_3_1, 3f),
                 CropAspect(R.string.crop_ratio_4_1, 4f),
                 CropAspect(R.string.crop_ratio_custom, -1f),
                 CropAspect(R.string.crop_ratio_original, -2f)
@@ -226,6 +244,19 @@ fun CropEditorScreen(
     }
     val winRight = winLeft + winW
     val winBottom = winTop + winH
+    // Latest corner positions + hit-test state for the unified gesture arena.
+    val density = LocalDensity.current
+    val cornerHitRadiusPx = with(density) { 48.dp.toPx() }
+    val latestCorners by rememberUpdatedState(
+        listOf(
+            Offset(winLeft, winTop),
+            Offset(winRight, winTop),
+            Offset(winLeft, winBottom),
+            Offset(winRight, winBottom)
+        )
+    )
+    val latestFreeMode by rememberUpdatedState(isFreeMode && freeInit)
+    val latestHitRadius by rememberUpdatedState(cornerHitRadiusPx)
     // Minimum scale so the image always covers the window.
     val minScale = if (dispW > 0 && dispH > 0) {
         maxOf(winW / dispW, winH / dispH, 1f)
@@ -347,11 +378,13 @@ fun CropEditorScreen(
                         )
                     }
                 } else {
-                    Row(
+                    // Horizontally scrollable ratio picker (standard crop UX).
+                    LazyRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(end = 8.dp)
                     ) {
-                        aspects.forEach { aspect ->
+                        items(aspects, key = { it.labelRes }) { aspect ->
                             FilterChip(
                                 selected = selectedAspect == aspect,
                                 onClick = { selectedAspect = aspect },
@@ -411,11 +444,73 @@ fun CropEditorScreen(
                     }
                 }
                 .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, _ ->
-                        scale = (scale * zoom).coerceIn(latestMinScale, 6f)
-                        offsetX += pan.x
-                        offsetY += pan.y
-                        clampOffsets()
+                    // Unified gesture arena: corner handles win over pan/zoom.
+                    // (Previously the parent transform gesture consumed drags
+                    // meant for the handles, so Free-mode resize never worked.)
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        var corner = -1
+                        if (latestFreeMode) {
+                            val hitR = latestHitRadius
+                            corner = latestCorners.indexOfFirst {
+                                (it - down.position).getDistance() <= hitR
+                            }
+                        }
+                        if (corner >= 0) {
+                            // Drag the crop-window corner.
+                            var prevPos = down.position
+                            var event: androidx.compose.ui.input.pointer.PointerEvent
+                            do {
+                                event = awaitPointerEvent()
+                                val change = event.changes.firstOrNull { it.id == down.id }
+                                if (change == null) break
+                                val dx = change.position.x - prevPos.x
+                                val dy = change.position.y - prevPos.y
+                                prevPos = change.position
+                                if (dx != 0f || dy != 0f) {
+                                    dragCorner(corner, dx, dy)
+                                    change.consume()
+                                }
+                            } while (event.changes.any { it.pressed })
+                        } else {
+                            // Pan / pinch-zoom (touch-slop aware, like
+                            // detectTransformGestures).
+                            val touchSlop = viewConfiguration.touchSlop
+                            var zoom = 1f
+                            var pan = Offset.Zero
+                            var pastTouchSlop = false
+                            var event: androidx.compose.ui.input.pointer.PointerEvent
+                            do {
+                                event = awaitPointerEvent()
+                                val canceled = event.changes.any { it.isConsumed }
+                                if (!canceled) {
+                                    val zoomChange = event.calculateZoom()
+                                    val panChange = event.calculatePan()
+                                    if (!pastTouchSlop) {
+                                        zoom *= zoomChange
+                                        pan += panChange
+                                        val centroidSize =
+                                            event.calculateCentroidSize(useCurrent = false)
+                                        val zoomMotion =
+                                            kotlin.math.abs(1 - zoom) * centroidSize
+                                        val panMotion = pan.getDistance()
+                                        if (zoomMotion > touchSlop || panMotion > touchSlop) {
+                                            pastTouchSlop = true
+                                        }
+                                    }
+                                    if (pastTouchSlop) {
+                                        scale = (scale * zoomChange).coerceIn(
+                                            latestMinScale,
+                                            6f
+                                        )
+                                        offsetX += panChange.x
+                                        offsetY += panChange.y
+                                        clampOffsets()
+                                        event.changes.forEach { it.consume() }
+                                    }
+                                }
+                            } while (event.changes.any { it.pressed })
+                        }
                     }
                 },
             contentAlignment = Alignment.Center
@@ -469,12 +564,12 @@ fun CropEditorScreen(
                         )
                     }
                 }
-                // Free-mode corner handles.
+                // Free-mode corner handles (visual; drag handled by parent arena).
                 if (isFreeMode && freeInit) {
-                    CornerHandle(winLeft, winTop, onDrag = { dx, dy -> dragCorner(0, dx, dy) })
-                    CornerHandle(winRight, winTop, onDrag = { dx, dy -> dragCorner(1, dx, dy) })
-                    CornerHandle(winLeft, winBottom, onDrag = { dx, dy -> dragCorner(2, dx, dy) })
-                    CornerHandle(winRight, winBottom, onDrag = { dx, dy -> dragCorner(3, dx, dy) })
+                    CornerHandle(winLeft, winTop)
+                    CornerHandle(winRight, winTop)
+                    CornerHandle(winLeft, winBottom)
+                    CornerHandle(winRight, winBottom)
                 }
             }
         }

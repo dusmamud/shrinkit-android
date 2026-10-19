@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -47,8 +49,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
+import com.dusrel.shrinkit.domain.model.BackgroundColor
 import com.dusrel.shrinkit.domain.model.TargetFormat
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
+import com.dusrel.shrinkit.presentation.components.FullscreenImageViewer
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
@@ -63,6 +67,7 @@ fun KbToolScreen(
     toolViewModel: ShrinkItViewModel,
     onBack: () -> Unit,
     onOpenCrop: (String) -> Unit,
+    onProcessComplete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val defaultKb = if (toolId == "kb20") 20 else 50
@@ -77,6 +82,34 @@ fun KbToolScreen(
         toolViewModel.clearAllImages()
         toolViewModel.applyTargetKb(defaultKb)
         toolViewModel.setBlackWhite(false)
+    }
+
+    // Navigate to the result screen once the batch finishes.
+    LaunchedEffect(item?.status) {
+        if (item?.status == ProcessingStatus.COMPLETED) {
+            onProcessComplete()
+        }
+    }
+
+    // Cropped preview (decoded + cropped bitmap) when a crop is set.
+    val croppedPreview by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(
+        initialValue = null,
+        key1 = item?.id,
+        key2 = item?.cropRect
+    ) {
+        value = if (item?.cropRect != null) {
+            toolViewModel.getCroppedPreview(item)
+        } else {
+            null
+        }
+    }
+
+    var showFullscreen by remember { mutableStateOf(false) }
+    if (showFullscreen && item != null) {
+        FullscreenImageViewer(
+            uri = item.uri,
+            onDismiss = { showFullscreen = false }
+        )
     }
 
     val picker = rememberLauncherForActivityResult(
@@ -150,7 +183,8 @@ fun KbToolScreen(
                     }
                 }
             } else {
-                // Selected image thumbnail.
+                // Selected image: cropped preview when a crop is set,
+                // tap for fullscreen, clear + crop actions.
                 item {
                     Row(
                         modifier = Modifier
@@ -159,13 +193,16 @@ fun KbToolScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        // Thumbnail shows the CROPPED image after crop apply.
+                        val thumbModel: Any = croppedPreview ?: item.uri
                         AsyncImage(
-                            model = item.uri,
+                            model = thumbModel,
                             contentDescription = item.filename,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(72.dp)
                                 .clip(RoundedCornerShape(12.dp))
+                                .clickable { showFullscreen = true }
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
@@ -187,10 +224,27 @@ fun KbToolScreen(
                                 )
                             }
                         }
-                        OutlinedButton(onClick = { onOpenCrop(item.id) }) {
-                            SymbolIcon(name = "crop", contentDescription = null)
-                            Spacer(Modifier.size(4.dp))
-                            Text(stringResource(R.string.action_crop))
+                        IconButton(
+                            onClick = { onOpenCrop(item.id) },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            SymbolIcon(
+                                name = "crop",
+                                contentDescription = stringResource(R.string.action_crop),
+                                tint = MaterialTheme.colorScheme.primary,
+                                fontSize = 22.sp
+                            )
+                        }
+                        IconButton(
+                            onClick = { toolViewModel.clearAllImages() },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            SymbolIcon(
+                                name = "close",
+                                contentDescription = stringResource(R.string.action_clear),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 22.sp
+                            )
                         }
                     }
                 }
@@ -265,6 +319,31 @@ fun KbToolScreen(
                                     onClick = { toolViewModel.updateFormat(format) },
                                     label = { Text(label) }
                                 )
+                            }
+                        }
+                    }
+                }
+
+                // Background color — only when the input may be transparent
+                // (PNG/WebP) and the output drops alpha (JPEG).
+                val needsBg = item != null &&
+                    (item.mimeType.contains("png", ignoreCase = true) ||
+                        item.mimeType.contains("webp", ignoreCase = true)) &&
+                    options.format == TargetFormat.JPEG
+                if (needsBg) {
+                    item {
+                        ToolSection(title = stringResource(R.string.section_background)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                listOf(
+                                    BackgroundColor.WHITE to stringResource(R.string.bg_white),
+                                    BackgroundColor.BLACK to stringResource(R.string.bg_black)
+                                ).forEach { (bg, label) ->
+                                    FilterChip(
+                                        selected = options.backgroundColor == bg,
+                                        onClick = { toolViewModel.updateBackgroundColor(bg) },
+                                        label = { Text(label) }
+                                    )
+                                }
                             }
                         }
                     }

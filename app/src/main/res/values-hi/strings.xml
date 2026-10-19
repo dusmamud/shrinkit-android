@@ -204,6 +204,12 @@
     <string name="crop_ratio_9_16">9:16</string>
     <string name="crop_ratio_2_3">2:3</string>
     <string name="crop_ratio_4_1">4:1</string>
+    <string name="crop_ratio_4_3">4:3</string>
+    <string name="crop_ratio_5_4">5:4</string>
+    <string name="crop_ratio_16_10">16:10</string>
+    <string name="crop_ratio_1_2">1:2</string>
+    <string name="crop_ratio_2_1">2:1</string>
+    <string name="crop_ratio_3_1">3:1</string>
     <string name="crop_ratio_custom">कस्टम</string>
     <string name="crop_ratio_locked">अनुपात लॉक्ड</string>
 
@@ -212,6 +218,7 @@
     <string name="action_compare">पहले / बाद में तुलना करें</string>
     <string name="action_rotate">90° घुमाएं</string>
     <string name="action_crop">क्रॉप</string>
+    <string name="action_clear">साफ़ करें</string>
     <string name="compare_before">पहले</string>
     <string name="compare_after">बाद में</string>
 

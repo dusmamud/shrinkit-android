@@ -90,18 +90,32 @@ fun ShrinkItNavHost(
             ShrinkItApp(
                 viewModel = toolViewModel,
                 onNavigateBack = { navController.popBackStack() },
-                onProcessComplete = { navController.navigate(Destinations.RESULTS) },
+                onProcessComplete = {
+                    navController.navigate(Destinations.results(Destinations.TOOL))
+                },
                 defaultQuality = prefs.defaultQuality,
                 defaultFormatName = prefs.defaultFormatName
             )
         }
 
-        composable(Destinations.RESULTS) {
+        composable(
+            route = Destinations.RESULTS,
+            arguments = listOf(navArgument("popTo") {
+                type = NavType.StringType
+                defaultValue = Destinations.TOOL
+            })
+        ) { backStackEntry ->
+            val popTo = backStackEntry.arguments?.getString("popTo")
+                ?: Destinations.TOOL
             ResultScreen(
                 toolViewModel = toolViewModel,
                 onBack = { navController.popBackStack() },
                 onDone = {
-                    navController.popBackStack(Destinations.TOOL, inclusive = false)
+                    if (popTo == "back") {
+                        navController.popBackStack()
+                    } else {
+                        navController.popBackStack(popTo, inclusive = false)
+                    }
                 }
             )
         }
@@ -172,6 +186,9 @@ fun ShrinkItNavHost(
                 },
                 onOpenCropLocked = { imageId, ratio, label ->
                     navController.navigate(Destinations.cropEditorLocked(imageId, ratio, label))
+                },
+                onProcessComplete = {
+                    navController.navigate(Destinations.results("back"))
                 }
             )
         }

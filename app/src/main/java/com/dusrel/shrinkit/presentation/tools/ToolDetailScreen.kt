@@ -17,6 +17,7 @@ fun ToolDetailScreen(
     onBack: () -> Unit,
     onOpenCrop: (imageId: String) -> Unit,
     onOpenCropLocked: (imageId: String, ratio: Float, label: String) -> Unit,
+    onProcessComplete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -26,6 +27,7 @@ fun ToolDetailScreen(
             toolViewModel = toolViewModel,
             onBack = onBack,
             onOpenCrop = onOpenCrop,
+            onProcessComplete = onProcessComplete,
             modifier = modifier
         )
         "passport" -> PassportToolScreen(

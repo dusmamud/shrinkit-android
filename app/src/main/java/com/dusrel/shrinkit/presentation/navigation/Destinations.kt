@@ -18,7 +18,9 @@ object Destinations {
     const val SETTINGS_ABOUT = "settings/about"
     const val TOOLS = "tools"
     const val TOOL_DETAIL = "tools/{toolId}"
-    const val RESULTS = "results"
+    const val RESULTS = "results?popTo={popTo}"
+    /** Results screen; [popTo] is the route Done pops back to ("back" = single pop). */
+    fun results(popTo: String = TOOL) = "results?popTo=$popTo"
 
     fun cropEditor(imageId: String): String = "crop/$imageId"
 

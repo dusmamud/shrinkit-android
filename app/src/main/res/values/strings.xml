@@ -204,6 +204,12 @@
     <string name="crop_ratio_9_16">9:16</string>
     <string name="crop_ratio_2_3">2:3</string>
     <string name="crop_ratio_4_1">4:1</string>
+    <string name="crop_ratio_4_3">4:3</string>
+    <string name="crop_ratio_5_4">5:4</string>
+    <string name="crop_ratio_16_10">16:10</string>
+    <string name="crop_ratio_1_2">1:2</string>
+    <string name="crop_ratio_2_1">2:1</string>
+    <string name="crop_ratio_3_1">3:1</string>
     <string name="crop_ratio_custom">Custom</string>
     <string name="crop_ratio_locked">Ratio locked</string>
 
@@ -212,6 +218,7 @@
     <string name="action_compare">Compare before / after</string>
     <string name="action_rotate">Rotate 90°</string>
     <string name="action_crop">Crop</string>
+    <string name="action_clear">Clear</string>
     <string name="compare_before">Before</string>
     <string name="compare_after">After</string>
 

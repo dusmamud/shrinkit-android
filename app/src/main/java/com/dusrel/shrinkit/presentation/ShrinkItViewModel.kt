@@ -583,6 +583,28 @@ class ShrinkItViewModel @Inject constructor(
      * rect is degenerate, leaving the source untouched. Recycles [source] when
      * a new bitmap is produced.
      */
+    /**
+     * Returns a downscaled preview of [item] with its crop applied (if any),
+     * for showing the cropped result in tool screens. Null when no crop
+     * is set or decoding fails. Runs on IO.
+     */
+    suspend fun getCroppedPreview(item: ImageItem, maxSide: Int = 512): Bitmap? =
+        withContext(Dispatchers.IO) {
+            val rect = item.cropRect ?: return@withContext null
+            val decoded = SafeBitmapDecoder.decode(application, item.uri)
+                ?: return@withContext null
+            val cropped = applyRelativeCrop(decoded, rect) ?: decoded
+            // Downscale for preview.
+            val scale = (maxOf(cropped.width, cropped.height).toFloat() / maxSide)
+                .coerceAtLeast(1f)
+            if (scale <= 1f) return@withContext cropped
+            val w = (cropped.width / scale).toInt().coerceAtLeast(1)
+            val h = (cropped.height / scale).toInt().coerceAtLeast(1)
+            val scaled = Bitmap.createScaledBitmap(cropped, w, h, true)
+            if (scaled != cropped) cropped.recycle()
+            scaled
+        }
+
     private fun applyRelativeCrop(source: Bitmap, rect: RelativeCropRect): Bitmap? {
         val w = source.width
         val h = source.height
