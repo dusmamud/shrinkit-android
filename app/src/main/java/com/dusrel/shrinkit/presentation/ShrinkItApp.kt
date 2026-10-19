@@ -27,7 +27,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -48,6 +50,7 @@ import com.dusrel.shrinkit.presentation.components.SettingsPanel
 import com.dusrel.shrinkit.presentation.components.ShrinkItTopBar
 import com.dusrel.shrinkit.presentation.util.InAppReviewManager
 import com.dusrel.shrinkit.presentation.util.InAppUpdateManager
+import com.dusrel.shrinkit.domain.model.ProcessingOptions
 
 @Composable
 fun ShrinkItApp(
@@ -66,7 +69,13 @@ fun ShrinkItApp(
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
-    val uiState by viewModel.uiState.collectAsState()
+    val images by viewModel.uiState.map { it.images }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = emptyList())
+    val isProcessing by viewModel.uiState.map { it.isProcessing }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = false)
+    val options by viewModel.uiState.map { it.options }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = ProcessingOptions())
+    val selectedPresetId by viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = null)
+    val currentProgress by viewModel.uiState.map { it.currentProgress }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = 0)
+    val totalProgress by viewModel.uiState.map { it.totalProgress }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = 0)
+    val userMessage by viewModel.uiState.map { it.userMessage }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = null)
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Apply Settings defaults when the tool opens (or when defaults change).
@@ -85,16 +94,16 @@ fun ShrinkItApp(
         activity?.let { InAppUpdateManager.checkForUpdates(it) }
     }
 
-    LaunchedEffect(uiState.userMessage) {
-        uiState.userMessage?.let { msg ->
+    LaunchedEffect(userMessage) {
+        userMessage?.let { msg ->
             snackbarHostState.showSnackbar(msg)
             viewModel.dismissUserMessage()
         }
     }
 
     // Trigger review flow when batch successfully finishes
-    LaunchedEffect(uiState.isProcessing) {
-        if (!uiState.isProcessing && uiState.images.isNotEmpty() && uiState.images.all { it.status == ProcessingStatus.COMPLETED }) {
+    LaunchedEffect(isProcessing) {
+        if (!isProcessing && images.isNotEmpty() && images.all { it.status == ProcessingStatus.COMPLETED }) {
             activity?.let { InAppReviewManager.requestReview(it) }
         }
     }
@@ -104,7 +113,7 @@ fun ShrinkItApp(
         topBar = topBar,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            AnimatedVisibility(visible = uiState.images.isNotEmpty()) {
+            AnimatedVisibility(visible = images.isNotEmpty()) {
                 Surface(
                     tonalElevation = 8.dp,
                     shadowElevation = 8.dp,
@@ -121,7 +130,7 @@ fun ShrinkItApp(
                         OutlinedButton(
                             onClick = { viewModel.clearAllImages() },
                             shape = RoundedCornerShape(12.dp),
-                            enabled = !uiState.isProcessing
+                            enabled = !isProcessing
                         ) {
                             SymbolIcon(name = "clear_all", contentDescription = null)
                             Spacer(modifier = Modifier.size(4.dp))
@@ -130,24 +139,24 @@ fun ShrinkItApp(
 
                         Button(
                             onClick = { viewModel.processBatch() },
-                            enabled = !uiState.isProcessing,
+                            enabled = !isProcessing,
                             colors = ButtonDefaults.buttonColors(containerColor = LocalButtonContainer.current),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f)
                         ) {
-                            if (uiState.isProcessing) {
+                            if (isProcessing) {
                                 CircularProgressIndicator(
                                     color = MaterialTheme.colorScheme.onPrimary,
                                     strokeWidth = 2.dp,
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.size(8.dp))
-                                Text(stringResource(R.string.status_processing, uiState.currentProgress, uiState.totalProgress))
+                                Text(stringResource(R.string.status_processing, currentProgress, totalProgress))
                             } else {
                                 SymbolIcon(name = "auto_awesome", contentDescription = null, filled = true)
                                 Spacer(modifier = Modifier.size(8.dp))
                                 Text(
-                                    text = "${stringResource(R.string.action_process_all)} (${uiState.images.size})",
+                                    text = "${stringResource(R.string.action_process_all)} (${images.size})",
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -175,7 +184,7 @@ fun ShrinkItApp(
             // Quick Presets Row
             item {
                 PresetChipsRow(
-                    selectedPresetId = uiState.selectedPresetId,
+                    selectedPresetId = selectedPresetId,
                     onPresetSelected = { preset -> viewModel.applyPreset(preset) }
                 )
             }
@@ -183,7 +192,7 @@ fun ShrinkItApp(
             // Detailed Settings Panel
             item {
                 SettingsPanel(
-                    options = uiState.options,
+                    options = options,
                     onWidthChanged = { viewModel.updateWidth(it) },
                     onHeightChanged = { viewModel.updateHeight(it) },
                     onUnitChanged = { viewModel.updateUnit(it) },
@@ -199,10 +208,10 @@ fun ShrinkItApp(
             }
 
             // Selected & Processed Images Section
-            if (uiState.images.isNotEmpty()) {
+            if (images.isNotEmpty()) {
                 item {
                     Text(
-                        text = "${stringResource(R.string.title_results)} (${uiState.images.size})",
+                        text = "${stringResource(R.string.title_results)} (${images.size})",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -211,7 +220,7 @@ fun ShrinkItApp(
                 }
 
                 items(
-                    items = uiState.images,
+                    items = images,
                     key = { it.id }
                 ) { item ->
                     ResultCard(

@@ -54,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.size.Size
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.data.local.ProcessedImageEntity
 import com.dusrel.shrinkit.presentation.components.HeaderIconButton
@@ -299,7 +301,10 @@ private fun HistoryRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = Uri.parse(entity.contentUri),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(Uri.parse(entity.contentUri))
+                .size(Size(200, 200))
+                .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -382,7 +387,10 @@ private fun HistoryTile(
     Column(modifier = modifier) {
         Box {
             AsyncImage(
-                model = Uri.parse(entity.contentUri),
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(Uri.parse(entity.contentUri))
+                    .size(Size(600, 360))
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

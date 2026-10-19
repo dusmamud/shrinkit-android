@@ -12,6 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -71,7 +74,7 @@ private fun ToolHeader(
     viewModel: ShrinkItViewModel,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val selectedPresetId by viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = null)
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -95,7 +98,7 @@ private fun ToolHeader(
                         val preset = ImagePreset.ALL.firstOrNull { it.id == presetId }
                             ?: return@forEach
                         FilterChip(
-                            selected = uiState.selectedPresetId == presetId,
+                            selected = selectedPresetId == presetId,
                             onClick = { viewModel.applyPreset(preset) },
                             label = {
                                 Text(
@@ -117,7 +120,7 @@ private fun ToolHeader(
                             val preset = ImagePreset.ALL.firstOrNull { it.id == presetId }
                                 ?: return@forEach
                             FilterChip(
-                                selected = uiState.selectedPresetId == presetId,
+                                selected = selectedPresetId == presetId,
                                 onClick = { viewModel.applyPreset(preset) },
                                 label = {
                                     Text(

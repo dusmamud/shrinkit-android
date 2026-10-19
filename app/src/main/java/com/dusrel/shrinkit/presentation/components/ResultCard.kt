@@ -40,6 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.size.Size
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.theme.LocalDropzoneBg
@@ -84,7 +86,10 @@ fun ResultCard(
                         .background(LocalDropzoneBg.current)
                 ) {
                     AsyncImage(
-                        model = item.processedUri ?: item.uri,
+                        model = ImageRequest.Builder(context)
+                            .data(item.processedUri ?: item.uri)
+                            .size(Size(200, 200))
+                            .build(),
                         contentDescription = item.filename,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.size(68.dp)
@@ -303,7 +308,10 @@ fun ResultCard(
                         )
                         Spacer(Modifier.height(4.dp))
                         AsyncImage(
-                            model = item.uri,
+                            model = ImageRequest.Builder(context)
+                                .data(item.uri)
+                                .size(Size(600, 420))
+                                .build(),
                             contentDescription = null,
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
@@ -331,7 +339,12 @@ fun ResultCard(
                         )
                         Spacer(Modifier.height(4.dp))
                         AsyncImage(
-                            model = item.processedUri,
+                            model = item.processedUri?.let {
+                                ImageRequest.Builder(context)
+                                    .data(it)
+                                    .size(Size(600, 420))
+                                    .build()
+                            },
                             contentDescription = null,
                             contentScale = ContentScale.Fit,
                             modifier = Modifier

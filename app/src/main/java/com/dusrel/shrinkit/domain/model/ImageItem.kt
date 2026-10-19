@@ -1,11 +1,13 @@
 package com.dusrel.shrinkit.domain.model
 
 import android.net.Uri
+import androidx.compose.runtime.Immutable
 
 /**
  * Crop rectangle expressed as fractions (0..1) of the source bitmap.
  * Set by the crop editor; null means "no custom crop".
  */
+@Immutable
 data class RelativeCropRect(
     val left: Float,
     val top: Float,
@@ -13,6 +15,7 @@ data class RelativeCropRect(
     val bottom: Float
 )
 
+@Immutable
 data class ImageItem(
     val id: String,
     val uri: Uri,
