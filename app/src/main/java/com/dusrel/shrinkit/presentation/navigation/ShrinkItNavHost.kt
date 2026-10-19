@@ -89,9 +89,6 @@ fun ShrinkItNavHost(
             ShrinkItApp(
                 viewModel = toolViewModel,
                 onNavigateBack = { navController.popBackStack() },
-                onOpenCropEditor = { imageId ->
-                    navController.navigate(Destinations.cropEditor(imageId))
-                },
                 defaultQuality = prefs.defaultQuality,
                 defaultFormatName = prefs.defaultFormatName
             )
