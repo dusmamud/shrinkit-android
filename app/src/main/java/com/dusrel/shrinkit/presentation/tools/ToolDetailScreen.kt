@@ -35,7 +35,6 @@ fun ToolDetailScreen(
     toolId: String,
     toolViewModel: ShrinkItViewModel,
     onBack: () -> Unit,
-    onOpenCropEditor: (String) -> Unit,
     defaultQuality: Int,
     defaultFormatName: String,
     modifier: Modifier = Modifier
@@ -45,7 +44,6 @@ fun ToolDetailScreen(
     ShrinkItApp(
         viewModel = toolViewModel,
         onNavigateBack = onBack,
-        onOpenCropEditor = onOpenCropEditor,
         defaultQuality = defaultQuality,
         defaultFormatName = defaultFormatName,
         initialToolId = toolId,

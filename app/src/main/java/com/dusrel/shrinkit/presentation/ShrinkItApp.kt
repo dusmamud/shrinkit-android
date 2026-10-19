@@ -44,7 +44,6 @@ import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import com.dusrel.shrinkit.presentation.components.ImagePickerSection
-import com.dusrel.shrinkit.presentation.components.PresetChipsRow
 import com.dusrel.shrinkit.presentation.components.ResultCard
 import com.dusrel.shrinkit.presentation.components.SettingsPanel
 import com.dusrel.shrinkit.presentation.components.ShrinkItTopBar
@@ -56,7 +55,6 @@ import com.dusrel.shrinkit.domain.model.ProcessingOptions
 fun ShrinkItApp(
     viewModel: ShrinkItViewModel = viewModel(),
     onNavigateBack: (() -> Unit)? = null,
-    onOpenCropEditor: ((String) -> Unit)? = null,
     defaultQuality: Int? = null,
     defaultFormatName: String? = null,
     /** Focused tool id (kb50/kb20/passport/social/compare) — applies its config on entry. */
@@ -72,7 +70,6 @@ fun ShrinkItApp(
     val images by remember { viewModel.uiState.map { it.images }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = emptyList())
     val isProcessing by remember { viewModel.uiState.map { it.isProcessing }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = false)
     val options by remember { viewModel.uiState.map { it.options }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = ProcessingOptions())
-    val selectedPresetId by remember { viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = null)
     val currentProgress by remember { viewModel.uiState.map { it.currentProgress }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = 0)
     val totalProgress by remember { viewModel.uiState.map { it.totalProgress }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = 0)
     val userMessage by remember { viewModel.uiState.map { it.userMessage }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = null)
@@ -181,33 +178,9 @@ fun ShrinkItApp(
                 )
             }
 
-            // Quick Presets Row
-            item {
-                PresetChipsRow(
-                    selectedPresetId = selectedPresetId,
-                    onPresetSelected = { preset -> viewModel.applyPreset(preset) }
-                )
-            }
-
-            // Detailed Settings Panel
-            item {
-                SettingsPanel(
-                    options = options,
-                    onWidthChanged = { viewModel.updateWidth(it) },
-                    onHeightChanged = { viewModel.updateHeight(it) },
-                    onUnitChanged = { viewModel.updateUnit(it) },
-                    onToggleAspectLock = { viewModel.toggleKeepAspectRatio() },
-                    onResizeModeChanged = { viewModel.updateResizeMode(it) },
-                    onFormatChanged = { viewModel.updateFormat(it) },
-                    onCompressModeChanged = { viewModel.updateCompressMode(it) },
-                    onQualityChanged = { viewModel.updateQuality(it) },
-                    onTargetKbChanged = { viewModel.updateTargetKb(it) },
-                    onBackgroundColorChanged = { viewModel.updateBackgroundColor(it) },
-                    onToggleStripExif = { viewModel.toggleStripExif() }
-                )
-            }
-
-            // Selected & Processed Images Section
+            // Selected & Processed Images Section — web parity: selected
+            // images show at the TOP, above the settings panel.
+            // (No crop action here: crop is against resize.)
             if (images.isNotEmpty()) {
                 item {
                     Text(
@@ -227,8 +200,24 @@ fun ShrinkItApp(
                         item = item,
                         onRemove = { viewModel.removeImage(item.id) },
                         onRotate = { viewModel.rotateImage(item.id) },
-                        onCrop = { onOpenCropEditor?.invoke(item.id) },
                         modifier = Modifier.animateItem()
+                    )
+                }
+
+                // Detailed Settings Panel — web parity: only visible once
+                // images are selected, below the image list.
+                item {
+                    SettingsPanel(
+                        options = options,
+                        onWidthChanged = { viewModel.updateWidth(it) },
+                        onHeightChanged = { viewModel.updateHeight(it) },
+                        onUnitChanged = { viewModel.updateUnit(it) },
+                        onToggleAspectLock = { viewModel.toggleKeepAspectRatio() },
+                        onResizeModeChanged = { viewModel.updateResizeMode(it) },
+                        onDpiChanged = { viewModel.updateDpi(it) },
+                        onFormatChanged = { viewModel.updateFormat(it) },
+                        onQualityChanged = { viewModel.updateQuality(it) },
+                        onBackgroundColorChanged = { viewModel.updateBackgroundColor(it) }
                     )
                 }
 

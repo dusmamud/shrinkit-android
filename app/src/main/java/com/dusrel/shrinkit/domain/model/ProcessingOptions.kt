@@ -6,7 +6,7 @@ data class ProcessingOptions(
     val unit: SizeUnit = SizeUnit.PERCENT,
     val keepAspectRatio: Boolean = true,
     val resizeMode: ResizeMode = ResizeMode.STRETCH,
-    val format: TargetFormat = TargetFormat.ORIGINAL,
+    val format: TargetFormat = TargetFormat.JPEG,
     val compressMode: CompressMode = CompressMode.QUALITY,
     val quality: Int = 90,
     val targetKb: Int = 200,

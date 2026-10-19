@@ -1,15 +1,10 @@
 package com.dusrel.shrinkit.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
@@ -19,12 +14,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,12 +33,17 @@ import androidx.compose.ui.unit.dp
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.BackgroundColor
-import com.dusrel.shrinkit.domain.model.CompressMode
 import com.dusrel.shrinkit.domain.model.ProcessingOptions
 import com.dusrel.shrinkit.domain.model.ResizeMode
 import com.dusrel.shrinkit.domain.model.SizeUnit
 import com.dusrel.shrinkit.domain.model.TargetFormat
 
+/**
+ * Web parity (/resize SettingsPanel): width/height + aspect lock + unit,
+ * DPI, resize mode (stretch/crop/fit), format, quality (JPEG/WebP only),
+ * background. No compress-mode toggle, no target-KB, no EXIF switch —
+ * those live on the dedicated tool screens (Phase 2).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPanel(
@@ -55,16 +53,18 @@ fun SettingsPanel(
     onUnitChanged: (SizeUnit) -> Unit,
     onToggleAspectLock: () -> Unit,
     onResizeModeChanged: (ResizeMode) -> Unit,
+    onDpiChanged: (Int) -> Unit,
     onFormatChanged: (TargetFormat) -> Unit,
-    onCompressModeChanged: (CompressMode) -> Unit,
     onQualityChanged: (Int) -> Unit,
-    onTargetKbChanged: (Int) -> Unit,
     onBackgroundColorChanged: (BackgroundColor) -> Unit,
-    onToggleStripExif: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var expandedAdvanced by remember { mutableStateOf(false) }
     var unitDropdownExpanded by remember { mutableStateOf(false) }
+
+    // Web rule: resize mode row only matters when unlocked and W != H.
+    val showResizeMode = !options.keepAspectRatio && options.width != options.height
+    // Web rule: quality slider only applies to JPEG/WebP (PNG/GIF force 100).
+    val showQuality = options.format == TargetFormat.JPEG || options.format == TargetFormat.WEBP
 
     Card(
         modifier = modifier
@@ -170,10 +170,10 @@ fun SettingsPanel(
                 }
             }
 
-            // Section 2: Resize Mode
+            // Section 2: DPI (web parity: 72/150/300)
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    text = stringResource(R.string.section_mode),
+                    text = stringResource(R.string.label_dpi),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium
                 )
@@ -181,76 +181,44 @@ fun SettingsPanel(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    ResizeMode.entries.forEach { mode ->
-                        val isSelected = options.resizeMode == mode
-                        val label = when (mode) {
-                            ResizeMode.STRETCH -> stringResource(R.string.mode_stretch)
-                            ResizeMode.CROP -> stringResource(R.string.mode_crop)
-                            ResizeMode.FIT -> stringResource(R.string.mode_fit)
-                        }
+                    listOf(72, 150, 300).forEach { dpi ->
                         FilterChip(
-                            selected = isSelected,
-                            onClick = { onResizeModeChanged(mode) },
-                            label = { Text(label) },
+                            selected = options.dpi == dpi,
+                            onClick = { onDpiChanged(dpi) },
+                            label = { Text(dpi.toString()) },
                             modifier = Modifier.weight(1f)
                         )
                     }
                 }
             }
 
-            // Section 3: Compression Mode (Quality vs Target KB)
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = stringResource(R.string.section_compression),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    FilterChip(
-                        selected = options.compressMode == CompressMode.QUALITY,
-                        onClick = { onCompressModeChanged(CompressMode.QUALITY) },
-                        label = { Text(stringResource(R.string.mode_quality)) },
-                        modifier = Modifier.weight(1f)
+            // Section 3: Resize Mode — web rule: only when unlocked and W != H
+            if (showResizeMode) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text = stringResource(R.string.section_mode),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium
                     )
-                    FilterChip(
-                        selected = options.compressMode == CompressMode.TARGET_KB,
-                        onClick = { onCompressModeChanged(CompressMode.TARGET_KB) },
-                        label = { Text(stringResource(R.string.mode_target_kb)) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                if (options.compressMode == CompressMode.QUALITY) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "${stringResource(R.string.label_quality)}: ${options.quality}%",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        ResizeMode.entries.forEach { mode ->
+                            val isSelected = options.resizeMode == mode
+                            val label = when (mode) {
+                                ResizeMode.STRETCH -> stringResource(R.string.mode_stretch)
+                                ResizeMode.CROP -> stringResource(R.string.mode_crop)
+                                ResizeMode.FIT -> stringResource(R.string.mode_fit)
+                            }
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { onResizeModeChanged(mode) },
+                                label = { Text(label) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
-                    Slider(
-                        value = options.quality.toFloat(),
-                        onValueChange = { onQualityChanged(it.toInt()) },
-                        valueRange = 1f..100f
-                    )
-                } else {
-                    OutlinedTextField(
-                        value = options.targetKb.toString(),
-                        onValueChange = { str ->
-                            str.toIntOrNull()?.let { onTargetKbChanged(it) }
-                        },
-                        label = { Text(stringResource(R.string.label_target_kb)) },
-                        placeholder = { Text(stringResource(R.string.hint_target_kb)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
                 }
             }
 
@@ -266,7 +234,8 @@ fun SettingsPanel(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     // AVIF has no Android framework encoder (Bitmap.compress), so it is
-                    // not offered as an output format. AVIF *input* still decodes on API 31+.
+                    // not offered as an output format. GIF needs a custom encoder —
+                    // deferred (web parity gap, tracked separately).
                     TargetFormat.entries.filter { it != TargetFormat.AVIF }.forEach { format ->
                         val isSelected = options.format == format
                         val label = when (format) {
@@ -285,84 +254,45 @@ fun SettingsPanel(
                 }
             }
 
-            // Advanced Options Toggle
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expandedAdvanced = !expandedAdvanced }
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.section_advanced),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                SymbolIcon(
-                    name = if (expandedAdvanced) "expand_less" else "expand_more",
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            AnimatedVisibility(visible = expandedAdvanced) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // Background Color Selector
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(
-                            text = stringResource(R.string.section_background),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(
-                                selected = options.backgroundColor == BackgroundColor.WHITE,
-                                onClick = { onBackgroundColorChanged(BackgroundColor.WHITE) },
-                                label = { Text(stringResource(R.string.bg_white)) }
-                            )
-                            FilterChip(
-                                selected = options.backgroundColor == BackgroundColor.BLACK,
-                                onClick = { onBackgroundColorChanged(BackgroundColor.BLACK) },
-                                label = { Text(stringResource(R.string.bg_black)) }
-                            )
-                        }
-                    }
-
-                    // Strip EXIF metadata
+            // Section 5: Quality — web rule: JPEG/WebP only
+            if (showQuality) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            SymbolIcon(
-                                name = "security",
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.opt_strip_exif),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = stringResource(R.string.opt_strip_exif_desc),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                        Switch(
-                            checked = options.stripExif,
-                            onCheckedChange = { onToggleStripExif() }
+                        Text(
+                            text = "${stringResource(R.string.label_quality)}: ${options.quality}%",
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
+                    Slider(
+                        value = options.quality.toFloat(),
+                        onValueChange = { onQualityChanged(it.toInt()) },
+                        valueRange = 1f..100f
+                    )
+                }
+            }
+
+            // Section 6: Background Color
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = stringResource(R.string.section_background),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = options.backgroundColor == BackgroundColor.WHITE,
+                        onClick = { onBackgroundColorChanged(BackgroundColor.WHITE) },
+                        label = { Text(stringResource(R.string.bg_white)) }
+                    )
+                    FilterChip(
+                        selected = options.backgroundColor == BackgroundColor.BLACK,
+                        onClick = { onBackgroundColorChanged(BackgroundColor.BLACK) },
+                        label = { Text(stringResource(R.string.bg_black)) }
+                    )
                 }
             }
         }

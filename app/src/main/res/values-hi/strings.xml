@@ -38,6 +38,7 @@
     <string name="mode_quality">क्वालिटी स्लाइडर (%)</string>
     <string name="mode_target_kb">टारगेट साइज़ (KB)</string>
     <string name="label_quality">क्वालिटी</string>
+    <string name="label_dpi">रिज़ॉल्यूशन (DPI)</string>
     <string name="label_target_kb">टारगेट फ़ाइल साइज़ (KB)</string>
     <string name="hint_target_kb">जैसे 20, 50, 100</string>
 

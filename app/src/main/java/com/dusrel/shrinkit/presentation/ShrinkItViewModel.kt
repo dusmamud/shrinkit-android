@@ -318,6 +318,15 @@ class ShrinkItViewModel @Inject constructor(
         }
     }
 
+    fun updateDpi(dpi: Int) {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(dpi = dpi),
+                selectedPresetId = null
+            )
+        }
+    }
+
     fun updateTargetKb(targetKb: Int) {
         _uiState.update { current ->
             current.copy(

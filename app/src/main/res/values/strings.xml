@@ -38,6 +38,7 @@
     <string name="mode_quality">Quality Slider (%)</string>
     <string name="mode_target_kb">Target Size (KB)</string>
     <string name="label_quality">Quality</string>
+    <string name="label_dpi">Resolution (DPI)</string>
     <string name="label_target_kb">Target File Size (KB)</string>
     <string name="hint_target_kb">e.g. 20, 50, 100</string>
 

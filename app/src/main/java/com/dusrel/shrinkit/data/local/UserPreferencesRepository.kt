@@ -27,7 +27,7 @@ data class UserPreferences(
     val onboardingDone: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val defaultQuality: Int = 90,
-    val defaultFormatName: String = "ORIGINAL",
+    val defaultFormatName: String = "JPEG",
     val notificationsEnabled: Boolean = true
 )
 
@@ -60,7 +60,7 @@ class UserPreferencesRepository @Inject constructor(
                     ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
                 }.getOrDefault(ThemeMode.SYSTEM),
                 defaultQuality = (prefs[Keys.DEFAULT_QUALITY] ?: 90).coerceIn(1, 100),
-                defaultFormatName = prefs[Keys.DEFAULT_FORMAT] ?: "ORIGINAL",
+                defaultFormatName = prefs[Keys.DEFAULT_FORMAT] ?: "JPEG",
                 notificationsEnabled = prefs[Keys.NOTIFICATIONS_ENABLED] ?: true
             )
         }

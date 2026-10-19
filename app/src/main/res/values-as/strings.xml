@@ -38,6 +38,7 @@
     <string name="mode_quality">গুণমান শ্লাইডাৰ (%)</string>
     <string name="mode_target_kb">লক্ষ্য আকাৰ (KB)</string>
     <string name="label_quality">গুণমান</string>
+    <string name="label_dpi">ৰিজলিউচন (DPI)</string>
     <string name="label_target_kb">লক্ষ্য ফাইল আকাৰ (KB)</string>
     <string name="hint_target_kb">যেনে ২০, ৫০, ১০০</string>
 
