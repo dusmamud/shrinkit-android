@@ -6,6 +6,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +15,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.dusrel.shrinkit.R
@@ -62,6 +65,22 @@ fun MainScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                     tonalElevation = 0.dp
                 ) {
+                    // Active tab is white (no accent/primary, no green pill).
+                    // Theme-aware: pure white on dark page, onBackground on
+                    // light page so the tab never disappears into the bg.
+                    val isDarkPage =
+                        MaterialTheme.colorScheme.background.luminance() < 0.5f
+                    val activeColor =
+                        if (isDarkPage) Color.White
+                        else MaterialTheme.colorScheme.onBackground
+                    val itemColors =
+                        NavigationBarItemDefaults.colors(
+                            selectedIconColor = activeColor,
+                            selectedTextColor = activeColor,
+                            indicatorColor = Color.Transparent,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     tabs.forEachIndexed { index, tab ->
                         NavigationBarItem(
                             selected = selectedTab == index,
@@ -73,7 +92,8 @@ fun MainScreen(
                                     filled = selectedTab == index
                                 )
                             },
-                            label = { Text(stringResource(tab.labelRes)) }
+                            label = { Text(stringResource(tab.labelRes)) },
+                            colors = itemColors
                         )
                     }
                 }
