@@ -2,7 +2,10 @@ package com.dusrel.shrinkit.presentation.history
 
 import android.net.Uri
 import android.text.format.DateFormat
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,11 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,11 +40,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,12 +55,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
-import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.data.local.ProcessedImageEntity
+import com.dusrel.shrinkit.presentation.components.ScreenTopBar
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
+import com.dusrel.shrinkit.presentation.theme.LocalSuccessBg
 import java.util.Date
 
+private enum class HistoryView { LIST, GRID }
+
 /**
- * Past processed images: thumbnail, stats, share and delete.
+ * Past processed images — Minimal flat design (no cards):
+ * flat rows in list view, flat rounded thumbnails in grid view.
+ * Per-item actions live in a ⋮ overflow menu; the header ⋮ menu holds
+ * List/Grid view toggle and Clear all.
  */
 @Composable
 fun HistoryScreen(
@@ -60,6 +77,8 @@ fun HistoryScreen(
     val history by viewModel.history.collectAsState()
     val userMessage by viewModel.userMessage.collectAsState()
     var showClearConfirm by remember { mutableStateOf(false) }
+    var showHeaderMenu by remember { mutableStateOf(false) }
+    var view by rememberSaveable { mutableStateOf(HistoryView.LIST) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(userMessage) {
@@ -69,37 +88,109 @@ fun HistoryScreen(
         }
     }
 
+    val countSubtitle = if (history.isEmpty()) {
+        null
+    } else {
+        stringResource(R.string.history_count, history.size)
+    }
+
     Scaffold(
+        modifier = modifier,
+        topBar = {
+            ScreenTopBar(
+                title = stringResource(R.string.history_title),
+                subtitle = countSubtitle,
+                actions = {
+                    if (history.isNotEmpty()) {
+                        Box {
+                            IconButton(onClick = { showHeaderMenu = true }) {
+                                SymbolIcon(
+                                    name = "more_vert",
+                                    contentDescription = stringResource(R.string.history_options)
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showHeaderMenu,
+                                onDismissRequest = { showHeaderMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.history_view_list)) },
+                                    onClick = {
+                                        view = HistoryView.LIST
+                                        showHeaderMenu = false
+                                    },
+                                    leadingIcon = {
+                                        SymbolIcon(
+                                            name = "view_list",
+                                            contentDescription = null,
+                                            tint = if (view == HistoryView.LIST)
+                                                MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        if (view == HistoryView.LIST) {
+                                            SymbolIcon(
+                                                name = "check",
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.history_view_grid)) },
+                                    onClick = {
+                                        view = HistoryView.GRID
+                                        showHeaderMenu = false
+                                    },
+                                    leadingIcon = {
+                                        SymbolIcon(
+                                            name = "grid_view",
+                                            contentDescription = null,
+                                            tint = if (view == HistoryView.GRID)
+                                                MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        if (view == HistoryView.GRID) {
+                                            SymbolIcon(
+                                                name = "check",
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                )
+                                HorizontalDivider()
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.history_clear_all)) },
+                                    onClick = {
+                                        showHeaderMenu = false
+                                        showClearConfirm = true
+                                    },
+                                    leadingIcon = {
+                                        SymbolIcon(
+                                            name = "delete",
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { scaffoldPadding ->
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(scaffoldPadding)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(R.string.history_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            if (history.isNotEmpty()) {
-                TextButton(onClick = { showClearConfirm = true }) {
-                    Text(stringResource(R.string.history_clear_all))
-                }
-            }
-        }
-
         if (history.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(scaffoldPadding)
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -124,23 +215,45 @@ fun HistoryScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-        } else {
+        } else if (view == HistoryView.LIST) {
             LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(scaffoldPadding),
                 contentPadding = PaddingValues(
-                    start = 16.dp, end = 16.dp, bottom = 16.dp
+                    start = 20.dp, end = 12.dp, top = 8.dp, bottom = 16.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 items(history, key = { it.id }) { entity ->
-                    HistoryCard(
+                    HistoryRow(
                         entity = entity,
                         onShare = { viewModel.share(entity) },
-                        onDelete = { viewModel.delete(entity) }
+                        onDelete = { viewModel.delete(entity) },
+                        modifier = Modifier.animateItem()
+                    )
+                }
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(scaffoldPadding),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(history, key = { it.id }) { entity ->
+                    HistoryTile(
+                        entity = entity,
+                        onShare = { viewModel.share(entity) },
+                        onDelete = { viewModel.delete(entity) },
+                        modifier = Modifier.animateItem()
                     )
                 }
             }
         }
-    }
     }
 
     if (showClearConfirm) {
@@ -153,7 +266,10 @@ fun HistoryScreen(
                     viewModel.clearAll()
                     showClearConfirm = false
                 }) {
-                    Text(stringResource(R.string.action_delete))
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
@@ -165,83 +281,212 @@ fun HistoryScreen(
     }
 }
 
+/** Flat list row — no card, spacing separates rows. */
 @Composable
-private fun HistoryCard(
+private fun HistoryRow(
     entity: ProcessedImageEntity,
     onShare: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val reduction = if (entity.originalBytes > 0) {
-        (((entity.originalBytes - entity.processedBytes).toDouble()
-            / entity.originalBytes.toDouble()) * 100).toInt().coerceAtLeast(0)
-    } else 0
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val date = remember(entity.createdAt) {
-        DateFormat.getMediumDateFormat(context).format(Date(entity.createdAt))
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    var showMenu by remember { mutableStateOf(false) }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        AsyncImage(
+            model = Uri.parse(entity.contentUri),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+                .size(56.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = entity.filename,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = historyStatsLine(entity),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        ReductionBadge(reductionPercent(entity))
+        Box {
+            IconButton(
+                onClick = { showMenu = true },
+                modifier = Modifier.size(36.dp)
+            ) {
+                SymbolIcon(
+                    name = "more_vert",
+                    contentDescription = stringResource(R.string.history_options)
+                )
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_share)) },
+                    onClick = {
+                        showMenu = false
+                        onShare()
+                    },
+                    leadingIcon = {
+                        SymbolIcon(name = "share", contentDescription = null)
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_delete)) },
+                    onClick = {
+                        showMenu = false
+                        onDelete()
+                    },
+                    leadingIcon = {
+                        SymbolIcon(
+                            name = "delete",
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+/** Flat grid tile — rounded thumbnail, text below, ⋮ overlay. */
+@Composable
+private fun HistoryTile(
+    entity: ProcessedImageEntity,
+    onShare: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showMenu by remember { mutableStateOf(false) }
+    Column(modifier = modifier) {
+        Box {
             AsyncImage(
                 model = Uri.parse(entity.contentUri),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(64.dp)
+                    .fillMaxWidth()
+                    .height(120.dp)
                     .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             )
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = entity.filename,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = "${formatBytes(entity.originalBytes)} → ${formatBytes(entity.processedBytes)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "-$reduction%",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
+            ) {
+                IconButton(
+                    onClick = { showMenu = true },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.85f)
+                        )
+                ) {
+                    SymbolIcon(
+                        name = "more_vert",
+                        contentDescription = stringResource(R.string.history_options)
                     )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "${entity.width}×${entity.height} · $date",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_share)) },
+                        onClick = {
+                            showMenu = false
+                            onShare()
+                        },
+                        leadingIcon = {
+                            SymbolIcon(name = "share", contentDescription = null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_delete)) },
+                        onClick = {
+                            showMenu = false
+                            onDelete()
+                        },
+                        leadingIcon = {
+                            SymbolIcon(
+                                name = "delete",
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     )
                 }
             }
-            IconButton(onClick = onShare) {
-                SymbolIcon(name = "share", contentDescription = stringResource(R.string.action_share))
-            }
-            IconButton(onClick = onDelete) {
-                SymbolIcon(
-                    name = "delete",
-                    contentDescription = stringResource(R.string.action_delete),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = entity.filename,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(Modifier.height(2.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ReductionBadge(reductionPercent(entity))
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = formatBytes(entity.processedBytes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
+}
+
+@Composable
+private fun ReductionBadge(percent: Int) {
+    Text(
+        text = "-$percent%",
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.tertiary,
+        modifier = Modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(LocalSuccessBg.current.copy(alpha = 0.9f))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    )
+}
+
+@Composable
+private fun historyStatsLine(entity: ProcessedImageEntity): String {
+    val context = LocalContext.current
+    val date = remember(entity.createdAt) {
+        DateFormat.getMediumDateFormat(context).format(Date(entity.createdAt))
+    }
+    return "${formatBytes(entity.originalBytes)} → ${formatBytes(entity.processedBytes)} · " +
+        "${entity.width}×${entity.height} · $date"
+}
+
+private fun reductionPercent(entity: ProcessedImageEntity): Int {
+    if (entity.originalBytes <= 0) return 0
+    return (((entity.originalBytes - entity.processedBytes).toDouble()
+        / entity.originalBytes.toDouble()) * 100).toInt().coerceAtLeast(0)
 }
 
 private fun formatBytes(bytes: Long): String {

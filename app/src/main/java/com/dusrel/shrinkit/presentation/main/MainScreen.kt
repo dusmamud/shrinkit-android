@@ -1,6 +1,9 @@
 package com.dusrel.shrinkit.presentation.main
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -12,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
@@ -32,6 +36,8 @@ private data class BottomTab(
 fun MainScreen(
     toolViewModel: ShrinkItViewModel,
     onOpenTool: () -> Unit,
+    onOpenTools: () -> Unit = {},
+    onOpenSettingsDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val tabs = listOf(
@@ -44,20 +50,32 @@ fun MainScreen(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            NavigationBar {
-                tabs.forEachIndexed { index, tab ->
-                    NavigationBarItem(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        icon = {
-                            SymbolIcon(
-                                name = tab.iconName,
-                                contentDescription = null,
-                                filled = selectedTab == index
-                            )
-                        },
-                        label = { Text(stringResource(tab.labelRes)) }
-                    )
+            // Web parity (cross-verified): bottom bar uses the page background
+            // with a hairline top border — not M3's default surfaceContainer
+            // tonal tint. containerColor override is API-supported.
+            Column {
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                )
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    tonalElevation = 0.dp
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        NavigationBarItem(
+                            selected = selectedTab == index,
+                            onClick = { selectedTab = index },
+                            icon = {
+                                SymbolIcon(
+                                    name = tab.iconName,
+                                    contentDescription = null,
+                                    filled = selectedTab == index
+                                )
+                            },
+                            label = { Text(stringResource(tab.labelRes)) }
+                        )
+                    }
                 }
             }
         }
@@ -67,12 +85,14 @@ fun MainScreen(
                 toolViewModel = toolViewModel,
                 onOpenTool = onOpenTool,
                 onOpenHistory = { selectedTab = 1 },
+                onOpenTools = onOpenTools,
                 modifier = Modifier.padding(innerPadding)
             )
             1 -> HistoryScreen(
                 modifier = Modifier.padding(innerPadding)
             )
             else -> SettingsScreen(
+                onNavigate = onOpenSettingsDetail,
                 modifier = Modifier.padding(innerPadding)
             )
         }

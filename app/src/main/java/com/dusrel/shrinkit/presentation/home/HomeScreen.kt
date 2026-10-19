@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import androidx.core.content.FileProvider
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.domain.model.CompressMode
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
+import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import java.io.File
 
@@ -51,6 +53,7 @@ fun HomeScreen(
     toolViewModel: ShrinkItViewModel,
     onOpenTool: () -> Unit,
     onOpenHistory: () -> Unit,
+    onOpenTools: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -100,8 +103,16 @@ fun HomeScreen(
         }
     }
 
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            ScreenTopBar(title = stringResource(R.string.app_name))
+        }
+    ) { scaffoldPadding ->
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(scaffoldPadding),
         contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -184,6 +195,12 @@ fun HomeScreen(
                     title = stringResource(R.string.home_action_history_title),
                     subtitle = stringResource(R.string.home_action_history_sub),
                     onClick = onOpenHistory
+                )
+                QuickActionCard(
+                    iconName = "auto_awesome",
+                    title = stringResource(R.string.home_action_tools_title),
+                    subtitle = stringResource(R.string.home_action_tools_sub),
+                    onClick = onOpenTools
                 )
             }
         }
@@ -358,6 +375,7 @@ private fun HowItWorksRow(step: String, title: String, body: String) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
     }
 }
 

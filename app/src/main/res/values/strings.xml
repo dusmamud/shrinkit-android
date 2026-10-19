@@ -210,4 +210,38 @@
     <string name="history_deleted">Deleted from history</string>
     <string name="history_delete_failed">Could not delete. Please try again.</string>
     <string name="history_share_failed">Could not share this photo.</string>
+
+    <!-- History view menu -->
+    <string name="history_view_list">List view</string>
+    <string name="history_view_grid">Grid view</string>
+    <string name="history_options">Options</string>
+    <!-- Settings additions -->
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_sub">Batch completion alerts</string>
+    <!-- Tools -->
+    <string name="tools_title">Tools</string>
+    <string name="tools_subtitle">Single-purpose, one tap</string>
+    <string name="tool_kb50_title">Compress to 50 KB</string>
+    <string name="tool_kb50_badge">Government Portals</string>
+    <string name="tool_kb50_desc">Strictly compress photos under 50 KB for UPSC, SSC, IBPS and bank exams — without blurring.</string>
+    <string name="tool_kb20_title">Compress to 20 KB</string>
+    <string name="tool_kb20_badge">Signatures &amp; IDs</string>
+    <string name="tool_kb20_desc">Reduce signature and thumb-impression scans to under 20 KB with sharp contrast.</string>
+    <string name="tool_passport_title">Passport Photo Maker</string>
+    <string name="tool_passport_badge">300 DPI Official</string>
+    <string name="tool_passport_desc">Format portraits to official standards with a pure white background.</string>
+    <string name="tool_social_title">Social Media Resizer</string>
+    <string name="tool_social_badge">2026 Standards</string>
+    <string name="tool_social_desc">One-tap sizes for every platform.</string>
+    <string name="tool_compare_title">Before / After</string>
+    <string name="tool_compare_badge">Visual Inspection</string>
+    <string name="tool_compare_desc">Process a photo, then tap Compare on the result to inspect quality.</string>
+    <string name="tool_target_upto">Up to %1$d KB</string>
+    <string name="history_count">%1$d images</string>
+    <string name="settings_defaults_sub">Quality %1$d%% Â· Format</string>
+    <string name="settings_privacy_note">100% on-device Â· No account Â· No ads</string>
+    <string name="settings_appearance_hint">System follows your phoneâs dark-mode schedule. Applies instantly across the app.</string>
+    <string name="settings_default_format_hint">Auto keeps each photoâs original format.</string>
+    <string name="home_action_tools_title">All Tools</string>
+    <string name="home_action_tools_sub">50 KB, passport, social â one tap each</string>
 </resources>

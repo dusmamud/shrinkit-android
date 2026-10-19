@@ -56,6 +56,12 @@ fun ShrinkItApp(
     onOpenCropEditor: ((String) -> Unit)? = null,
     defaultQuality: Int? = null,
     defaultFormatName: String? = null,
+    /** Focused tool id (kb50/kb20/passport/social/compare) — applies its config on entry. */
+    initialToolId: String? = null,
+    /** Override the top bar (tool detail screens show the tool title). */
+    topBar: @Composable () -> Unit = { ShrinkItTopBar(onBackClick = onNavigateBack) },
+    /** Extra header content rendered above the picker (tool badge/description). */
+    headerContent: @Composable () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -68,6 +74,11 @@ fun ShrinkItApp(
         if (defaultQuality != null && defaultFormatName != null) {
             viewModel.applyPreferenceDefaults(defaultQuality, defaultFormatName)
         }
+    }
+
+    // Focused tool entry (Tools hub): apply the tool's locked config once.
+    LaunchedEffect(initialToolId) {
+        initialToolId?.let { viewModel.applyToolConfig(it) }
     }
 
     LaunchedEffect(Unit) {
@@ -90,7 +101,7 @@ fun ShrinkItApp(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { ShrinkItTopBar(onBackClick = onNavigateBack) },
+        topBar = topBar,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             AnimatedVisibility(visible = uiState.images.isNotEmpty()) {
@@ -152,6 +163,8 @@ fun ShrinkItApp(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            item { headerContent() }
+
             // Hero / Picker Card
             item {
                 ImagePickerSection(
@@ -205,7 +218,8 @@ fun ShrinkItApp(
                         item = item,
                         onRemove = { viewModel.removeImage(item.id) },
                         onRotate = { viewModel.rotateImage(item.id) },
-                        onCrop = { onOpenCropEditor?.invoke(item.id) }
+                        onCrop = { onOpenCropEditor?.invoke(item.id) },
+                        modifier = Modifier.animateItem()
                     )
                 }
 

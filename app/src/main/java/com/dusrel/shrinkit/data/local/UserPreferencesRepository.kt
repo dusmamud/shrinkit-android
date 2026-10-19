@@ -27,7 +27,8 @@ data class UserPreferences(
     val onboardingDone: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val defaultQuality: Int = 90,
-    val defaultFormatName: String = "ORIGINAL"
+    val defaultFormatName: String = "ORIGINAL",
+    val notificationsEnabled: Boolean = true
 )
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
@@ -44,6 +45,7 @@ class UserPreferencesRepository @Inject constructor(
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val DEFAULT_QUALITY = intPreferencesKey("default_quality")
         val DEFAULT_FORMAT = stringPreferencesKey("default_format")
+        val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     }
 
     val preferences: Flow<UserPreferences> = context.dataStore.data
@@ -58,7 +60,8 @@ class UserPreferencesRepository @Inject constructor(
                     ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
                 }.getOrDefault(ThemeMode.SYSTEM),
                 defaultQuality = (prefs[Keys.DEFAULT_QUALITY] ?: 90).coerceIn(1, 100),
-                defaultFormatName = prefs[Keys.DEFAULT_FORMAT] ?: "ORIGINAL"
+                defaultFormatName = prefs[Keys.DEFAULT_FORMAT] ?: "ORIGINAL",
+                notificationsEnabled = prefs[Keys.NOTIFICATIONS_ENABLED] ?: true
             )
         }
 
@@ -76,5 +79,9 @@ class UserPreferencesRepository @Inject constructor(
 
     suspend fun setDefaultFormatName(name: String) {
         context.dataStore.edit { it[Keys.DEFAULT_FORMAT] = name }
+    }
+
+    suspend fun setNotificationsEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.NOTIFICATIONS_ENABLED] = enabled }
     }
 }

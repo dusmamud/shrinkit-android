@@ -210,4 +210,35 @@
     <string name="history_deleted">इतिहास से हटाया गया</string>
     <string name="history_delete_failed">हटा नहीं सका। कृपया दोबारा कोशिश करें।</string>
     <string name="history_share_failed">यह फोटो शेयर नहीं हो सकी।</string>
+
+    <string name="history_view_list">सूची दृश्य</string>
+    <string name="history_view_grid">ग्रिड दृश्य</string>
+    <string name="history_options">विकल्प</string>
+    <string name="settings_notifications">सूचनाएं</string>
+    <string name="settings_notifications_sub">बैच पूरा होने पर अलर्ट</string>
+    <string name="tools_title">टूल्स</string>
+    <string name="tools_subtitle">एक उद्देश्य, एक टैप</string>
+    <string name="tool_kb50_title">50 KB तक कंप्रेस करें</string>
+    <string name="tool_kb50_badge">सरकारी पोर्टल</string>
+    <string name="tool_kb50_desc">UPSC, SSC, IBPS और बैंक परीक्षाओं के लिए फिना धुधलाए 50 KB से कम करें।</string>
+    <string name="tool_kb20_title">20 KB तक कंप्रेस करें</string>
+    <string name="tool_kb20_badge">हस्ताक्षर</string>
+    <string name="tool_kb20_desc">हस्ताक्षर और अंगूठे के निशान 20 KB से कम करें।</string>
+    <string name="tool_passport_title">पासपोर्ट फोटो मेकर</string>
+    <string name="tool_passport_badge">300 DPI आधिकारिक</string>
+    <string name="tool_passport_desc">फोटो को आधिकारिक मानक के अनुसार बनाएं।</string>
+    <string name="tool_social_title">सोशल मीडिया रीसाइजर</string>
+    <string name="tool_social_badge">2026 मानक</string>
+    <string name="tool_social_desc">हर प्लेटफार्म के लिए एक-टैप साइज।</string>
+    <string name="tool_compare_title">पहले / बाद में</string>
+    <string name="tool_compare_badge">दृश्य जांच</string>
+    <string name="tool_compare_desc">फोटो प्रोसेस करें, फिर Compare दबाएं।</string>
+    <string name="tool_target_upto">%1$d KB तक</string>
+    <string name="history_count">%1$d छवियां</string>
+    <string name="settings_defaults_sub">à¤à¥à¤£à¤µà¤¤à¥à¤¤à¤¾ %1$d%% Â· à¤«à¤¼à¥à¤°à¤®à¥à¤</string>
+    <string name="settings_privacy_note">100% à¤¡à¤¿à¤µà¤¾à¤à¤¸ à¤ªà¤° Â· à¤à¥à¤ à¤à¤¾à¤¤à¤¾ à¤¨à¤¹à¥à¤ Â· à¤à¥à¤ à¤µà¤¿à¤à¥à¤à¤¾à¤ªà¤¨ à¤¨à¤¹à¥à¤</string>
+    <string name="settings_appearance_hint">à¤¸à¤¿à¤¸à¥à¤à¤® à¤à¤ªà¤à¥ à¤«à¥à¤¨ à¤à¥ à¤¡à¤¾à¤°à¥à¤-à¤®à¥à¤¡ à¤à¥ à¤«à¥à¤²à¥ à¤à¤°à¤¤à¤¾ à¤¹à¥à¥¤</string>
+    <string name="settings_default_format_hint">à¤à¤à¥ à¤¹à¤° à¤«à¥à¤à¥ à¤à¤¾ à¤®à¥à¤² à¤«à¤¼à¥à¤°à¤®à¥à¤ à¤°à¤à¤¤à¤¾ à¤¹à¥à¥¤</string>
+    <string name="home_action_tools_title">à¤¸à¤­à¥ à¤à¥à¤²à¥à¤¸</string>
+    <string name="home_action_tools_sub">50 KB, à¤ªà¤¾à¤¸à¤ªà¥à¤°à¥à¤, à¤¸à¥à¤¶à¤² â à¤à¤ à¤à¥à¤ª à¤®à¥à¤</string>
 </resources>

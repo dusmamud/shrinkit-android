@@ -13,6 +13,12 @@ object Destinations {
     const val MAIN = "main"
     const val TOOL = "tool"
     const val CROP_EDITOR = "crop/{imageId}"
+    const val SETTINGS_APPEARANCE = "settings/appearance"
+    const val SETTINGS_DEFAULTS = "settings/defaults"
+    const val SETTINGS_ABOUT = "settings/about"
+    const val TOOLS = "tools"
+    const val TOOL_DETAIL = "tools/{toolId}"
 
     fun cropEditor(imageId: String): String = "crop/$imageId"
+    fun toolDetail(toolId: String): String = "tools/$toolId"
 }

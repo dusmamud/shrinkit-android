@@ -172,7 +172,9 @@ fun ShrinkItTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            // Web parity: header uses the page background (bg-tpage), not surface.
+            containerColor = MaterialTheme.colorScheme.background,
+            scrolledContainerColor = MaterialTheme.colorScheme.background
         )
     )
 }

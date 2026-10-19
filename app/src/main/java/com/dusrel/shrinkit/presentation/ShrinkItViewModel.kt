@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.data.local.HistoryDao
 import com.dusrel.shrinkit.data.local.ProcessedImageEntity
+import com.dusrel.shrinkit.data.local.UserPreferencesRepository
 import com.dusrel.shrinkit.data.storage.MediaStoreExporter
+import com.dusrel.shrinkit.presentation.util.NotificationHelper
 import com.dusrel.shrinkit.domain.engine.BinarySearchCompressor
 import com.dusrel.shrinkit.domain.engine.DimensionField
 import com.dusrel.shrinkit.domain.engine.ExifSanitizer
@@ -33,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,7 +56,8 @@ data class ShrinkItUiState(
 @HiltViewModel
 class ShrinkItViewModel @Inject constructor(
     private val application: Application,
-    private val historyDao: HistoryDao
+    private val historyDao: HistoryDao,
+    private val prefs: UserPreferencesRepository
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(ShrinkItUiState())
@@ -171,6 +175,40 @@ class ShrinkItViewModel @Inject constructor(
             current.copy(
                 options = preset.options,
                 selectedPresetId = preset.id
+            )
+        }
+    }
+
+    /**
+     * Focused tool entry from the Tools hub. Applies the tool's locked
+     * configuration (mirrors the web app's single-purpose tool pages).
+     */
+    fun applyToolConfig(toolId: String) {
+        when (toolId) {
+            "kb50" -> applyTargetKb(50)
+            "kb20" -> applyTargetKb(20)
+            "passport" -> ImagePreset.ALL.firstOrNull { it.id == "passport_in" }
+                ?.let { applyPreset(it) }
+            "social" -> ImagePreset.ALL.firstOrNull { it.id == "instagram_post" }
+                ?.let { applyPreset(it) }
+            // "compare": default workspace — compare happens per completed result.
+            else -> Unit
+        }
+    }
+
+    /**
+     * Locks compression to a target file size, keeping current dimensions
+     * and forcing JPEG (the web tool behavior for Compress-to-X-KB pages).
+     */
+    fun applyTargetKb(kb: Int) {
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(
+                    compressMode = CompressMode.TARGET_KB,
+                    targetKb = kb.coerceIn(1, 2000),
+                    format = TargetFormat.JPEG
+                ),
+                selectedPresetId = null
             )
         }
     }
@@ -475,6 +513,28 @@ class ShrinkItViewModel @Inject constructor(
                     userMessage = application.getString(R.string.status_done)
                 )
             }
+
+            // Batch completion alert (respects the Settings toggle; the
+            // helper itself no-ops when the runtime permission is missing).
+            val completedCount = _uiState.value.images.count { img ->
+                img.status == ProcessingStatus.COMPLETED
+            }
+            if (completedCount > 0 &&
+                prefs.preferences.first().notificationsEnabled
+            ) {
+                val saved = formatBytes(_uiState.value.totalSavedBytes)
+                NotificationHelper.showCompletionNotification(
+                    application, completedCount, saved
+                )
+            }
+        }
+    }
+
+    private fun formatBytes(bytes: Long): String {
+        if (bytes <= 0) return "0 KB"
+        return when {
+            bytes >= 1024 * 1024 -> String.format("%.1f MB", bytes / (1024.0 * 1024.0))
+            else -> String.format("%.0f KB", bytes / 1024.0)
         }
     }
 

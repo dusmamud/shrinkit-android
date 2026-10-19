@@ -210,4 +210,35 @@
     <string name="history_deleted">ইতিহাসৰ পৰা মচা হ\'ল</string>
     <string name="history_delete_failed">মচিব নোৱাৰিলে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।</string>
     <string name="history_share_failed">এই ফটো শ্বেয়াৰ কৰিব নোৱাৰিলে।</string>
+
+    <string name="history_view_list">তালিকা দৃশ্য</string>
+    <string name="history_view_grid">গ্ৰিড দৃশ্য</string>
+    <string name="history_options">বিকল্প</string>
+    <string name="settings_notifications">জনানী</string>
+    <string name="settings_notifications_sub">বেচ সমাপ্ত হলে সজাগ কৰা</string>
+    <string name="tools_title">সাঁজুলি</string>
+    <string name="tools_subtitle">এটা উদ্দেশ্য, এটা টেপ</string>
+    <string name="tool_kb50_title">50 KBলৈ কমাওক</string>
+    <string name="tool_kb50_badge">চৰকাৰী পৰ্টেল</string>
+    <string name="tool_kb50_desc">UPSC, SSC, IBPS আৰু বেঙ্ক পৰীক্ষাৰ বাবে ধুঁদলী নোহোৱাকৈ 50 KBৰ তললৈ কমাওক।</string>
+    <string name="tool_kb20_title">20 KBলৈ কমাওক</string>
+    <string name="tool_kb20_badge">স্বাক্ষৰ</string>
+    <string name="tool_kb20_desc">স্বাক্ষৰ আৰু বুঢ়া আঙুলিৰ চিন 20 KBৰ তললৈ কমাওক।</string>
+    <string name="tool_passport_title">পাসপৰ্ট ফটো মেকাৰ</string>
+    <string name="tool_passport_badge">300 DPI আনুষ্ঠানিক</string>
+    <string name="tool_passport_desc">ফটো আনুষ্ঠানিক মানদণ্ডলৈ ৰূপান্তৰ কৰক।</string>
+    <string name="tool_social_title">সামাজিক মাধ্যম ৰীসাইজাৰ</string>
+    <string name="tool_social_badge">2026 মানদণ্ড</string>
+    <string name="tool_social_desc">প্ৰতিটো প্লেটফৰমৰ বাবে এটা-টেপ আকাৰ।</string>
+    <string name="tool_compare_title">আগৰ / পিছৰ</string>
+    <string name="tool_compare_badge">দৃশ্য পৰীক্ষা</string>
+    <string name="tool_compare_desc">ফটো প্ৰক্ৰিযা কৰক, তাৰপিছত Compare টিপক।</string>
+    <string name="tool_target_upto">%1$d KBলৈকৈ</string>
+    <string name="history_count">%1$d খন ছবি</string>
+    <string name="settings_defaults_sub">à¦à§à¦£à¦à¦¤ à¦®à¦¾à¦¨ %1$d%% Â· à¦«à§°à¦®à§à¦</string>
+    <string name="settings_privacy_note">100% à¦¡à¦¿à¦­à¦¾à¦à¦à¦¤ Â· à¦à§à¦¨à§ à¦à§à¦¯à¦¾à¦à¦¾à¦à¦£à§à¦ à¦¨à¦¾à¦ Â· à¦à§à¦¨à§ à¦¬à¦¿à¦à§à¦à¦¾à¦ªà¦¨ à¦¨à¦¾à¦</string>
+    <string name="settings_appearance_hint">à¦à¦¿à¦·à¦à§à¦®à§ à¦à¦ªà§à¦¨à¦¾à§° à¦«à§à¦¨à§° à¦¡à¦¾à§°à¦-à¦®à¦¡ à¦à¦¨à§à¦¸à§°à¦£ à¦à§°à§à¥¤</string>
+    <string name="settings_default_format_hint">à¦à¦à§à§ à¦ªà§à§°à¦¤à¦¿à¦à§ à¦«à¦à§à§° à¦®à§à¦² à¦«à§°à¦®à§à¦ à§°à¦¾à¦à§à¥¤</string>
+    <string name="home_action_tools_title">সমূহ সাঁজুলি</string>
+    <string name="home_action_tools_sub">50 KB, পাসপৰ্ট, সামাজিক — এটা টেপত</string>
 </resources>
