@@ -47,35 +47,34 @@ fun ShrinkItNavHost(
     onOnboardingFinished: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val enterSpec = fadeIn(tween(TRANSITION_MS)) +
-        slideIntoContainer(
-            AnimatedContentTransitionScope.SlideDirection.Start,
-            tween(TRANSITION_MS)
-        )
-    val exitSpec = fadeOut(tween(TRANSITION_MS)) +
-        slideOutOfContainer(
-            AnimatedContentTransitionScope.SlideDirection.Start,
-            tween(TRANSITION_MS)
-        )
-    val popEnterSpec = fadeIn(tween(TRANSITION_MS)) +
-        slideIntoContainer(
-            AnimatedContentTransitionScope.SlideDirection.End,
-            tween(TRANSITION_MS)
-        )
-    val popExitSpec = fadeOut(tween(TRANSITION_MS)) +
-        slideOutOfContainer(
-            AnimatedContentTransitionScope.SlideDirection.End,
-            tween(TRANSITION_MS)
-        )
-
     NavHost(
         navController = navController,
         startDestination = if (prefs.onboardingDone) Destinations.MAIN else Destinations.ONBOARDING,
         modifier = modifier,
-        enterTransition = { enterSpec },
-        exitTransition = { exitSpec },
-        popEnterTransition = { popEnterSpec },
-        popExitTransition = { popExitSpec }
+        enterTransition = {
+            fadeIn(tween(TRANSITION_MS)) + slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(TRANSITION_MS)
+            )
+        },
+        exitTransition = {
+            fadeOut(tween(TRANSITION_MS)) + slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(TRANSITION_MS)
+            )
+        },
+        popEnterTransition = {
+            fadeIn(tween(TRANSITION_MS)) + slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(TRANSITION_MS)
+            )
+        },
+        popExitTransition = {
+            fadeOut(tween(TRANSITION_MS)) + slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(TRANSITION_MS)
+            )
+        }
     ) {
         composable(Destinations.ONBOARDING) {
             OnboardingScreen(onFinished = {
