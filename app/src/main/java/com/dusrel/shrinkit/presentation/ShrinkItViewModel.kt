@@ -591,8 +591,11 @@ class ShrinkItViewModel @Inject constructor(
     suspend fun getCroppedPreview(item: ImageItem, maxSide: Int = 512): Bitmap? =
         withContext(Dispatchers.IO) {
             val rect = item.cropRect ?: return@withContext null
-            val decoded = SafeBitmapDecoder.decode(application, item.uri)
-                ?: return@withContext null
+            val decoded = try {
+                SafeBitmapDecoder.decode(application, item.uri).bitmap
+            } catch (_: Exception) {
+                return@withContext null
+            }
             val cropped = applyRelativeCrop(decoded, rect) ?: decoded
             // Downscale for preview.
             val scale = (maxOf(cropped.width, cropped.height).toFloat() / maxSide)
