@@ -7,9 +7,10 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,9 +36,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -64,22 +65,37 @@ fun HomeScreen(
     val context = LocalContext.current
 
     // Camera capture: permission -> temp file -> TakePicture -> add to tool.
-    val pendingPhotoUri = remember { arrayOfNulls<Uri>(1) }
+    // The pending URI lives in the activity-scoped ViewModel so a config
+    // change while the camera app is open does not lose the capture.
     val takePictureLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            pendingPhotoUri[0]?.let { uri ->
+            toolViewModel.pendingCameraUri?.let { uri ->
+                toolViewModel.pendingCameraUri = null
                 toolViewModel.addImages(listOf(uri))
                 onOpenTool()
             }
+        } else {
+            toolViewModel.pendingCameraUri = null
         }
     }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            launchCamera(context, pendingPhotoUri, takePictureLauncher::launch)
+            launchCamera(
+                context = context,
+                onUriReady = { uri -> toolViewModel.pendingCameraUri = uri },
+                onError = {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.error_camera_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                launch = takePictureLauncher::launch
+            )
         } else {
             Toast.makeText(
                 context,
@@ -91,7 +107,7 @@ fun HomeScreen(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(20.dp),
+        contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
@@ -140,7 +156,18 @@ fun HomeScreen(
                                 context, Manifest.permission.CAMERA
                             ) == PackageManager.PERMISSION_GRANTED
                         ) {
-                            launchCamera(context, pendingPhotoUri, takePictureLauncher::launch)
+                            launchCamera(
+                                context = context,
+                                onUriReady = { uri -> toolViewModel.pendingCameraUri = uri },
+                                onError = {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.error_camera_failed),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                launch = takePictureLauncher::launch
+                            )
                         } else {
                             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                         }
@@ -230,7 +257,8 @@ fun HomeScreen(
 
 private fun launchCamera(
     context: Context,
-    pendingPhotoUri: Array<Uri?>,
+    onUriReady: (Uri) -> Unit,
+    onError: () -> Unit,
     launch: (Uri) -> Unit
 ) {
     try {
@@ -241,9 +269,10 @@ private fun launchCamera(
             "${context.packageName}.fileprovider",
             file
         )
-        pendingPhotoUri[0] = uri
+        onUriReady(uri)
         launch(uri)
     } catch (_: Exception) {
+        onError()
     }
 }
 
@@ -255,9 +284,8 @@ private fun QuickActionCard(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -305,13 +333,13 @@ private fun HowItWorksRow(step: String, title: String, body: String) {
             color = BrandBlue,
             modifier = Modifier.size(28.dp)
         ) {
-            androidx.compose.foundation.layout.Box(
+            Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
                     text = step,
-                    color = androidx.compose.ui.graphics.Color.White,
+                    color = Color.White,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold
                 )

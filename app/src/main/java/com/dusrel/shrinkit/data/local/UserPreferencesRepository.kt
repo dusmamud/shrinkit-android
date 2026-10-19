@@ -5,12 +5,15 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,16 +46,21 @@ class UserPreferencesRepository @Inject constructor(
         val DEFAULT_FORMAT = stringPreferencesKey("default_format")
     }
 
-    val preferences: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
-        UserPreferences(
-            onboardingDone = prefs[Keys.ONBOARDING_DONE] ?: false,
-            themeMode = runCatching {
-                ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
-            }.getOrDefault(ThemeMode.SYSTEM),
-            defaultQuality = (prefs[Keys.DEFAULT_QUALITY] ?: 90).coerceIn(1, 100),
-            defaultFormatName = prefs[Keys.DEFAULT_FORMAT] ?: "ORIGINAL"
-        )
-    }
+    val preferences: Flow<UserPreferences> = context.dataStore.data
+        .catch { e ->
+            // Corrupted prefs file must not crash collectors; fall back to defaults.
+            if (e is IOException) emit(emptyPreferences()) else throw e
+        }
+        .map { prefs ->
+            UserPreferences(
+                onboardingDone = prefs[Keys.ONBOARDING_DONE] ?: false,
+                themeMode = runCatching {
+                    ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
+                }.getOrDefault(ThemeMode.SYSTEM),
+                defaultQuality = (prefs[Keys.DEFAULT_QUALITY] ?: 90).coerceIn(1, 100),
+                defaultFormatName = prefs[Keys.DEFAULT_FORMAT] ?: "ORIGINAL"
+            )
+        }
 
     suspend fun setOnboardingDone() {
         context.dataStore.edit { it[Keys.ONBOARDING_DONE] = true }

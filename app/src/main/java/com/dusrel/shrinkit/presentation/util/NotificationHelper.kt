@@ -38,7 +38,7 @@ object NotificationHelper {
         val text = context.getString(R.string.notification_processing_desc, currentFilename)
 
         return NotificationCompat.Builder(context, ShrinkItApplication.CHANNEL_ID_PROCESSING)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(text)
             .setProgress(total, current, false)
@@ -78,7 +78,7 @@ object NotificationHelper {
         val text = context.getString(R.string.notification_done_desc, processedCount, totalSavingsFormatted)
 
         val notification = NotificationCompat.Builder(context, ShrinkItApplication.CHANNEL_ID_PROCESSING)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(text)
             .setAutoCancel(true)

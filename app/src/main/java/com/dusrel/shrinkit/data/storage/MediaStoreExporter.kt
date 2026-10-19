@@ -79,7 +79,8 @@ object MediaStoreExporter {
     }
 
     /**
-     * Saves a temporary file to app-internal cache for fast previewing and sharing
+     * Saves a temporary file to app-internal cache for fast previewing and sharing.
+     * Prunes cached files older than 7 days on each save to avoid unbounded growth.
      */
     fun saveToInternalCache(
         context: Context,
@@ -90,11 +91,25 @@ object MediaStoreExporter {
         if (!cacheDir.exists()) {
             cacheDir.mkdirs()
         }
+        pruneOldCache(cacheDir, maxAgeMs = 7L * 24 * 60 * 60 * 1000)
         val file = File(cacheDir, filename)
         FileOutputStream(file).use { out ->
             out.write(data)
             out.flush()
         }
         return file
+    }
+
+    private fun pruneOldCache(cacheDir: File, maxAgeMs: Long) {
+        try {
+            val cutoff = System.currentTimeMillis() - maxAgeMs
+            cacheDir.listFiles()?.forEach { file ->
+                if (file.isFile && file.lastModified() < cutoff) {
+                    runCatching { file.delete() }
+                }
+            }
+        } catch (_: Exception) {
+            // Cache pruning is best-effort; never fail the save.
+        }
     }
 }

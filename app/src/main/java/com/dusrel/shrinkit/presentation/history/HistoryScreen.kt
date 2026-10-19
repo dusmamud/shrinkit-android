@@ -4,6 +4,7 @@ import android.net.Uri
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,9 +26,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,9 +62,25 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val history by viewModel.history.collectAsState()
+    val userMessage by viewModel.userMessage.collectAsState()
     var showClearConfirm by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    LaunchedEffect(userMessage) {
+        userMessage?.let { msg ->
+            snackbarHostState.showSnackbar(msg)
+            viewModel.dismissUserMessage()
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { scaffoldPadding ->
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(scaffoldPadding)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,7 +129,7 @@ fun HistoryScreen(
             }
         } else {
             LazyColumn(
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                contentPadding = PaddingValues(
                     start = 16.dp, end = 16.dp, bottom = 16.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -122,6 +143,7 @@ fun HistoryScreen(
                 }
             }
         }
+    }
     }
 
     if (showClearConfirm) {

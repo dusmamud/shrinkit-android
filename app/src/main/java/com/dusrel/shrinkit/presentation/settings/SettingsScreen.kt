@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -76,9 +77,14 @@ fun SettingsScreen(
     )
     var showAbout by remember { mutableStateOf(false) }
 
+    // Hoisted out of the LazyColumn item: survives item recomposition/disposal.
+    var qualitySliderValue by remember(prefs.defaultQuality) {
+        mutableFloatStateOf(prefs.defaultQuality.toFloat())
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(20.dp),
+        contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
@@ -128,15 +134,12 @@ fun SettingsScreen(
                     text = stringResource(R.string.settings_default_quality, prefs.defaultQuality),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                var sliderValue by remember(prefs.defaultQuality) {
-                    mutableFloatStateOf(prefs.defaultQuality.toFloat())
-                }
                 Slider(
-                    value = sliderValue,
-                    onValueChange = { sliderValue = it },
+                    value = qualitySliderValue,
+                    onValueChange = { qualitySliderValue = it },
                     onValueChangeFinished = {
                         scope.launch {
-                            viewModel.prefs.setDefaultQuality(sliderValue.toInt())
+                            viewModel.prefs.setDefaultQuality(qualitySliderValue.toInt())
                         }
                     },
                     valueRange = 1f..100f,
@@ -207,15 +210,31 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_rate),
                     subtitle = stringResource(R.string.settings_rate_sub),
                     onClick = {
-                        try {
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                android.net.Uri.parse(
-                                    "market://details?id=${context.packageName}"
+                        val pkg = context.packageName
+                        val launched = try {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    android.net.Uri.parse("market://details?id=$pkg")
                                 )
                             )
-                            context.startActivity(intent)
+                            true
                         } catch (_: Exception) {
+                            false
+                        }
+                        if (!launched) {
+                            // Play Store app missing: fall back to the web listing.
+                            try {
+                                context.startActivity(
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        android.net.Uri.parse(
+                                            "https://play.google.com/store/apps/details?id=$pkg"
+                                        )
+                                    )
+                                )
+                            } catch (_: Exception) {
+                            }
                         }
                     }
                 )

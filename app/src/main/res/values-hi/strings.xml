@@ -198,4 +198,16 @@
     <string name="action_crop">क्रॉप</string>
     <string name="compare_before">पहले</string>
     <string name="compare_after">बाद में</string>
+
+    <!-- Accessibility -->
+    <string name="content_desc_language">भाषा</string>
+    <string name="content_desc_menu">मेन्यू</string>
+
+    <!-- Camera -->
+    <string name="error_camera_failed">कैमरा नहीं खुल सका। कृपया दोबारा कोशिश करें।</string>
+
+    <!-- History feedback -->
+    <string name="history_deleted">इतिहास से हटाया गया</string>
+    <string name="history_delete_failed">हटा नहीं सका। कृपया दोबारा कोशिश करें।</string>
+    <string name="history_share_failed">यह फोटो शेयर नहीं हो सकी।</string>
 </resources>

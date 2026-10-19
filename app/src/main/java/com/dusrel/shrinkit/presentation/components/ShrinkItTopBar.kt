@@ -91,7 +91,7 @@ fun ShrinkItTopBar(
             IconButton(onClick = { showLangMenu = true }) {
                 Icon(
                     imageVector = Icons.Default.Language,
-                    contentDescription = "Language",
+                    contentDescription = stringResource(R.string.content_desc_language),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -127,7 +127,7 @@ fun ShrinkItTopBar(
             IconButton(onClick = { showMenu = true }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Menu",
+                    contentDescription = stringResource(R.string.content_desc_menu),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

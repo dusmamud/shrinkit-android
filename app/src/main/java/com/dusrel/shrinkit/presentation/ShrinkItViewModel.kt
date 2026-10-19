@@ -58,6 +58,13 @@ class ShrinkItViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ShrinkItUiState())
     val uiState: StateFlow<ShrinkItUiState> = _uiState.asStateFlow()
 
+    /**
+     * Holds the FileProvider URI for an in-flight camera capture. Kept here
+     * (activity-scoped) instead of in Compose `remember` so the capture
+     * survives configuration changes while the camera app is open.
+     */
+    var pendingCameraUri: Uri? = null
+
     fun addImages(uris: List<Uri>) {
         if (uris.isEmpty()) return
 
@@ -480,13 +487,15 @@ class ShrinkItViewModel @Inject constructor(
         val h = source.height
         if (w <= 0 || h <= 0) return null
 
-        val left = (rect.left.coerceIn(0f, 1f) * w).toInt()
-        val top = (rect.top.coerceIn(0f, 1f) * h).toInt()
-        val right = (rect.right.coerceIn(0f, 1f) * w).toInt()
-        val bottom = (rect.bottom.coerceIn(0f, 1f) * h).toInt()
+        // Defensive clamps: each edge is ordered so no empty range can occur
+        // (coerceIn(min, max) with min > max would throw).
+        val left = (rect.left.coerceIn(0f, 1f) * w).toInt().coerceIn(0, w - 1)
+        val top = (rect.top.coerceIn(0f, 1f) * h).toInt().coerceIn(0, h - 1)
+        val right = (rect.right.coerceIn(0f, 1f) * w).toInt().coerceIn(left + 1, w)
+        val bottom = (rect.bottom.coerceIn(0f, 1f) * h).toInt().coerceIn(top + 1, h)
 
-        val cw = (right - left).coerceIn(1, w - left)
-        val ch = (bottom - top).coerceIn(1, h - top)
+        val cw = right - left
+        val ch = bottom - top
         if (cw >= w && ch >= h) return null // effectively the whole image
 
         return try {

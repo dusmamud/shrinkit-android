@@ -198,4 +198,16 @@
     <string name="action_crop">ক্ৰপ</string>
     <string name="compare_before">আগত</string>
     <string name="compare_after">পিছত</string>
+
+    <!-- Accessibility -->
+    <string name="content_desc_language">ভাষা</string>
+    <string name="content_desc_menu">মেনু</string>
+
+    <!-- Camera -->
+    <string name="error_camera_failed">কেমেৰা খুলিব নোৱাৰিলে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।</string>
+
+    <!-- History feedback -->
+    <string name="history_deleted">ইতিহাসৰ পৰা মচা হ\'ল</string>
+    <string name="history_delete_failed">মচিব নোৱাৰিলে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।</string>
+    <string name="history_share_failed">এই ফটো শ্বেয়াৰ কৰিব নোৱাৰিলে।</string>
 </resources>
