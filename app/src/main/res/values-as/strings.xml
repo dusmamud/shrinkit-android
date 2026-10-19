@@ -241,4 +241,19 @@
     <string name="settings_default_format_hint">à¦à¦à§à§ à¦ªà§à§°à¦¤à¦¿à¦à§ à¦«à¦à§à§° à¦®à§à¦² à¦«à§°à¦®à§à¦ à§°à¦¾à¦à§à¥¤</string>
     <string name="home_action_tools_title">সমূহ সাঁজুলি</string>
     <string name="home_action_tools_sub">50 KB, পাসপৰ্ট, সামাজিক — এটা টেপত</string>
+    <string name="home_hero_title">ছবি সৰু কৰক,\nমান বজাই ৰাখক।</string>
+    <string name="home_hero_subtitle">বেচত ৰিছাইজ আৰু কম্প্ৰেছ কৰক।\nসকলো আপোনাৰ ফোনতে থাকে।</string>
+    <string name="home_cta_select_photos">ফটো বাছক</string>
+    <string name="home_cta_caption">এবাৰত 50 লৈকে · আপলোডৰ প্ৰয়োজন নাই</string>
+    <string name="home_row_camera_title">ফটো তোলক</string>
+    <string name="home_row_camera_sub">কেমেৰা → তৎক্ষণাত সৰু কৰক</string>
+    <string name="home_row_exam_title">পৰীক্ষাৰ ফটো</string>
+    <string name="home_row_exam_badge">20 KB</string>
+    <string name="home_row_exam_sub">পাছপʼৰ্ট / চহী এক টেপত</string>
+    <string name="home_row_history_title">হিষ্ট্ৰী</string>
+    <string name="home_row_tools_title">সকলো সঁজুলি</string>
+    <string name="home_row_tools_sub">50 KB · পাছপʼৰ্ট · ছʼচিয়েল · Compare</string>
+    <string name="home_how_step1">1 · এবাৰত 50 খন ছবি বাছক</string>
+    <string name="home_how_step2">2 · প্ৰিছেট বাছক বা আকাৰ নিজে ঠিক কৰক</string>
+    <string name="home_how_step3">3 · প্ৰচেছ কৰক — ফাইল Pictures / ShrinkIt ত জমা হʼব</string>
 </resources>

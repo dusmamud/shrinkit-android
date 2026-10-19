@@ -241,4 +241,19 @@
     <string name="settings_default_format_hint">à¤à¤à¥ à¤¹à¤° à¤«à¥à¤à¥ à¤à¤¾ à¤®à¥à¤² à¤«à¤¼à¥à¤°à¤®à¥à¤ à¤°à¤à¤¤à¤¾ à¤¹à¥à¥¤</string>
     <string name="home_action_tools_title">à¤¸à¤­à¥ à¤à¥à¤²à¥à¤¸</string>
     <string name="home_action_tools_sub">50 KB, à¤ªà¤¾à¤¸à¤ªà¥à¤°à¥à¤, à¤¸à¥à¤¶à¤² â à¤à¤ à¤à¥à¤ª à¤®à¥à¤</string>
+    <string name="home_hero_title">इमेज़ श्रिंक करें,\nक्वालिटी बनाए रखें।</string>
+    <string name="home_hero_subtitle">बैच में रीसाइज़ और कंप्रेस करें।\nसब कुछ आपके फोन में रहता है।</string>
+    <string name="home_cta_select_photos">फोटो चुनें</string>
+    <string name="home_cta_caption">एक बार में 50 तक · अपलोड की ज़रूरत नहीं</string>
+    <string name="home_row_camera_title">फोटो लें</string>
+    <string name="home_row_camera_sub">कैमरा → तुरंत श्रिंक करें</string>
+    <string name="home_row_exam_title">एग्ज़ाम फोटो</string>
+    <string name="home_row_exam_badge">20 KB</string>
+    <string name="home_row_exam_sub">पासपोर्ट / हस्ताक्षर एक टैप में</string>
+    <string name="home_row_history_title">हिस्ट्री</string>
+    <string name="home_row_tools_title">सभी टूल्स</string>
+    <string name="home_row_tools_sub">50 KB · पासपोर्ट · सोशल · Compare</string>
+    <string name="home_how_step1">1 · एक बार में 50 इमेज चुनें</string>
+    <string name="home_how_step2">2 · प्रीसेट चुनें या साइज़ खुद सेट करें</string>
+    <string name="home_how_step3">3 · प्रोसेस करें — फाइलें Pictures / ShrinkIt में सेव होंगी</string>
 </resources>

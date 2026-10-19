@@ -244,4 +244,19 @@
     <string name="settings_default_format_hint">Auto keeps each photoâs original format.</string>
     <string name="home_action_tools_title">All Tools</string>
     <string name="home_action_tools_sub">50 KB, passport, social â one tap each</string>
+    <string name="home_hero_title">Shrink images,\nkeep quality.</string>
+    <string name="home_hero_subtitle">Batch resize &amp; compress.\nEverything stays on your phone.</string>
+    <string name="home_cta_select_photos">Select photos</string>
+    <string name="home_cta_caption">Up to 50 at once · no upload needed</string>
+    <string name="home_row_camera_title">Take a photo</string>
+    <string name="home_row_camera_sub">Camera → shrink instantly</string>
+    <string name="home_row_exam_title">Exam photo</string>
+    <string name="home_row_exam_badge">20 KB</string>
+    <string name="home_row_exam_sub">Passport / signature in one tap</string>
+    <string name="home_row_history_title">History</string>
+    <string name="home_row_tools_title">All tools</string>
+    <string name="home_row_tools_sub">50 KB · Passport · Social · Compare</string>
+    <string name="home_how_step1">1 · Pick up to 50 images</string>
+    <string name="home_how_step2">2 · Choose a preset or set size manually</string>
+    <string name="home_how_step3">3 · Process — files save to Pictures / ShrinkIt</string>
 </resources>

@@ -7,7 +7,10 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,19 +24,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -43,10 +51,13 @@ import com.dusrel.shrinkit.domain.model.CompressMode
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
+import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 import java.io.File
 
 /**
- * Branded landing screen: quick actions into the Tool, plus product education.
+ * Home screen — body is a same-to-same replica of the approved Minimal
+ * mockup: centered hero + full-width CTA + flat quick-action rows +
+ * collapsible How-it-works. Header stays logo-free per user instruction.
  */
 @Composable
 fun HomeScreen(
@@ -102,6 +113,33 @@ fun HomeScreen(
             ).show()
         }
     }
+    val onCameraClick = {
+        if (ContextCompat.checkSelfPermission(
+                context, Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            launchCamera(
+                context = context,
+                onUriReady = { uri -> toolViewModel.pendingCameraUri = uri },
+                onError = {
+                    Toast.makeText(
+                        context,
+                        cameraFailedMsg,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                launch = takePictureLauncher::launch
+            )
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    var howOpen by remember { mutableStateOf(true) }
+    val howChevronRotation by animateFloatAsState(
+        targetValue = if (howOpen) 90f else 0f,
+        label = "howChevron"
+    )
 
     Scaffold(
         modifier = modifier,
@@ -109,162 +147,239 @@ fun HomeScreen(
             ScreenTopBar(title = stringResource(R.string.app_name))
         }
     ) { scaffoldPadding ->
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(scaffoldPadding),
-        contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item {
-            // Brand hero
-            Column(modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)) {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_tagline),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        item {
-            Text(
-                text = stringResource(R.string.home_quick_actions),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionCard(
-                    iconName = "photo_library",
-                    title = stringResource(R.string.home_action_compress_title),
-                    subtitle = stringResource(R.string.home_action_compress_sub),
-                    onClick = {
-                        toolViewModel.clearAllImages()
-                        onOpenTool()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(scaffoldPadding)
+        ) {
+            // ---- Hero (mockup: padding 30px 22px 0, centered) ----
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 22.dp, end = 22.dp, top = 30.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_hero_title),
+                        fontSize = 23.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.4).sp,
+                        lineHeight = 31.sp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = stringResource(R.string.home_hero_subtitle),
+                        fontSize = 13.5.sp,
+                        lineHeight = 21.6.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(24.dp))
+                    Button(
+                        onClick = {
+                            toolViewModel.clearAllImages()
+                            onOpenTool()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(vertical = 15.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = LocalButtonContainer.current,
+                            contentColor = androidx.compose.ui.graphics.Color.White
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_cta_select_photos),
+                            fontSize = 14.5.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
-                )
-                QuickActionCard(
-                    iconName = "camera_alt",
-                    title = stringResource(R.string.home_action_camera_title),
-                    subtitle = stringResource(R.string.home_action_camera_sub),
-                    onClick = {
-                        if (ContextCompat.checkSelfPermission(
-                                context, Manifest.permission.CAMERA
-                            ) == PackageManager.PERMISSION_GRANTED
-                        ) {
-                            launchCamera(
-                                context = context,
-                                onUriReady = { uri -> toolViewModel.pendingCameraUri = uri },
-                                onError = {
-                                    Toast.makeText(
-                                        context,
-                                        cameraFailedMsg,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                },
-                                launch = takePictureLauncher::launch
-                            )
-                        } else {
-                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = stringResource(R.string.home_cta_caption),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            // ---- Quick-action rows (mockup: padding 0 22px, margin-top 30px) ----
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 0.dp)
+                        .padding(top = 30.dp)
+                ) {
+                    HomeRow(
+                        iconName = "camera_alt",
+                        title = stringResource(R.string.home_row_camera_title),
+                        subtitle = stringResource(R.string.home_row_camera_sub),
+                        onClick = onCameraClick
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    HomeRow(
+                        iconName = "picture_as_pdf",
+                        title = stringResource(R.string.home_row_exam_title),
+                        subtitle = stringResource(R.string.home_row_exam_sub),
+                        badge = stringResource(R.string.home_row_exam_badge),
+                        onClick = {
+                            toolViewModel.clearAllImages()
+                            toolViewModel.updateCompressMode(CompressMode.TARGET_KB)
+                            toolViewModel.updateTargetKb(20)
+                            onOpenTool()
                         }
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    HomeRow(
+                        iconName = "history",
+                        title = stringResource(R.string.home_row_history_title),
+                        subtitle = stringResource(R.string.home_action_history_sub),
+                        onClick = onOpenHistory
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    HomeRow(
+                        iconName = "auto_awesome",
+                        title = stringResource(R.string.home_row_tools_title),
+                        subtitle = stringResource(R.string.home_row_tools_sub),
+                        onClick = onOpenTools
+                    )
+                }
+            }
+
+            // ---- How it works (collapsible, mockup: padding 0 22px, margin-top 26px) ----
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 22.dp)
+                        .padding(top = 26.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { howOpen = !howOpen }
+                            .padding(vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_how_it_works),
+                            fontSize = 13.5.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.weight(1f)
+                        )
+                        SymbolIcon(
+                            name = "chevron_right",
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .rotate(howChevronRotation)
+                        )
                     }
-                )
-                QuickActionCard(
-                    iconName = "picture_as_pdf",
-                    title = stringResource(R.string.home_action_20kb_title),
-                    subtitle = stringResource(R.string.home_action_20kb_sub),
-                    onClick = {
-                        toolViewModel.clearAllImages()
-                        toolViewModel.updateCompressMode(CompressMode.TARGET_KB)
-                        toolViewModel.updateTargetKb(20)
-                        onOpenTool()
+                    if (howOpen) {
+                        Text(
+                            text = stringResource(R.string.home_how_step1) + "\n" +
+                                stringResource(R.string.home_how_step2) + "\n" +
+                                stringResource(R.string.home_how_step3),
+                            fontSize = 13.sp,
+                            lineHeight = 26.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 2.dp, bottom = 10.dp)
+                        )
                     }
-                )
-                QuickActionCard(
-                    iconName = "history",
-                    title = stringResource(R.string.home_action_history_title),
-                    subtitle = stringResource(R.string.home_action_history_sub),
-                    onClick = onOpenHistory
-                )
-                QuickActionCard(
-                    iconName = "auto_awesome",
-                    title = stringResource(R.string.home_action_tools_title),
-                    subtitle = stringResource(R.string.home_action_tools_sub),
-                    onClick = onOpenTools
-                )
+                }
             }
-        }
 
-        item {
-            Text(
-                text = stringResource(R.string.home_how_it_works),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+            item { Spacer(Modifier.height(28.dp)) }
         }
-
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                HowItWorksRow(
-                    step = "1",
-                    title = stringResource(R.string.home_step1_title),
-                    body = stringResource(R.string.home_step1_body)
-                )
-                HowItWorksRow(
-                    step = "2",
-                    title = stringResource(R.string.home_step2_title),
-                    body = stringResource(R.string.home_step2_body)
-                )
-                HowItWorksRow(
-                    step = "3",
-                    title = stringResource(R.string.home_step3_title),
-                    body = stringResource(R.string.home_step3_body)
-                )
-            }
-        }
-
-        item {
-            Text(
-                text = stringResource(R.string.home_why_shrinkit),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                FeatureRow(
-                    "shield",
-                    stringResource(R.string.home_feat_privacy_title),
-                    stringResource(R.string.home_feat_privacy_body)
-                )
-                FeatureRow(
-                    "speed",
-                    stringResource(R.string.home_feat_exact_title),
-                    stringResource(R.string.home_feat_exact_body)
-                )
-                FeatureRow(
-                    "translate",
-                    stringResource(R.string.home_feat_lang_title),
-                    stringResource(R.string.home_feat_lang_body)
-                )
-            }
-        }
-
-        item { Spacer(Modifier.height(8.dp)) }
     }
+}
+
+/**
+ * Flat quick-action row — mockup `.rowbtn`: 42dp accent-soft tile,
+ * 14.5sp/600 title (+ optional badge), 12.5sp muted subtitle, 16dp chevron.
+ */
+@Composable
+private fun HomeRow(
+    iconName: String,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+    badge: String? = null,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 13.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .clip(RoundedCornerShape(11.dp))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            SymbolIcon(
+                name = iconName,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                fontSize = 20.sp
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = title,
+                    fontSize = 14.5.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                if (badge != null) {
+                    Spacer(Modifier.width(6.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                RoundedCornerShape(6.dp)
+                            )
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                RoundedCornerShape(6.dp)
+                            )
+                            .padding(horizontal = 9.dp, vertical = 4.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = badge,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(1.dp))
+            Text(
+                text = subtitle,
+                fontSize = 12.5.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        SymbolIcon(
+            name = "chevron_right",
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 16.sp,
+            modifier = Modifier.size(16.dp)
+        )
     }
 }
 
@@ -286,121 +401,5 @@ private fun launchCamera(
         launch(uri)
     } catch (_: Exception) {
         onError()
-    }
-}
-
-@Composable
-private fun QuickActionCard(
-    iconName: String,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                modifier = Modifier.size(48.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    SymbolIcon(
-                        name = iconName,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        fontSize = 24.sp
-                    )
-                }
-            }
-            Spacer(Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun HowItWorksRow(step: String, title: String, body: String) {
-    Row(verticalAlignment = Alignment.Top) {
-        Surface(
-            shape = RoundedCornerShape(50),
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(28.dp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = step,
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun FeatureRow(iconName: String, title: String, body: String) {
-    Row(verticalAlignment = Alignment.Top) {
-        SymbolIcon(
-            name = iconName,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            fontSize = 22.sp,
-            modifier = Modifier.size(22.dp)
-        )
-        Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
     }
 }
