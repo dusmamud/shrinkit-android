@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,7 @@ private fun ToolHeader(
     viewModel: ShrinkItViewModel,
     modifier: Modifier = Modifier
 ) {
-    val selectedPresetId by viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = null)
+    val selectedPresetId by remember { viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = null)
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(

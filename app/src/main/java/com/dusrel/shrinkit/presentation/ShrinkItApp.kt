@@ -69,13 +69,13 @@ fun ShrinkItApp(
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
-    val images by viewModel.uiState.map { it.images }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = emptyList())
-    val isProcessing by viewModel.uiState.map { it.isProcessing }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = false)
-    val options by viewModel.uiState.map { it.options }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = ProcessingOptions())
-    val selectedPresetId by viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = null)
-    val currentProgress by viewModel.uiState.map { it.currentProgress }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = 0)
-    val totalProgress by viewModel.uiState.map { it.totalProgress }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = 0)
-    val userMessage by viewModel.uiState.map { it.userMessage }.distinctUntilChanged().collectAsStateWithLifecycle(initialValue = null)
+    val images by remember { viewModel.uiState.map { it.images }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = emptyList())
+    val isProcessing by remember { viewModel.uiState.map { it.isProcessing }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = false)
+    val options by remember { viewModel.uiState.map { it.options }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = ProcessingOptions())
+    val selectedPresetId by remember { viewModel.uiState.map { it.selectedPresetId }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = null)
+    val currentProgress by remember { viewModel.uiState.map { it.currentProgress }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = 0)
+    val totalProgress by remember { viewModel.uiState.map { it.totalProgress }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = 0)
+    val userMessage by remember { viewModel.uiState.map { it.userMessage }.distinctUntilChanged() }.collectAsStateWithLifecycle(initialValue = null)
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Apply Settings defaults when the tool opens (or when defaults change).
