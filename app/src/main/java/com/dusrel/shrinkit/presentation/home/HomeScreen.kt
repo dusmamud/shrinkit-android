@@ -64,6 +64,10 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
 
+    // Resolve toast messages in composable scope (configuration-aware)
+    val cameraFailedMsg = stringResource(R.string.error_camera_failed)
+    val cameraPermissionMsg = stringResource(R.string.error_camera_permission)
+
     // Camera capture: permission -> temp file -> TakePicture -> add to tool.
     // The pending URI lives in the activity-scoped ViewModel so a config
     // change while the camera app is open does not lose the capture.
@@ -90,7 +94,7 @@ fun HomeScreen(
                 onError = {
                     Toast.makeText(
                         context,
-                        stringResource(R.string.error_camera_failed),
+                        cameraFailedMsg,
                         Toast.LENGTH_SHORT
                     ).show()
                 },
@@ -99,7 +103,7 @@ fun HomeScreen(
         } else {
             Toast.makeText(
                 context,
-                stringResource(R.string.error_camera_permission),
+                cameraPermissionMsg,
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -162,7 +166,7 @@ fun HomeScreen(
                                 onError = {
                                     Toast.makeText(
                                         context,
-                                        stringResource(R.string.error_camera_failed),
+                                        cameraFailedMsg,
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 },

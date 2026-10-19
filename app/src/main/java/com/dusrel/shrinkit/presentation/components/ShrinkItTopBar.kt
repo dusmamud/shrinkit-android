@@ -54,6 +54,11 @@ fun ShrinkItTopBar(
     var showMenu by remember { mutableStateOf(false) }
     var showLangMenu by remember { mutableStateOf(false) }
 
+    // Resolve URLs in composable scope (configuration-aware); used in onClick lambdas below
+    val websiteUrl = stringResource(R.string.url_website)
+    val privacyUrl = stringResource(R.string.url_privacy)
+    val termsUrl = stringResource(R.string.url_terms)
+
     TopAppBar(
         modifier = modifier,
         navigationIcon = {
@@ -146,7 +151,7 @@ fun ShrinkItTopBar(
                         )
                     },
                     onClick = {
-                        BrowserLauncher.openUrl(context, stringResource(R.string.url_website))
+                        BrowserLauncher.openUrl(context, websiteUrl)
                         showMenu = false
                     }
                 )
@@ -160,14 +165,14 @@ fun ShrinkItTopBar(
                         )
                     },
                     onClick = {
-                        BrowserLauncher.openUrl(context, stringResource(R.string.url_privacy))
+                        BrowserLauncher.openUrl(context, privacyUrl)
                         showMenu = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.link_terms)) },
                     onClick = {
-                        BrowserLauncher.openUrl(context, stringResource(R.string.url_terms))
+                        BrowserLauncher.openUrl(context, termsUrl)
                         showMenu = false
                     }
                 )
