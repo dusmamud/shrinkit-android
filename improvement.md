@@ -8,10 +8,10 @@
 ### Fonts — `app/src/main/res/font/`
 | File | Source | License |
 |---|---|---|
-| `poppins_Regular.ttf` (156 KB) | google/fonts, Poppins 400 | SIL OFL 1.1 — commercial OK |
-| `poppins_Medium.ttf` (155 KB) | google/fonts, Poppins 500 | SIL OFL 1.1 — commercial OK |
-| `poppins_SemiBold.ttf` (154 KB) | google/fonts, Poppins 600 | SIL OFL 1.1 — commercial OK |
-| `poppins_Bold.ttf` (152 KB) | google/fonts, Poppins 700 | SIL OFL 1.1 — commercial OK |
+| `poppins_regular.ttf` (156 KB) | google/fonts, Poppins 400 | SIL OFL 1.1 — commercial OK |
+| `poppins_medium.ttf` (155 KB) | google/fonts, Poppins 500 | SIL OFL 1.1 — commercial OK |
+| `poppins_semibold.ttf` (154 KB) | google/fonts, Poppins 600 | SIL OFL 1.1 — commercial OK |
+| `poppins_bold.ttf` (152 KB) | google/fonts, Poppins 700 | SIL OFL 1.1 — commercial OK |
 | `material_symbols_rounded.ttf` (66 KB) | google/material-design-icons, variable font subset to 21 used icons, FILL=0 (outlined/regular) | Apache 2.0 — commercial OK |
 | `material_symbols_rounded_filled.ttf` (65 KB) | same source, FILL=1 instance, subset to 21 used icons | Apache 2.0 — commercial OK |
 
