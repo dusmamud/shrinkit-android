@@ -260,10 +260,8 @@ fun CompareToolScreen(
                                         .pointerInput(Unit) {
                                             detectDragGestures { change, dragAmount ->
                                                 change.consume()
-                                                val dxFrac = with(density) {
-                                                    dragAmount.x.toDp() / fullW.toDp()
-                                                }
-                                                dividerPos = (dividerPos + dxFrac).coerceIn(0.02f, 0.98f)
+                                                val dxDp = with(density) { dragAmount.x.toDp() }
+                                                dividerPos = (dividerPos + dxDp / fullW).coerceIn(0.02f, 0.98f)
                                             }
                                         },
                                     contentAlignment = Alignment.Center
