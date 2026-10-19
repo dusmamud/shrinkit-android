@@ -15,6 +15,7 @@ fun PassportToolScreen(
     toolViewModel: ShrinkItViewModel,
     onBack: () -> Unit,
     onOpenCropLocked: (imageId: String, ratio: Float, label: String) -> Unit,
+    onProcessComplete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val presets = listOf(
@@ -59,6 +60,7 @@ fun PassportToolScreen(
         toolViewModel = toolViewModel,
         onBack = onBack,
         onOpenCropLocked = onOpenCropLocked,
+        onProcessComplete = onProcessComplete,
         modifier = modifier
     )
 }
@@ -72,6 +74,7 @@ fun SocialToolScreen(
     toolViewModel: ShrinkItViewModel,
     onBack: () -> Unit,
     onOpenCropLocked: (imageId: String, ratio: Float, label: String) -> Unit,
+    onProcessComplete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val presets = listOf(
@@ -140,6 +143,7 @@ fun SocialToolScreen(
         toolViewModel = toolViewModel,
         onBack = onBack,
         onOpenCropLocked = onOpenCropLocked,
+        onProcessComplete = onProcessComplete,
         modifier = modifier
     )
 }

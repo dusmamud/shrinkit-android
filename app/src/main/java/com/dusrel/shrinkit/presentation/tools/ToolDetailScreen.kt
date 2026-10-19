@@ -2,8 +2,6 @@ package com.dusrel.shrinkit.presentation.tools
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.dusrel.shrinkit.data.storage.MediaStoreExporter
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 
 /**
@@ -20,7 +18,6 @@ fun ToolDetailScreen(
     onProcessComplete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     when (toolId) {
         "kb50", "kb20" -> KbToolScreen(
             toolId = toolId,
@@ -34,24 +31,20 @@ fun ToolDetailScreen(
             toolViewModel = toolViewModel,
             onBack = onBack,
             onOpenCropLocked = onOpenCropLocked,
+            onProcessComplete = onProcessComplete,
             modifier = modifier
         )
         "social" -> SocialToolScreen(
             toolViewModel = toolViewModel,
             onBack = onBack,
             onOpenCropLocked = onOpenCropLocked,
+            onProcessComplete = onProcessComplete,
             modifier = modifier
         )
         "compare" -> CompareToolScreen(
+            toolViewModel = toolViewModel,
             onBack = onBack,
-            onSaveBytes = { bytes, filename ->
-                MediaStoreExporter.saveToPictures(
-                    context = context,
-                    data = bytes,
-                    filename = filename,
-                    mimeType = "image/jpeg"
-                )
-            },
+            onProcessComplete = onProcessComplete,
             modifier = modifier
         )
         else -> KbToolScreen(

@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,9 +32,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -59,6 +62,7 @@ import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.domain.engine.BinarySearchCompressor
 import com.dusrel.shrinkit.domain.engine.SafeBitmapDecoder
 import com.dusrel.shrinkit.domain.model.TargetFormat
+import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
@@ -69,14 +73,20 @@ import kotlinx.coroutines.withContext
  * Before / After Compare (web parity: /tools/compare-images).
  * Select → immediately shows the comparison slider.
  * Mobile UX rule: only the divider HANDLE is draggable (scroll always wins).
+ *
+ * Canvas fits the whole image (aspectRatio from the bitmap, ContentScale.Fit)
+ * — no cropping. Actions live in a 2-row bottom bar. Save publishes the
+ * result to the shared ResultScreen (save/share/fullscreen there).
  */
 @Composable
 fun CompareToolScreen(
+    toolViewModel: ShrinkItViewModel,
     onBack: () -> Unit,
-    onSaveBytes: (bytes: ByteArray, filename: String) -> Unit,
+    onProcessComplete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var originalBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var compressedBytes by remember { mutableStateOf<ByteArray?>(null) }
@@ -84,10 +94,30 @@ fun CompareToolScreen(
     var quality by remember { mutableFloatStateOf(65f) }
     var dividerPos by remember { mutableFloatStateOf(0.5f) } // 0..1
     var working by remember { mutableStateOf(false) }
+    var publishing by remember { mutableStateOf(false) }
+    var pickedName by remember { mutableStateOf("image") }
 
     val picker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? -> imageUri = uri }
+    ) { uri: Uri? ->
+        if (uri != null) {
+            imageUri = uri
+            pickedName = context.contentResolver.query(
+                uri,
+                arrayOf(android.provider.MediaStore.MediaColumns.DISPLAY_NAME),
+                null, null, null
+            )?.use { c ->
+                if (c.moveToFirst()) c.getString(0) else "image"
+            } ?: "image"
+        }
+    }
+
+    fun reset() {
+        imageUri = null
+        originalBitmap = null
+        compressedBytes = null
+        dividerPos = 0.5f
+    }
 
     // Decode original when picked.
     LaunchedEffect(imageUri) {
@@ -128,6 +158,74 @@ fun CompareToolScreen(
                 title = stringResource(R.string.tool_compare_title),
                 onBackClick = onBack
             )
+        },
+        bottomBar = {
+            // Actions in 2 rows at the bottom (not cramped beside the canvas).
+            if (imageUri != null && compressedBytes != null) {
+                Surface(
+                    tonalElevation = 0.dp,
+                    color = MaterialTheme.colorScheme.background,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                val uri = imageUri
+                                val cmp = compressedBytes
+                                val bmp = originalBitmap
+                                if (uri == null || cmp == null || bmp == null || publishing) return@Button
+                                publishing = true
+                                scope.launch {
+                                    val ok = toolViewModel.publishCompareResult(
+                                        originalUri = uri,
+                                        filename = pickedName,
+                                        originalBytes = originalBytes,
+                                        originalWidth = bmp.width,
+                                        originalHeight = bmp.height,
+                                        processedData = cmp
+                                    )
+                                    publishing = false
+                                    if (ok) onProcessComplete()
+                                }
+                            },
+                            enabled = !publishing,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = LocalButtonContainer.current
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (publishing) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    strokeWidth = 2.dp,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(Modifier.size(8.dp))
+                            }
+                            Text(
+                                stringResource(R.string.tool_compare_save),
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                        Button(
+                            onClick = { reset() },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Text(stringResource(R.string.tool_compare_change))
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         LazyColumn(
@@ -192,11 +290,13 @@ fun CompareToolScreen(
                     }
                 }
 
-                // Comparison canvas.
+                // Comparison canvas — fits the WHOLE image (aspect from the
+                // bitmap, ContentScale.Fit). No cropping.
                 item {
                     val bmp = originalBitmap
                     val cmp = compressedBytes
-                    if (bmp != null && cmp != null) {
+                    if (bmp != null && cmp != null && bmp.width > 0 && bmp.height > 0) {
+                        val aspect = bmp.width.toFloat() / bmp.height.toFloat()
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -206,7 +306,7 @@ fun CompareToolScreen(
                             BoxWithConstraints(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(280.dp)
+                                    .aspectRatio(aspect)
                                     .clip(RoundedCornerShape(16.dp))
                             ) {
                                 val fullW = maxWidth
@@ -215,7 +315,7 @@ fun CompareToolScreen(
                                 AsyncImage(
                                     model = cmp,
                                     contentDescription = stringResource(R.string.tool_compare_after),
-                                    contentScale = ContentScale.Crop,
+                                    contentScale = ContentScale.Fit,
                                     modifier = Modifier.fillMaxSize()
                                 )
                                 // Original = clipped to left of divider.
@@ -228,7 +328,7 @@ fun CompareToolScreen(
                                     AsyncImage(
                                         model = bmp,
                                         contentDescription = stringResource(R.string.tool_compare_before),
-                                        contentScale = ContentScale.Crop,
+                                        contentScale = ContentScale.Fit,
                                         modifier = Modifier.size(fullW, fullH)
                                     )
                                 }
@@ -325,65 +425,30 @@ fun CompareToolScreen(
                     }
                 }
 
-                // Size badges + save.
+                // Size badges (actions moved to the bottom bar).
                 item {
                     val cmp = compressedBytes
                     if (cmp != null) {
                         val saved = if (originalBytes > 0) {
                             ((1 - cmp.size.toFloat() / originalBytes) * 100).toInt().coerceAtLeast(0)
                         } else 0
-                        Column(
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "${stringResource(R.string.tool_compare_before)}: ${formatKb(originalBytes)}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "${stringResource(R.string.tool_compare_after)}: ${formatKb(cmp.size.toLong())} (−$saved%)",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                            Button(
-                                onClick = {
-                                    onSaveBytes(cmp, "shrinkit-compare-q${quality.toInt()}.jpg")
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = LocalButtonContainer.current
-                                ),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    stringResource(R.string.tool_compare_save),
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                            Button(
-                                onClick = {
-                                    imageUri = null
-                                    originalBitmap = null
-                                    compressedBytes = null
-                                    dividerPos = 0.5f
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                )
-                            ) {
-                                Text(stringResource(R.string.tool_compare_change))
-                            }
+                            Text(
+                                text = "${stringResource(R.string.tool_compare_before)}: ${formatKb(originalBytes)}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "${stringResource(R.string.tool_compare_after)}: ${formatKb(cmp.size.toLong())} (−$saved%)",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }

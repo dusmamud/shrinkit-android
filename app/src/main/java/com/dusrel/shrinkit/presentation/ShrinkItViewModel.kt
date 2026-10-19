@@ -274,6 +274,64 @@ class ShrinkItViewModel @Inject constructor(
         setBlackWhite(false)
     }
 
+    /**
+     * Prepares a fresh wizard-tool session (passport/social). Called ONCE at
+     * navigation time — same reason as prepareKbTool (composable recreation
+     * on crop return must not wipe state).
+     */
+    fun prepareWizardTool() {
+        clearAllImages()
+    }
+
+    /**
+     * Publishes an externally-produced result (compare tool) as a completed
+     * item so the shared ResultScreen can display it with save/share.
+     * Writes the bytes to cache and returns true on success.
+     */
+    suspend fun publishCompareResult(
+        originalUri: Uri,
+        filename: String,
+        originalBytes: Long,
+        originalWidth: Int,
+        originalHeight: Int,
+        processedData: ByteArray
+    ): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val dir = java.io.File(application.cacheDir, "results").apply { mkdirs() }
+            val file = java.io.File(dir, "compare_${System.currentTimeMillis()}.jpg")
+            file.writeBytes(processedData)
+            val processedUri = androidx.core.content.FileProvider.getUriForFile(
+                application,
+                "${application.packageName}.fileprovider",
+                file
+            )
+            val bounds = SafeBitmapDecoder.decodeBounds(application, processedUri)
+            val reduction = if (originalBytes > 0) {
+                ((1 - processedData.size.toFloat() / originalBytes) * 100)
+                    .toInt().coerceIn(0, 100)
+            } else 0
+            val item = ImageItem(
+                id = java.util.UUID.randomUUID().toString(),
+                uri = originalUri,
+                filename = filename,
+                originalSizeBytes = originalBytes,
+                originalWidth = originalWidth,
+                originalHeight = originalHeight,
+                mimeType = "image/jpeg",
+                status = ProcessingStatus.COMPLETED,
+                processedUri = processedUri,
+                processedSizeBytes = processedData.size.toLong(),
+                processedWidth = bounds.width,
+                processedHeight = bounds.height,
+                reductionPercent = reduction
+            )
+            _uiState.update { it.copy(images = listOf(item)) }
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     fun applyCropAspectLock(imageId: String) {
         val item = getImage(imageId) ?: return
         _uiState.update { current ->

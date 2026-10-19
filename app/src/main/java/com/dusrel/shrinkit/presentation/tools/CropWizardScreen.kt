@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,6 +51,7 @@ import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import com.dusrel.shrinkit.domain.model.SizeUnit
 import com.dusrel.shrinkit.domain.model.TargetFormat
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
+import com.dusrel.shrinkit.presentation.components.FullscreenImageViewer
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
@@ -82,6 +84,7 @@ fun CropWizardScreen(
     toolViewModel: ShrinkItViewModel,
     onBack: () -> Unit,
     onOpenCropLocked: (imageId: String, ratio: Float, label: String) -> Unit,
+    onProcessComplete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by toolViewModel.uiState.collectAsStateWithLifecycle()
@@ -91,9 +94,40 @@ fun CropWizardScreen(
     var selectedPreset by remember(presets) { mutableStateOf(presets.first()) }
     var targetKbText by remember { mutableStateOf("200") }
 
-    // Fresh single-image wizard state on entry.
-    LaunchedEffect(Unit) {
-        toolViewModel.clearAllImages()
+    // NOTE: fresh state is prepared at navigation time (prepareWizardTool).
+    // No clearing here — the screen is recreated on crop return.
+
+    // Navigate to the result screen once, on the completing transition.
+    var wasProcessing by remember { mutableStateOf(false) }
+    val isProcessingNow = uiState.isProcessing
+    LaunchedEffect(isProcessingNow) {
+        if (wasProcessing && !isProcessingNow &&
+            item?.status == ProcessingStatus.COMPLETED
+        ) {
+            onProcessComplete()
+        }
+        wasProcessing = isProcessingNow
+    }
+
+    // Cropped preview when a crop is set.
+    val croppedPreview by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(
+        initialValue = null,
+        key1 = item?.id,
+        key2 = item?.cropRect
+    ) {
+        value = if (item?.cropRect != null) {
+            toolViewModel.getCroppedPreview(item)
+        } else {
+            null
+        }
+    }
+
+    var showFullscreen by remember { mutableStateOf(false) }
+    if (showFullscreen && item != null) {
+        FullscreenImageViewer(
+            uri = item.uri,
+            onDismiss = { showFullscreen = false }
+        )
     }
 
     val picker = rememberLauncherForActivityResult(
@@ -197,6 +231,7 @@ fun CropWizardScreen(
                 }
             } else {
                 // Picked image → crop CTA (opens locked-ratio crop screen).
+                // Thumbnail shows the CROPPED image after crop apply.
                 item {
                     Row(
                         modifier = Modifier
@@ -205,13 +240,15 @@ fun CropWizardScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        val thumbModel: Any = croppedPreview ?: item.uri
                         AsyncImage(
-                            model = item.uri,
+                            model = thumbModel,
                             contentDescription = item.filename,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(72.dp)
                                 .clip(RoundedCornerShape(12.dp))
+                                .clickable { showFullscreen = true }
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(

@@ -167,10 +167,14 @@ fun ShrinkItNavHost(
             ToolsHubScreen(
                 onBack = { navController.popBackStack() },
                 onOpenTool = { toolId ->
-                    // Fresh KB-tool state once per hub entry (not in the
+                    // Fresh tool state once per hub entry (not in the
                     // composable — it would clear on return from crop).
                     if (toolId == "kb50" || toolId == "kb20") {
                         toolViewModel.prepareKbTool(toolId)
+                    } else if (toolId == "passport" || toolId == "social") {
+                        toolViewModel.prepareWizardTool()
+                    } else if (toolId == "compare") {
+                        toolViewModel.clearAllImages()
                     }
                     navController.navigate(Destinations.toolDetail(toolId))
                 }
