@@ -52,7 +52,7 @@ private val SymbolCodepoints = mapOf(
     "lock_open" to "\uE898",
     "more_vert" to "\uE5D4",
     "view_list" to "\uE8EF",
-    "grid_view" to "\uF0B2",
+    "grid_view" to "\uE9B0",
     "notifications" to "\uE7F4",
     "rotate_right" to "\uE41A",
     "open_in_browser" to "\uE89D",

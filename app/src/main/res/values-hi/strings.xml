@@ -14,6 +14,7 @@
     <string name="action_clear_all">सब हटाएं</string>
     <string name="action_process_all">सभी इमेज कंप्रेस करें</string>
     <string name="action_save_gallery">गैलरी में सेव करें</string>
+    <string name="action_save">सेव करें</string>
     <string name="badge_done">हो गया</string>
     <string name="results_title">परिणाम (%1$d)</string>
     <string name="results_summary">%1$d इमेज \u00b7 %2$s बचाया</string>

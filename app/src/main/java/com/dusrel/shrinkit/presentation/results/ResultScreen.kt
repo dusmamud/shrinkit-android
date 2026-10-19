@@ -219,7 +219,12 @@ private fun HeroResultCard(item: ImageItem) {
     val context = LocalContext.current
     var showFullscreen by remember(item.id) { mutableStateOf(false) }
     if (showFullscreen && item.processedUri != null) {
-        FullscreenImageViewer(uri = item.processedUri!!, onDismiss = { showFullscreen = false })
+        FullscreenImageViewer(
+            uri = item.processedUri!!,
+            onDismiss = { showFullscreen = false },
+            onShare = { shareResult(context, item) },
+            onSave = { saveResult(context, item) }
+        )
     }
 
     Card(
@@ -294,7 +299,12 @@ private fun CompactResultCard(item: ImageItem) {
     val context = LocalContext.current
     var showFullscreen by remember(item.id) { mutableStateOf(false) }
     if (showFullscreen && item.processedUri != null) {
-        FullscreenImageViewer(uri = item.processedUri!!, onDismiss = { showFullscreen = false })
+        FullscreenImageViewer(
+            uri = item.processedUri!!,
+            onDismiss = { showFullscreen = false },
+            onShare = { shareResult(context, item) },
+            onSave = { saveResult(context, item) }
+        )
     }
 
     Card(
@@ -362,7 +372,12 @@ private fun GridResultCard(item: ImageItem) {
     val context = LocalContext.current
     var showFullscreen by remember(item.id) { mutableStateOf(false) }
     if (showFullscreen && item.processedUri != null) {
-        FullscreenImageViewer(uri = item.processedUri!!, onDismiss = { showFullscreen = false })
+        FullscreenImageViewer(
+            uri = item.processedUri!!,
+            onDismiss = { showFullscreen = false },
+            onShare = { shareResult(context, item) },
+            onSave = { saveResult(context, item) }
+        )
     }
 
     Card(
