@@ -1,11 +1,10 @@
 package com.dusrel.shrinkit.presentation.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIntoContainer
-import androidx.compose.animation.slideOutOfContainer
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -52,28 +51,20 @@ fun ShrinkItNavHost(
         startDestination = if (prefs.onboardingDone) Destinations.MAIN else Destinations.ONBOARDING,
         modifier = modifier,
         enterTransition = {
-            fadeIn(tween(TRANSITION_MS)) + slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Start,
-                tween(TRANSITION_MS)
-            )
+            fadeIn(tween(TRANSITION_MS)) +
+                slideInHorizontally(tween(TRANSITION_MS)) { fullWidth -> fullWidth }
         },
         exitTransition = {
-            fadeOut(tween(TRANSITION_MS)) + slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Start,
-                tween(TRANSITION_MS)
-            )
+            fadeOut(tween(TRANSITION_MS)) +
+                slideOutHorizontally(tween(TRANSITION_MS)) { fullWidth -> -fullWidth }
         },
         popEnterTransition = {
-            fadeIn(tween(TRANSITION_MS)) + slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.End,
-                tween(TRANSITION_MS)
-            )
+            fadeIn(tween(TRANSITION_MS)) +
+                slideInHorizontally(tween(TRANSITION_MS)) { fullWidth -> -fullWidth }
         },
         popExitTransition = {
-            fadeOut(tween(TRANSITION_MS)) + slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.End,
-                tween(TRANSITION_MS)
-            )
+            fadeOut(tween(TRANSITION_MS)) +
+                slideOutHorizontally(tween(TRANSITION_MS)) { fullWidth -> fullWidth }
         }
     ) {
         composable(Destinations.ONBOARDING) {
