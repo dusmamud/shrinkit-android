@@ -38,6 +38,9 @@ fun AboutScreen(
             context.packageManager.getPackageInfo(context.packageName, 0)?.versionName
         }.getOrNull() ?: "1.0.0"
     }
+    val privacyUrl = stringResource(R.string.url_privacy)
+    val termsUrl = stringResource(R.string.url_terms)
+    val websiteUrl = stringResource(R.string.url_website)
 
     Scaffold(
         modifier = modifier,
@@ -87,7 +90,7 @@ fun AboutScreen(
                     onClick = {
                         BrowserLauncher.openUrl(
                             context,
-                            context.getString(R.string.url_privacy)
+                            privacyUrl
                         )
                     }
                 )
@@ -98,7 +101,7 @@ fun AboutScreen(
                     onClick = {
                         BrowserLauncher.openUrl(
                             context,
-                            context.getString(R.string.url_terms)
+                            termsUrl
                         )
                     }
                 )
@@ -109,7 +112,7 @@ fun AboutScreen(
                     onClick = {
                         BrowserLauncher.openUrl(
                             context,
-                            context.getString(R.string.url_website)
+                            websiteUrl
                         )
                     }
                 )
