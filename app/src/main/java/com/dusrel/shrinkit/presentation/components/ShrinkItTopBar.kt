@@ -4,40 +4,28 @@ import android.app.LocaleManager
 import android.os.Build
 import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import com.dusrel.shrinkit.R
-import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.util.BrowserLauncher
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Tool workspace header — compact Minimal bar (same spec as [ScreenTopBar]:
+ * 10dp/14dp padding, 16sp title, page-color bg + hairline border, no logo).
+ * Keeps the language selector and overflow menu from the original app.
+ */
 @Composable
 fun ShrinkItTopBar(
     onBackClick: (() -> Unit)? = null,
@@ -52,130 +40,99 @@ fun ShrinkItTopBar(
     val privacyUrl = stringResource(R.string.url_privacy)
     val termsUrl = stringResource(R.string.url_terms)
 
-    TopAppBar(
-        modifier = modifier,
-        navigationIcon = {
-            if (onBackClick != null) {
-                IconButton(onClick = onBackClick) {
+    ScreenTopBar(
+        title = stringResource(R.string.app_name),
+        onBackClick = onBackClick,
+        actions = {
+            // Language selector button
+            Box {
+                HeaderIconButton(onClick = { showLangMenu = true }) {
                     SymbolIcon(
-                        name = "arrow_back",
-                        contentDescription = stringResource(R.string.action_back)
+                        name = "language",
+                        contentDescription = stringResource(R.string.content_desc_language),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                DropdownMenu(
+                    expanded = showLangMenu,
+                    onDismissRequest = { showLangMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.lang_english)) },
+                        onClick = {
+                            setAppLocale(context, "en")
+                            showLangMenu = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.lang_hindi)) },
+                        onClick = {
+                            setAppLocale(context, "hi")
+                            showLangMenu = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.lang_assamese)) },
+                        onClick = {
+                            setAppLocale(context, "as")
+                            showLangMenu = false
+                        }
+                    )
+                }
+            }
+
+            // Overflow Menu
+            Box {
+                HeaderIconButton(onClick = { showMenu = true }) {
+                    SymbolIcon(
+                        name = "more_vert",
+                        contentDescription = stringResource(R.string.content_desc_menu),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.link_website)) },
+                        leadingIcon = {
+                            SymbolIcon(
+                                name = "open_in_browser",
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        onClick = {
+                            BrowserLauncher.openUrl(context, websiteUrl)
+                            showMenu = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.link_privacy_policy)) },
+                        leadingIcon = {
+                            SymbolIcon(
+                                name = "privacy_tip",
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        onClick = {
+                            BrowserLauncher.openUrl(context, privacyUrl)
+                            showMenu = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.link_terms)) },
+                        onClick = {
+                            BrowserLauncher.openUrl(context, termsUrl)
+                            showMenu = false
+                        }
                     )
                 }
             }
         },
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        },
-        actions = {
-            // Language selector button
-            IconButton(onClick = { showLangMenu = true }) {
-                SymbolIcon(
-                    name = "language",
-                    contentDescription = stringResource(R.string.content_desc_language),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            DropdownMenu(
-                expanded = showLangMenu,
-                onDismissRequest = { showLangMenu = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.lang_english)) },
-                    onClick = {
-                        setAppLocale(context, "en")
-                        showLangMenu = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.lang_hindi)) },
-                    onClick = {
-                        setAppLocale(context, "hi")
-                        showLangMenu = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.lang_assamese)) },
-                    onClick = {
-                        setAppLocale(context, "as")
-                        showLangMenu = false
-                    }
-                )
-            }
-
-            // Overflow Menu
-            IconButton(onClick = { showMenu = true }) {
-                SymbolIcon(
-                    name = "more_vert",
-                    contentDescription = stringResource(R.string.content_desc_menu),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.link_website)) },
-                    leadingIcon = {
-                        SymbolIcon(
-                            name = "open_in_browser",
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    onClick = {
-                        BrowserLauncher.openUrl(context, websiteUrl)
-                        showMenu = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.link_privacy_policy)) },
-                    leadingIcon = {
-                        SymbolIcon(
-                            name = "privacy_tip",
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    onClick = {
-                        BrowserLauncher.openUrl(context, privacyUrl)
-                        showMenu = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.link_terms)) },
-                    onClick = {
-                        BrowserLauncher.openUrl(context, termsUrl)
-                        showMenu = false
-                    }
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            // Web parity: header uses the page background (bg-tpage), not surface.
-            containerColor = MaterialTheme.colorScheme.background,
-            scrolledContainerColor = MaterialTheme.colorScheme.background
-        )
+        modifier = modifier
     )
 }
 

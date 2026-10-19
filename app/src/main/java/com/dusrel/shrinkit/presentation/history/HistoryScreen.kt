@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.data.local.ProcessedImageEntity
+import com.dusrel.shrinkit.presentation.components.HeaderIconButton
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.theme.LocalSuccessBg
@@ -103,10 +104,11 @@ fun HistoryScreen(
                 actions = {
                     if (history.isNotEmpty()) {
                         Box {
-                            IconButton(onClick = { showHeaderMenu = true }) {
+                            HeaderIconButton(onClick = { showHeaderMenu = true }) {
                                 SymbolIcon(
                                     name = "more_vert",
-                                    contentDescription = stringResource(R.string.history_options)
+                                    contentDescription = stringResource(R.string.history_options),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             DropdownMenu(
@@ -293,7 +295,7 @@ private fun HistoryRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp),
+            .padding(horizontal = 2.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
@@ -309,15 +311,16 @@ private fun HistoryRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = entity.filename,
-                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = historyStatsLine(entity),
-                style = MaterialTheme.typography.bodySmall,
+                fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -384,8 +387,8 @@ private fun HistoryTile(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .height(118.dp)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             )
             Box(
