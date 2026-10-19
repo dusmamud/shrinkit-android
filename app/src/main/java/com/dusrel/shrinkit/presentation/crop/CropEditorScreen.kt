@@ -12,13 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -171,7 +167,7 @@ fun CropEditorScreen(
                 title = { Text(stringResource(R.string.crop_title)) },
                 navigationIcon = {
                     IconButton(onClick = onCancel) {
-                        Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.action_cancel))
+                        SymbolIcon(name = "close", contentDescription = stringResource(R.string.action_cancel))
                     }
                 },
                 actions = {
@@ -182,7 +178,7 @@ fun CropEditorScreen(
                         },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
-                        Icon(Icons.Filled.Check, contentDescription = null)
+                        SymbolIcon(name = "check", contentDescription = null, filled = true)
                         Spacer(Modifier.width(4.dp))
                         Text(stringResource(R.string.crop_apply))
                     }

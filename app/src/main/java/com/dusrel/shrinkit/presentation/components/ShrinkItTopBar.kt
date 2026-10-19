@@ -11,16 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import com.dusrel.shrinkit.R
-import com.dusrel.shrinkit.presentation.theme.BrandBlue
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.util.BrowserLauncher
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,8 +57,8 @@ fun ShrinkItTopBar(
         navigationIcon = {
             if (onBackClick != null) {
                 IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                    SymbolIcon(
+                        name = "arrow_back",
                         contentDescription = stringResource(R.string.action_back)
                     )
                 }
@@ -94,8 +87,8 @@ fun ShrinkItTopBar(
         actions = {
             // Language selector button
             IconButton(onClick = { showLangMenu = true }) {
-                Icon(
-                    imageVector = Icons.Default.Language,
+                SymbolIcon(
+                    name = "language",
                     contentDescription = stringResource(R.string.content_desc_language),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -130,8 +123,8 @@ fun ShrinkItTopBar(
 
             // Overflow Menu
             IconButton(onClick = { showMenu = true }) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
+                SymbolIcon(
+                    name = "more_vert",
                     contentDescription = stringResource(R.string.content_desc_menu),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -144,10 +137,10 @@ fun ShrinkItTopBar(
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.link_website)) },
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.OpenInBrowser,
+                        SymbolIcon(
+                            name = "open_in_browser",
                             contentDescription = null,
-                            tint = BrandBlue
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     },
                     onClick = {
@@ -158,8 +151,8 @@ fun ShrinkItTopBar(
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.link_privacy_policy)) },
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.PrivacyTip,
+                        SymbolIcon(
+                            name = "privacy_tip",
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )

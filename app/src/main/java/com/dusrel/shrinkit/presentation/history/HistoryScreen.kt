@@ -16,14 +16,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,11 +41,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.data.local.ProcessedImageEntity
-import com.dusrel.shrinkit.presentation.theme.BrandBlue
 import java.util.Date
 
 /**
@@ -108,10 +103,11 @@ fun HistoryScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Filled.History,
+                SymbolIcon(
+                    name = "history",
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.outline,
+                    fontSize = 64.sp,
                     modifier = Modifier.size(64.dp)
                 )
                 Spacer(Modifier.height(16.dp))
@@ -223,7 +219,7 @@ private fun HistoryCard(
                         text = "-$reduction%",
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = BrandBlue
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
@@ -234,11 +230,11 @@ private fun HistoryCard(
                 }
             }
             IconButton(onClick = onShare) {
-                Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.action_share))
+                SymbolIcon(name = "share", contentDescription = stringResource(R.string.action_share))
             }
             IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Filled.Delete,
+                SymbolIcon(
+                    name = "delete",
                     contentDescription = stringResource(R.string.action_delete),
                     tint = MaterialTheme.colorScheme.error
                 )

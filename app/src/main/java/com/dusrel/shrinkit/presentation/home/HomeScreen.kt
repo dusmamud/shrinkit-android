@@ -21,17 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.PictureAsPdf
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,17 +30,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.domain.model.CompressMode
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
-import com.dusrel.shrinkit.presentation.theme.BrandBlue
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import java.io.File
 
 /**
@@ -121,7 +112,7 @@ fun HomeScreen(
                     text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
-                    color = BrandBlue
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
@@ -143,7 +134,7 @@ fun HomeScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 QuickActionCard(
-                    icon = Icons.Filled.PhotoLibrary,
+                    iconName = "photo_library",
                     title = stringResource(R.string.home_action_compress_title),
                     subtitle = stringResource(R.string.home_action_compress_sub),
                     onClick = {
@@ -152,7 +143,7 @@ fun HomeScreen(
                     }
                 )
                 QuickActionCard(
-                    icon = Icons.Filled.CameraAlt,
+                    iconName = "camera_alt",
                     title = stringResource(R.string.home_action_camera_title),
                     subtitle = stringResource(R.string.home_action_camera_sub),
                     onClick = {
@@ -178,7 +169,7 @@ fun HomeScreen(
                     }
                 )
                 QuickActionCard(
-                    icon = Icons.Filled.PictureAsPdf,
+                    iconName = "picture_as_pdf",
                     title = stringResource(R.string.home_action_20kb_title),
                     subtitle = stringResource(R.string.home_action_20kb_sub),
                     onClick = {
@@ -189,7 +180,7 @@ fun HomeScreen(
                     }
                 )
                 QuickActionCard(
-                    icon = Icons.Filled.History,
+                    iconName = "history",
                     title = stringResource(R.string.home_action_history_title),
                     subtitle = stringResource(R.string.home_action_history_sub),
                     onClick = onOpenHistory
@@ -238,17 +229,17 @@ fun HomeScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 FeatureRow(
-                    Icons.Filled.Shield,
+                    "shield",
                     stringResource(R.string.home_feat_privacy_title),
                     stringResource(R.string.home_feat_privacy_body)
                 )
                 FeatureRow(
-                    Icons.Filled.Speed,
+                    "speed",
                     stringResource(R.string.home_feat_exact_title),
                     stringResource(R.string.home_feat_exact_body)
                 )
                 FeatureRow(
-                    Icons.Filled.Translate,
+                    "translate",
                     stringResource(R.string.home_feat_lang_title),
                     stringResource(R.string.home_feat_lang_body)
                 )
@@ -282,7 +273,7 @@ private fun launchCamera(
 
 @Composable
 private fun QuickActionCard(
-    icon: ImageVector,
+    iconName: String,
     title: String,
     subtitle: String,
     onClick: () -> Unit
@@ -301,15 +292,20 @@ private fun QuickActionCard(
         ) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = BrandBlue.copy(alpha = 0.12f),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                 modifier = Modifier.size(48.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = BrandBlue,
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier.padding(12.dp)
-                )
+                ) {
+                    SymbolIcon(
+                        name = iconName,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        fontSize = 24.sp
+                    )
+                }
             }
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -334,7 +330,7 @@ private fun HowItWorksRow(step: String, title: String, body: String) {
     Row(verticalAlignment = Alignment.Top) {
         Surface(
             shape = RoundedCornerShape(50),
-            color = BrandBlue,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(28.dp)
         ) {
             Box(
@@ -366,12 +362,13 @@ private fun HowItWorksRow(step: String, title: String, body: String) {
 }
 
 @Composable
-private fun FeatureRow(icon: ImageVector, title: String, body: String) {
+private fun FeatureRow(iconName: String, title: String, body: String) {
     Row(verticalAlignment = Alignment.Top) {
-        Icon(
-            imageVector = icon,
+        SymbolIcon(
+            name = iconName,
             contentDescription = null,
-            tint = BrandBlue,
+            tint = MaterialTheme.colorScheme.primary,
+            fontSize = 22.sp,
             modifier = Modifier.size(22.dp)
         )
         Spacer(Modifier.width(12.dp))

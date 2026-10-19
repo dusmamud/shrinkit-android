@@ -15,13 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -42,13 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import com.dusrel.shrinkit.presentation.components.ImagePickerSection
 import com.dusrel.shrinkit.presentation.components.PresetChipsRow
 import com.dusrel.shrinkit.presentation.components.ResultCard
 import com.dusrel.shrinkit.presentation.components.SettingsPanel
 import com.dusrel.shrinkit.presentation.components.ShrinkItTopBar
-import com.dusrel.shrinkit.presentation.theme.BrandBlue
 import com.dusrel.shrinkit.presentation.util.InAppReviewManager
 import com.dusrel.shrinkit.presentation.util.InAppUpdateManager
 
@@ -115,7 +111,7 @@ fun ShrinkItApp(
                             shape = RoundedCornerShape(12.dp),
                             enabled = !uiState.isProcessing
                         ) {
-                            Icon(imageVector = Icons.Default.ClearAll, contentDescription = null)
+                            SymbolIcon(name = "clear_all", contentDescription = null)
                             Spacer(modifier = Modifier.size(4.dp))
                             Text(stringResource(R.string.action_clear_all))
                         }
@@ -123,7 +119,7 @@ fun ShrinkItApp(
                         Button(
                             onClick = { viewModel.processBatch() },
                             enabled = !uiState.isProcessing,
-                            colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f)
                         ) {
@@ -136,7 +132,7 @@ fun ShrinkItApp(
                                 Spacer(modifier = Modifier.size(8.dp))
                                 Text(stringResource(R.string.status_processing, uiState.currentProgress, uiState.totalProgress))
                             } else {
-                                Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null)
+                                SymbolIcon(name = "auto_awesome", contentDescription = null, filled = true)
                                 Spacer(modifier = Modifier.size(8.dp))
                                 Text(
                                     text = "${stringResource(R.string.action_process_all)} (${uiState.images.size})",

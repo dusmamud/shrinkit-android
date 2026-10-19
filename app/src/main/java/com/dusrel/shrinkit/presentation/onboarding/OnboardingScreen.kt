@@ -2,6 +2,7 @@ package com.dusrel.shrinkit.presentation.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,12 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.PhotoSizeSelectLarge
-import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,19 +24,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dusrel.shrinkit.R
-import com.dusrel.shrinkit.presentation.theme.BrandBlue
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import kotlinx.coroutines.launch
 
 private data class OnboardingPage(
-    val icon: ImageVector,
+    val iconName: String,
     val titleRes: Int,
-    val bodyRes: Int
+    val bodyRes: Int,
+    val filled: Boolean = true
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -51,17 +48,17 @@ fun OnboardingScreen(
 ) {
     val pages = listOf(
         OnboardingPage(
-            Icons.Filled.Shield,
+            "shield",
             R.string.onboarding_privacy_title,
             R.string.onboarding_privacy_body
         ),
         OnboardingPage(
-            Icons.Filled.PhotoSizeSelectLarge,
+            "photo_size_select_large",
             R.string.onboarding_target_title,
             R.string.onboarding_target_body
         ),
         OnboardingPage(
-            Icons.Filled.Bolt,
+            "bolt",
             R.string.onboarding_batch_title,
             R.string.onboarding_batch_body
         )
@@ -103,17 +100,21 @@ fun OnboardingScreen(
             ) {
                 Surface(
                     shape = CircleShape,
-                    color = BrandBlue.copy(alpha = 0.12f),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                     modifier = Modifier.size(120.dp)
                 ) {
-                    Icon(
-                        imageVector = page.icon,
-                        contentDescription = null,
-                        tint = BrandBlue,
-                        modifier = Modifier
-                            .padding(28.dp)
-                            .fillMaxSize()
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        SymbolIcon(
+                            name = page.iconName,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            filled = page.filled,
+                            fontSize = 64.sp
+                        )
+                    }
                 }
                 Spacer(Modifier.height(32.dp))
                 Text(
@@ -143,7 +144,7 @@ fun OnboardingScreen(
                         .padding(horizontal = 4.dp)
                         .size(if (selected) 24.dp else 8.dp, 8.dp)
                         .clip(CircleShape),
-                    color = if (selected) BrandBlue
+                    color = if (selected) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.outlineVariant
                 ) {}
             }

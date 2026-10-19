@@ -12,12 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -44,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.BackgroundColor
 import com.dusrel.shrinkit.domain.model.CompressMode
 import com.dusrel.shrinkit.domain.model.ProcessingOptions
@@ -113,8 +108,8 @@ fun SettingsPanel(
                     onClick = onToggleAspectLock,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Icon(
-                        imageVector = if (options.keepAspectRatio) Icons.Default.Lock else Icons.Default.LockOpen,
+                    SymbolIcon(
+                        name = if (options.keepAspectRatio) "lock" else "lock_open",
                         contentDescription = stringResource(R.string.label_aspect_lock),
                         tint = if (options.keepAspectRatio) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -305,8 +300,8 @@ fun SettingsPanel(
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Icon(
-                    imageVector = if (expandedAdvanced) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                SymbolIcon(
+                    name = if (expandedAdvanced) "expand_less" else "expand_more",
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -345,8 +340,8 @@ fun SettingsPanel(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Security,
+                            SymbolIcon(
+                                name = "security",
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary
                             )

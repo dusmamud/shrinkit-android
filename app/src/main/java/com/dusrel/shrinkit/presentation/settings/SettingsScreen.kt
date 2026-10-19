@@ -14,18 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
@@ -41,13 +34,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.data.local.ThemeMode
 import com.dusrel.shrinkit.data.local.UserPreferencesRepository
 import com.dusrel.shrinkit.domain.model.TargetFormat
@@ -187,7 +180,7 @@ fun SettingsScreen(
         item {
             SettingsSection(title = stringResource(R.string.settings_general)) {
                 SettingsRow(
-                    icon = Icons.Filled.Language,
+                    iconName = "language",
                     title = stringResource(R.string.settings_language),
                     subtitle = stringResource(R.string.settings_language_sub),
                     onClick = {
@@ -206,7 +199,7 @@ fun SettingsScreen(
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                 SettingsRow(
-                    icon = Icons.Filled.Star,
+                    iconName = "star",
                     title = stringResource(R.string.settings_rate),
                     subtitle = stringResource(R.string.settings_rate_sub),
                     onClick = {
@@ -240,7 +233,7 @@ fun SettingsScreen(
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                 SettingsRow(
-                    icon = Icons.Filled.Info,
+                    iconName = "info",
                     title = stringResource(R.string.settings_about),
                     subtitle = stringResource(R.string.settings_about_sub),
                     onClick = { showAbout = true }
@@ -297,8 +290,8 @@ private fun SettingsSection(
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Filled.Palette,
+            SymbolIcon(
+                name = "palette",
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(end = 8.dp)
@@ -323,7 +316,7 @@ private fun SettingsSection(
 
 @Composable
 private fun SettingsRow(
-    icon: ImageVector,
+    iconName: String,
     title: String,
     subtitle: String,
     onClick: () -> Unit
@@ -335,8 +328,8 @@ private fun SettingsRow(
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
+        SymbolIcon(
+            name = iconName,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary
         )
@@ -352,8 +345,8 @@ private fun SettingsRow(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        Icon(
-            imageVector = Icons.Filled.ChevronRight,
+        SymbolIcon(
+            name = "chevron_right",
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )

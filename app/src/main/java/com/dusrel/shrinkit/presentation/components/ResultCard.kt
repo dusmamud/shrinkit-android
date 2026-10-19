@@ -14,18 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Compare
-import androidx.compose.material.icons.filled.Crop
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.RotateRight
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -46,8 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.ImageItem
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import java.text.DecimalFormat
@@ -193,11 +186,12 @@ fun ResultCard(
                                 onClick = { showCompare = !showCompare },
                                 modifier = Modifier.size(36.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Compare,
+                                SymbolIcon(
+                                    name = "compare",
                                     contentDescription = stringResource(R.string.action_compare),
                                     tint = if (showCompare) MaterialTheme.colorScheme.primary
                                     else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 20.sp,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -205,10 +199,11 @@ fun ResultCard(
                                 onClick = { shareImage(context, item) },
                                 modifier = Modifier.size(36.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Share,
+                                SymbolIcon(
+                                    name = "share",
                                     contentDescription = stringResource(R.string.action_share),
                                     tint = MaterialTheme.colorScheme.primary,
+                                    fontSize = 20.sp,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -221,10 +216,11 @@ fun ResultCard(
                                     onClick = onRotate,
                                     modifier = Modifier.size(36.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.RotateRight,
+                                    SymbolIcon(
+                                        name = "rotate_right",
                                         contentDescription = stringResource(R.string.action_rotate),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 20.sp,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -234,10 +230,11 @@ fun ResultCard(
                                     onClick = onCrop,
                                     modifier = Modifier.size(36.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Crop,
+                                    SymbolIcon(
+                                        name = "crop",
                                         contentDescription = stringResource(R.string.action_crop),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 20.sp,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -248,10 +245,11 @@ fun ResultCard(
                             onClick = onRemove,
                             modifier = Modifier.size(36.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
+                            SymbolIcon(
+                                name = "close",
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 18.sp,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -262,10 +260,11 @@ fun ResultCard(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Error,
+                            SymbolIcon(
+                                name = "error",
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.error,
+                                fontSize = 14.sp,
                                 modifier = Modifier.size(14.dp)
                             )
                             Text(

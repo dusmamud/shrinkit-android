@@ -1,11 +1,6 @@
 package com.dusrel.shrinkit.presentation.main
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -16,16 +11,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.history.HistoryScreen
 import com.dusrel.shrinkit.presentation.home.HomeScreen
 import com.dusrel.shrinkit.presentation.settings.SettingsScreen
 
 private data class BottomTab(
-    val icon: ImageVector,
+    val iconName: String,
     val labelRes: Int
 )
 
@@ -40,9 +35,9 @@ fun MainScreen(
     modifier: Modifier = Modifier
 ) {
     val tabs = listOf(
-        BottomTab(Icons.Filled.Home, R.string.tab_home),
-        BottomTab(Icons.Filled.History, R.string.tab_history),
-        BottomTab(Icons.Filled.Settings, R.string.tab_settings)
+        BottomTab("home", R.string.tab_home),
+        BottomTab("history", R.string.tab_history),
+        BottomTab("settings", R.string.tab_settings)
     )
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
@@ -54,7 +49,13 @@ fun MainScreen(
                     NavigationBarItem(
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
-                        icon = { Icon(tab.icon, contentDescription = null) },
+                        icon = {
+                            SymbolIcon(
+                                name = tab.iconName,
+                                contentDescription = null,
+                                filled = selectedTab == index
+                            )
+                        },
                         label = { Text(stringResource(tab.labelRes)) }
                     )
                 }

@@ -16,15 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,8 +31,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dusrel.shrinkit.R
-import com.dusrel.shrinkit.presentation.theme.BrandBlue
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 
 @Composable
 fun ImagePickerSection(
@@ -88,10 +84,11 @@ fun ImagePickerSection(
                     modifier = Modifier.size(64.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Default.AddPhotoAlternate,
+                        SymbolIcon(
+                            name = "add_photo_alternate",
                             contentDescription = null,
-                            tint = BrandBlue,
+                            tint = MaterialTheme.colorScheme.primary,
+                            fontSize = 36.sp,
                             modifier = Modifier.size(36.dp)
                         )
                     }
@@ -126,10 +123,11 @@ fun ImagePickerSection(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
+                        SymbolIcon(
+                            name = "lock",
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.secondary,
+                            fontSize = 14.sp,
                             modifier = Modifier.size(14.dp)
                         )
                         Text(
@@ -149,7 +147,7 @@ fun ImagePickerSection(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
