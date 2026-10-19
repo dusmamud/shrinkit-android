@@ -2,6 +2,7 @@ package com.dusrel.shrinkit.presentation
 
 import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -112,10 +114,16 @@ fun ShrinkItApp(
         bottomBar = {
             AnimatedVisibility(visible = images.isNotEmpty()) {
                 Surface(
-                    tonalElevation = 8.dp,
-                    shadowElevation = 8.dp,
-                    color = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.fillMaxWidth()
+                    tonalElevation = 0.dp,
+                    shadowElevation = 0.dp,
+                    color = MaterialTheme.colorScheme.background,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(0.dp)
+                        )
                 ) {
                     Row(
                         modifier = Modifier
@@ -124,10 +132,12 @@ fun ShrinkItApp(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedButton(
+                        TextButton(
                             onClick = { viewModel.clearAllImages() },
-                            shape = RoundedCornerShape(12.dp),
-                            enabled = !isProcessing
+                            enabled = !isProcessing,
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         ) {
                             SymbolIcon(name = "clear_all", contentDescription = null)
                             Spacer(modifier = Modifier.size(4.dp))
@@ -137,7 +147,12 @@ fun ShrinkItApp(
                         Button(
                             onClick = { viewModel.processBatch() },
                             enabled = !isProcessing,
-                            colors = ButtonDefaults.buttonColors(containerColor = LocalButtonContainer.current),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = LocalButtonContainer.current,
+                                contentColor = androidx.compose.ui.graphics.Color.White,
+                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f)
                         ) {
@@ -184,7 +199,7 @@ fun ShrinkItApp(
             if (images.isNotEmpty()) {
                 item {
                     Text(
-                        text = "${stringResource(R.string.title_results)} (${images.size})",
+                        text = "${stringResource(R.string.title_selected_images)} (${images.size})",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,6 +61,15 @@ fun ResultCard(
 ) {
     val context = LocalContext.current
     var showCompare by remember(item.id) { mutableStateOf(false) }
+    var showFullscreen by remember(item.id) { mutableStateOf(false) }
+
+    // Fullscreen viewer (tap thumbnail).
+    if (showFullscreen) {
+        FullscreenImageViewer(
+            uri = item.processedUri ?: item.uri,
+            onDismiss = { showFullscreen = false }
+        )
+    }
 
     Card(
         modifier = modifier
@@ -78,12 +88,13 @@ fun ResultCard(
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Thumbnail
+                // Thumbnail (tap for fullscreen).
                 Box(
                     modifier = Modifier
                         .size(68.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(LocalDropzoneBg.current)
+                        .clickable { showFullscreen = true }
                 ) {
                     AsyncImage(
                         model = ImageRequest.Builder(context)
@@ -200,6 +211,18 @@ fun ResultCard(
                                     contentDescription = stringResource(R.string.action_compare),
                                     tint = if (showCompare) MaterialTheme.colorScheme.primary
                                     else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 20.sp,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            IconButton(
+                                onClick = { saveImage(context, item) },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                SymbolIcon(
+                                    name = "download",
+                                    contentDescription = stringResource(R.string.action_save_gallery),
+                                    tint = MaterialTheme.colorScheme.primary,
                                     fontSize = 20.sp,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -389,6 +412,33 @@ private fun shareImage(context: Context, item: ImageItem) {
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
     context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+}
+
+private fun saveImage(context: Context, item: ImageItem) {
+    val uri = item.processedUri ?: return
+    try {
+        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            ?: return
+        val ext = when {
+            item.mimeType.contains("png") -> "png"
+            item.mimeType.contains("webp") -> "webp"
+            else -> "jpg"
+        }
+        val baseName = item.filename.substringBeforeLast(".")
+        com.dusrel.shrinkit.data.storage.MediaStoreExporter.saveToPictures(
+            context = context,
+            data = bytes,
+            filename = "shrinkit_${baseName}.$ext",
+            mimeType = item.mimeType.ifEmpty { "image/jpeg" }
+        )
+        android.widget.Toast.makeText(
+            context,
+            context.getString(R.string.toast_saved_gallery),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
+    } catch (_: Exception) {
+        // Silent: the file is already in Pictures/ShrinkIt from processing.
+    }
 }
 
 private fun formatBytes(bytes: Long): String {

@@ -8,11 +8,13 @@
     <string name="title_home">ShrinkIt</string>
     <string name="title_settings">আকাৰ আৰু ফৰ্মেট ছেটিংছ</string>
     <string name="title_results">সংকোচনৰ ফলাফল</string>
+    <string name="title_selected_images">বছা ছবিসমূহ</string>
     <string name="action_pick_images">ছবি বাছক</string>
     <string name="action_add_more">আৰু যোগ কৰক</string>
     <string name="action_clear_all">সকলো আঁতৰাওক</string>
     <string name="action_process_all">সকলো ছবি সংকুচিত কৰক</string>
     <string name="action_save_gallery">গেলেৰীত সংৰক্ষণ কৰক</string>
+    <string name="toast_saved_gallery">Pictures / ShrinkIt ত সাঁচিলে</string>
     <string name="action_share">শ্বেয়াৰ কৰক</string>
 
     <!-- Settings Controls -->

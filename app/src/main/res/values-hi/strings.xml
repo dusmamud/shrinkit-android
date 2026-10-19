@@ -8,11 +8,13 @@
     <string name="title_home">ShrinkIt</string>
     <string name="title_settings">रिसाइज़ और फॉर्मेट सेटिंग्स</string>
     <string name="title_results">कंप्रेस परिणाम</string>
+    <string name="title_selected_images">चुनी गई इमेज</string>
     <string name="action_pick_images">फ़ोटो चुनें</string>
     <string name="action_add_more">और जोड़ें</string>
     <string name="action_clear_all">सब हटाएं</string>
     <string name="action_process_all">सभी इमेज कंप्रेस करें</string>
     <string name="action_save_gallery">गैलरी में सेव करें</string>
+    <string name="toast_saved_gallery">Pictures / ShrinkIt में सेव हो गया</string>
     <string name="action_share">शेयर करें</string>
 
     <!-- Settings Controls -->

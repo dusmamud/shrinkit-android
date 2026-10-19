@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -68,6 +69,18 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+
+    // Select photos: open the system picker FIRST, then land on the
+    // ShrinkIt screen with the chosen images already selected.
+    val pickImagesLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(maxItems = 50)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            toolViewModel.clearAllImages()
+            toolViewModel.addImages(uris)
+            onOpenTool()
+        }
+    }
 
     // Resolve toast messages in composable scope (configuration-aware)
     val cameraFailedMsg = stringResource(R.string.error_camera_failed)
@@ -180,8 +193,9 @@ fun HomeScreen(
                     Spacer(Modifier.height(24.dp))
                     Button(
                         onClick = {
-                            toolViewModel.clearAllImages()
-                            onOpenTool()
+                            pickImagesLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),

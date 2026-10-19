@@ -40,6 +40,7 @@ private val SymbolCodepoints = mapOf(
     "crop" to "\uE3BE",
     "close" to "\uE5CD",
     "delete" to "\uE92E",
+    "download" to "\uE884",
     "error" to "\uF8B6",
     "expand_less" to "\uE5CE",
     "expand_more" to "\uE5CF",

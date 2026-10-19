@@ -8,11 +8,13 @@
     <string name="title_home">ShrinkIt</string>
     <string name="title_settings">Resize &amp; Format Settings</string>
     <string name="title_results">Compressed Results</string>
+    <string name="title_selected_images">Selected Images</string>
     <string name="action_pick_images">Select Images</string>
     <string name="action_add_more">Add More</string>
     <string name="action_clear_all">Clear All</string>
     <string name="action_process_all">Compress All Images</string>
     <string name="action_save_gallery">Save to Gallery</string>
+    <string name="toast_saved_gallery">Saved to Pictures / ShrinkIt</string>
     <string name="action_share">Share</string>
 
     <!-- Settings Controls -->
