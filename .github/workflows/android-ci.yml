@@ -21,9 +21,6 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install Android 17 (API 37) platform
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37"
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
@@ -49,9 +46,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-
-      - name: Install Android 17 (API 37) platform
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -79,9 +73,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-
-      - name: Install Android 17 (API 37) platform
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
