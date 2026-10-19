@@ -47,7 +47,7 @@ val ALL_TOOLS = listOf(
 )
 
 /**
- * Hub listing the 5 single-purpose tools (web parity: /tools/* pages).
+ * Hub listing the 5 single-purpose tools (web parity: the /tools pages).
  */
 @Composable
 fun ToolsHubScreen(

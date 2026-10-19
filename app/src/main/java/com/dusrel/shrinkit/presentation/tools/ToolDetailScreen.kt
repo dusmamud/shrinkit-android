@@ -23,7 +23,7 @@ import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 
 /**
- * Focused single-purpose tool page (web parity: /tools/*).
+ * Focused single-purpose tool page (web parity: the /tools pages).
  * Reuses the full workspace engine with the tool's config pre-applied.
  */
 @Composable
