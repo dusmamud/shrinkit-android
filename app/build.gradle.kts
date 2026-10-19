@@ -26,7 +26,10 @@ kotlin {
 
 android {
     namespace = "com.dusrel.shrinkit"
-    compileSdk = 36
+    // compileSdk 37 (Android 17): required by Compose BOM 2026.09.00, Coil 3.6.3,
+    // Hilt 1.4.0 etc. — compiling against newer APIs is safe; targetSdk stays 36
+    // so no new runtime behavior is opted into, minSdk stays 24.
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.dusrel.shrinkit"
