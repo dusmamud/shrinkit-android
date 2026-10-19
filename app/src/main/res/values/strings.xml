@@ -104,4 +104,98 @@
     <!-- Status -->
     <string name="status_processing">Processing %1$d / %2$d</string>
     <string name="section_advanced">Advanced Options</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_home">Home</string>
+    <string name="tab_history">History</string>
+    <string name="tab_settings">Settings</string>
+    <string name="action_back">Back</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_privacy_title">100% Private, Always</string>
+    <string name="onboarding_privacy_body">Every photo is resized on your phone. Nothing is ever uploaded, tracked or shared.</string>
+    <string name="onboarding_target_title">Hit Exact File Sizes</string>
+    <string name="onboarding_target_body">Need exactly 20 KB for a form? Smart compression converges on your target size automatically.</string>
+    <string name="onboarding_batch_title">Batch in Seconds</string>
+    <string name="onboarding_batch_body">Compress up to 50 photos at once, convert formats, and save them straight to your gallery.</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+
+    <!-- Home -->
+    <string name="home_tagline">Resize, compress &amp; convert photos — free, private, on-device.</string>
+    <string name="home_quick_actions">Quick actions</string>
+    <string name="home_action_compress_title">Compress Photos</string>
+    <string name="home_action_compress_sub">Pick images and shrink them your way</string>
+    <string name="home_action_camera_title">Take a Photo</string>
+    <string name="home_action_camera_sub">Capture and compress instantly</string>
+    <string name="home_action_20kb_title">20 KB for Forms</string>
+    <string name="home_action_20kb_sub">One-tap preset for exam &amp; job forms</string>
+    <string name="home_action_history_title">My History</string>
+    <string name="home_action_history_sub">See, share or delete past results</string>
+    <string name="home_how_it_works">How it works</string>
+    <string name="home_step1_title">Pick or capture</string>
+    <string name="home_step1_body">Choose photos from your gallery or take a new one.</string>
+    <string name="home_step2_title">Set size &amp; format</string>
+    <string name="home_step2_body">Dial in dimensions, quality or an exact KB target.</string>
+    <string name="home_step3_title">Save &amp; share</string>
+    <string name="home_step3_body">Exports land in Pictures/ShrinkIt, ready to share.</string>
+    <string name="home_why_shrinkit">Why ShrinkIt</string>
+    <string name="home_feat_privacy_title">Private by design</string>
+    <string name="home_feat_privacy_body">On-device processing with EXIF &amp; GPS scrubbing.</string>
+    <string name="home_feat_exact_title">Exact targets</string>
+    <string name="home_feat_exact_body">Binary-search engine hits 20 KB, 50 KB and more.</string>
+    <string name="home_feat_lang_title">Your language</string>
+    <string name="home_feat_lang_body">English, Hindi and Assamese built in.</string>
+    <string name="error_camera_permission">Camera permission is needed to take photos.</string>
+
+    <!-- History -->
+    <string name="history_title">History</string>
+    <string name="history_clear_all">Clear all</string>
+    <string name="history_empty_title">Nothing here yet</string>
+    <string name="history_empty_body">Processed photos will appear here for quick share and delete.</string>
+    <string name="history_clear_title">Clear history?</string>
+    <string name="history_clear_body">This removes all history records. Saved photos in your gallery are kept.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_defaults">Processing defaults</string>
+    <string name="settings_default_quality">Default quality: %1$d</string>
+    <string name="settings_default_format">Default format</string>
+    <string name="settings_general">General</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_sub">Uses Android per-app language settings</string>
+    <string name="settings_rate">Rate ShrinkIt</string>
+    <string name="settings_rate_sub">Love the app? Leave a review on Play Store</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_sub">Version, privacy policy and more</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_body">Free, private, on-device image resizing for everyone.</string>
+    <string name="about_privacy">Privacy Policy</string>
+
+    <!-- Crop editor -->
+    <string name="crop_title">Crop</string>
+    <string name="crop_apply">Apply</string>
+    <string name="crop_reset">Remove crop</string>
+    <string name="crop_hint">Drag to move, pinch to zoom. The bright area is kept.</string>
+    <string name="crop_ratio_1_1">1:1</string>
+    <string name="crop_ratio_4_5">4:5</string>
+    <string name="crop_ratio_3_4">3:4</string>
+    <string name="crop_ratio_16_9">16:9</string>
+    <string name="crop_ratio_original">Original</string>
+
+    <!-- Result card -->
+    <string name="badge_cropped">Cropped</string>
+    <string name="action_compare">Compare before / after</string>
+    <string name="action_rotate">Rotate 90°</string>
+    <string name="action_crop">Crop</string>
+    <string name="compare_before">Before</string>
+    <string name="compare_after">After</string>
 </resources>

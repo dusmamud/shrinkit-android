@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
@@ -46,6 +47,7 @@ import com.dusrel.shrinkit.presentation.util.BrowserLauncher
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShrinkItTopBar(
+    onBackClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -54,6 +56,16 @@ fun ShrinkItTopBar(
 
     TopAppBar(
         modifier = modifier,
+        navigationIcon = {
+            if (onBackClick != null) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.action_back)
+                    )
+                }
+            }
+        },
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

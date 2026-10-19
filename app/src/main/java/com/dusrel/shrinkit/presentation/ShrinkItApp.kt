@@ -55,12 +55,23 @@ import com.dusrel.shrinkit.presentation.util.InAppUpdateManager
 @Composable
 fun ShrinkItApp(
     viewModel: ShrinkItViewModel = viewModel(),
+    onNavigateBack: (() -> Unit)? = null,
+    onOpenCropEditor: ((String) -> Unit)? = null,
+    defaultQuality: Int? = null,
+    defaultFormatName: String? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Apply Settings defaults when the tool opens (or when defaults change).
+    LaunchedEffect(defaultQuality, defaultFormatName) {
+        if (defaultQuality != null && defaultFormatName != null) {
+            viewModel.applyPreferenceDefaults(defaultQuality, defaultFormatName)
+        }
+    }
 
     LaunchedEffect(Unit) {
         activity?.let { InAppUpdateManager.checkForUpdates(it) }
@@ -82,7 +93,7 @@ fun ShrinkItApp(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { ShrinkItTopBar() },
+        topBar = { ShrinkItTopBar(onBackClick = onNavigateBack) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             AnimatedVisibility(visible = uiState.images.isNotEmpty()) {
@@ -195,7 +206,9 @@ fun ShrinkItApp(
                 ) { item ->
                     ResultCard(
                         item = item,
-                        onRemove = { viewModel.removeImage(item.id) }
+                        onRemove = { viewModel.removeImage(item.id) },
+                        onRotate = { viewModel.rotateImage(item.id) },
+                        onCrop = { onOpenCropEditor?.invoke(item.id) }
                     )
                 }
 

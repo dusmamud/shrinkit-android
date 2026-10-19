@@ -1,10 +1,14 @@
 package com.dusrel.shrinkit.presentation
 
 import android.app.Application
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.data.local.HistoryDao
+import com.dusrel.shrinkit.data.local.ProcessedImageEntity
 import com.dusrel.shrinkit.data.storage.MediaStoreExporter
 import com.dusrel.shrinkit.domain.engine.BinarySearchCompressor
 import com.dusrel.shrinkit.domain.engine.DimensionField
@@ -16,6 +20,7 @@ import com.dusrel.shrinkit.domain.engine.SizeUnits
 import com.dusrel.shrinkit.domain.model.BackgroundColor
 import com.dusrel.shrinkit.domain.model.CompressMode
 import com.dusrel.shrinkit.domain.model.ImageItem
+import com.dusrel.shrinkit.domain.model.RelativeCropRect
 import com.dusrel.shrinkit.domain.model.ImagePreset
 import com.dusrel.shrinkit.domain.model.ProcessingOptions
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
@@ -46,7 +51,8 @@ data class ShrinkItUiState(
 
 @HiltViewModel
 class ShrinkItViewModel @Inject constructor(
-    private val application: Application
+    private val application: Application,
+    private val historyDao: HistoryDao
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(ShrinkItUiState())
@@ -113,6 +119,43 @@ class ShrinkItViewModel @Inject constructor(
 
     fun clearAllImages() {
         _uiState.update { it.copy(images = emptyList(), isProcessing = false) }
+    }
+
+    fun getImage(id: String): ImageItem? =
+        _uiState.value.images.find { it.id == id }
+
+    /** Cycles 0 -> 90 -> 180 -> 270 -> 0 degrees clockwise. */
+    fun rotateImage(id: String) {
+        _uiState.update { current ->
+            current.copy(
+                images = current.images.map { item ->
+                    if (item.id == id) {
+                        item.copy(rotationDegrees = (item.rotationDegrees + 90) % 360)
+                    } else item
+                }
+            )
+        }
+    }
+
+    fun setCropRect(id: String, rect: RelativeCropRect?) {
+        _uiState.update { current ->
+            current.copy(
+                images = current.images.map { item ->
+                    if (item.id == id) item.copy(cropRect = rect) else item
+                }
+            )
+        }
+    }
+
+    /** Applies Settings defaults (quality/format) to the current options. */
+    fun applyPreferenceDefaults(quality: Int, formatName: String) {
+        val format = runCatching { TargetFormat.valueOf(formatName) }
+            .getOrDefault(TargetFormat.ORIGINAL)
+        _uiState.update { current ->
+            current.copy(
+                options = current.options.copy(quality = quality, format = format)
+            )
+        }
     }
 
     fun applyPreset(preset: ImagePreset) {
@@ -308,6 +351,15 @@ class ShrinkItViewModel @Inject constructor(
                         )
                     }
 
+                    // Apply per-image edits: custom crop first, then rotation.
+                    var workBitmap = decoded.bitmap
+                    item.cropRect?.let { rect ->
+                        workBitmap = applyRelativeCrop(workBitmap, rect) ?: workBitmap
+                    }
+                    if (item.rotationDegrees != 0) {
+                        workBitmap = applyRotation(workBitmap, item.rotationDegrees)
+                    }
+
                     val format = if (opts.format == TargetFormat.ORIGINAL) {
                         when {
                             decoded.mimeType.contains("png") -> TargetFormat.PNG
@@ -320,7 +372,7 @@ class ShrinkItViewModel @Inject constructor(
                     }.encodeSafe()
 
                     val resized = ResizeEngine.resize(
-                        source = decoded.bitmap,
+                        source = workBitmap,
                         targetWidth = targetW,
                         targetHeight = targetH,
                         mode = opts.resizeMode,
@@ -334,10 +386,10 @@ class ShrinkItViewModel @Inject constructor(
                         BinarySearchCompressor.compressWithQuality(resized, format, opts.quality)
                     }
 
-                    if (resized != decoded.bitmap) {
+                    if (resized != workBitmap) {
                         resized.recycle()
                     }
-                    decoded.bitmap.recycle()
+                    workBitmap.recycle()
 
                     val baseName = item.filename.substringBeforeLast(".")
                     val outFileName = "shrinkit_${baseName}.${format.extension}"
@@ -369,6 +421,23 @@ class ShrinkItViewModel @Inject constructor(
                         (((item.originalSizeBytes - outBytes).toDouble() / item.originalSizeBytes.toDouble()) * 100.0).toInt()
                     } else 0
 
+                    // Record in History (best effort — never fails the batch)
+                    try {
+                        historyDao.insert(
+                            ProcessedImageEntity(
+                                filename = outFileName,
+                                contentUri = savedUri.toString(),
+                                originalBytes = item.originalSizeBytes,
+                                processedBytes = outBytes,
+                                width = compressionResult.finalWidth,
+                                height = compressionResult.finalHeight,
+                                format = format.name,
+                                createdAt = System.currentTimeMillis()
+                            )
+                        )
+                    } catch (_: Exception) {
+                    }
+
                     updatedList[index] = item.copy(
                         status = ProcessingStatus.COMPLETED,
                         processedUri = savedUri,
@@ -398,6 +467,50 @@ class ShrinkItViewModel @Inject constructor(
                     userMessage = application.getString(R.string.status_done)
                 )
             }
+        }
+    }
+
+    /**
+     * Crops [source] to the relative rect (fractions 0..1). Returns null if the
+     * rect is degenerate, leaving the source untouched. Recycles [source] when
+     * a new bitmap is produced.
+     */
+    private fun applyRelativeCrop(source: Bitmap, rect: RelativeCropRect): Bitmap? {
+        val w = source.width
+        val h = source.height
+        if (w <= 0 || h <= 0) return null
+
+        val left = (rect.left.coerceIn(0f, 1f) * w).toInt()
+        val top = (rect.top.coerceIn(0f, 1f) * h).toInt()
+        val right = (rect.right.coerceIn(0f, 1f) * w).toInt()
+        val bottom = (rect.bottom.coerceIn(0f, 1f) * h).toInt()
+
+        val cw = (right - left).coerceIn(1, w - left)
+        val ch = (bottom - top).coerceIn(1, h - top)
+        if (cw >= w && ch >= h) return null // effectively the whole image
+
+        return try {
+            val cropped = Bitmap.createBitmap(source, left, top, cw, ch)
+            if (cropped != source) source.recycle()
+            cropped
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Rotates [source] clockwise by [degrees] (90/180/270). Recycles [source]
+     * when a new bitmap is produced.
+     */
+    private fun applyRotation(source: Bitmap, degrees: Int): Bitmap {
+        if (degrees % 360 == 0) return source
+        return try {
+            val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
+            val rotated = Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+            if (rotated != source) source.recycle()
+            rotated
+        } catch (_: Exception) {
+            source
         }
     }
 

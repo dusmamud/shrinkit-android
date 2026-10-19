@@ -2,6 +2,17 @@ package com.dusrel.shrinkit.domain.model
 
 import android.net.Uri
 
+/**
+ * Crop rectangle expressed as fractions (0..1) of the source bitmap.
+ * Set by the crop editor; null means "no custom crop".
+ */
+data class RelativeCropRect(
+    val left: Float,
+    val top: Float,
+    val right: Float,
+    val bottom: Float
+)
+
 data class ImageItem(
     val id: String,
     val uri: Uri,
@@ -16,5 +27,9 @@ data class ImageItem(
     val processedWidth: Int = 0,
     val processedHeight: Int = 0,
     val reductionPercent: Int = 0,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    /** Clockwise rotation to apply before resize: 0, 90, 180 or 270. */
+    val rotationDegrees: Int = 0,
+    /** Custom crop from the crop editor; null = no custom crop. */
+    val cropRect: RelativeCropRect? = null
 )

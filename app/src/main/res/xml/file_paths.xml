@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Temp camera captures, shared only with the camera app -->
+    <cache-path name="camera" path="camera/" />
+</paths>

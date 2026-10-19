@@ -104,4 +104,98 @@
     <!-- Status -->
     <string name="status_processing">প্ৰচেছিং %1$d / %2$d</string>
     <string name="section_advanced">উন্নত বিকল্প</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_home">হোম</string>
+    <string name="tab_history">ইতিহাস</string>
+    <string name="tab_settings">ছেটিংছ</string>
+    <string name="action_back">ঘূৰি যাওক</string>
+    <string name="action_delete">মচক</string>
+    <string name="action_cancel">বাতিল কৰক</string>
+    <string name="action_close">বন্ধ কৰক</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_privacy_title">100% ব্যক্তিগত, সদায়</string>
+    <string name="onboarding_privacy_body">প্ৰতিখন ফটো আপোনাৰ ফোনতে ৰিছাইজ হয়। একো আপলোড, ট্ৰেক বা শ্বেয়াৰ নহয়।</string>
+    <string name="onboarding_target_title">নিখুঁত ফাইল আকাৰ</string>
+    <string name="onboarding_target_body">ফৰ্মৰ বাবে ঠিক 20 KB লাগে? স্মাৰ্ট কম্প্ৰেছনে আপোনাৰ লক্ষ্য আকাৰত নিজে নিজে উপনীত হয়।</string>
+    <string name="onboarding_batch_title">ছেকেণ্ডতে বেচ</string>
+    <string name="onboarding_batch_body">একেলগে 50 খন ফটো কম্প্ৰেছ কৰক, ফৰ্মেট সলনি কৰক আৰু পোনে পোনে গেলাৰীত ছেভ কৰক।</string>
+    <string name="onboarding_skip">বাদ দিয়ক</string>
+    <string name="onboarding_next">পৰৱৰ্তী</string>
+    <string name="onboarding_get_started">আৰম্ভ কৰক</string>
+
+    <!-- Home -->
+    <string name="home_tagline">ফটো ৰিছাইজ, কম্প্ৰেছ আৰু কনভাৰ্ট কৰক — বিনামূলীয়া, ব্যক্তিগত, অন-ডিভাইচ।</string>
+    <string name="home_quick_actions">দ্ৰুত কাৰ্য</string>
+    <string name="home_action_compress_title">ফটো কম্প্ৰেছ কৰক</string>
+    <string name="home_action_compress_sub">ছবি বাছক আৰু আপোনাৰ মতে সৰু কৰক</string>
+    <string name="home_action_camera_title">ফটো তোলক</string>
+    <string name="home_action_camera_sub">তৎক্ষণাৎ কেপচাৰ কৰি কম্প্ৰেছ কৰক</string>
+    <string name="home_action_20kb_title">ফৰ্মৰ বাবে 20 KB</string>
+    <string name="home_action_20kb_sub">পৰীক্ষা আৰু চাকৰি ফৰ্মৰ বাবে ৱান-টেপ প্ৰিছেট</string>
+    <string name="home_action_history_title">মোৰ ইতিহাস</string>
+    <string name="home_action_history_sub">পুৰণি ফলাফল চাওক, শ্বেয়াৰ বা মচক</string>
+    <string name="home_how_it_works">ই কেনেকৈ কাম কৰে</string>
+    <string name="home_step1_title">বাছক বা কেপচাৰ কৰক</string>
+    <string name="home_step1_body">গেলাৰীৰ পৰা ফটো বাছক বা নতুন ফটো তোলক।</string>
+    <string name="home_step2_title">আকাৰ আৰু ফৰ্মেট নিৰ্ধাৰণ কৰক</string>
+    <string name="home_step2_body">ডাইমেনচন, কোৱালিটি বা নিখুঁত KB লক্ষ্য বাছক।</string>
+    <string name="home_step3_title">ছেভ আৰু শ্বেয়াৰ কৰক</string>
+    <string name="home_step3_body">এক্সপৰ্ট Pictures/ShrinkIt-ত ছেভ হয়, শ্বেয়াৰৰ বাবে সাজু।</string>
+    <string name="home_why_shrinkit">কিয় ShrinkIt</string>
+    <string name="home_feat_privacy_title">ডিজাইনৰ পৰাই ব্যক্তিগত</string>
+    <string name="home_feat_privacy_body">EXIF আৰু GPS স্ক্ৰাবিঙৰ সৈতে অন-ডিভাইচ প্ৰচেছিং।</string>
+    <string name="home_feat_exact_title">নিখুঁত লক্ষ্য</string>
+    <string name="home_feat_exact_body">বাইনাৰী-ছাৰ্চ ইঞ্জিনে 20 KB, 50 KB আৰু তাতকৈ অধিকত উপনীত হয়।</string>
+    <string name="home_feat_lang_title">আপোনাৰ ভাষা</string>
+    <string name="home_feat_lang_body">ইংৰাজী, হিন্দী আৰু অসমীয়া অন্তৰ্নিৰ্মিত।</string>
+    <string name="error_camera_permission">ফটো তুলিবলৈ কেমেৰা অনুমতি প্ৰয়োজন।</string>
+
+    <!-- History -->
+    <string name="history_title">ইতিহাস</string>
+    <string name="history_clear_all">সকলো মচক</string>
+    <string name="history_empty_title">এতিয়াও একো নাই</string>
+    <string name="history_empty_body">প্ৰচেছ কৰা ফটো দ্ৰুত শ্বেয়াৰ আৰু মচাৰ বাবে ইয়াত দেখা যাব।</string>
+    <string name="history_clear_title">ইতিহাস মচিবনে?</string>
+    <string name="history_clear_body">ইয়াৰ দ্বাৰা সকলো ইতিহাস ৰেকৰ্ড মচা যাব। গেলাৰীত ছেভ কৰা ফটো থাকিব।</string>
+
+    <!-- Settings -->
+    <string name="settings_title">ছেটিংছ</string>
+    <string name="settings_appearance">ৰূপ</string>
+    <string name="theme_system">ছিষ্টেম ডিফল্ট</string>
+    <string name="theme_light">পোহৰ</string>
+    <string name="theme_dark">আন্ধাৰ</string>
+    <string name="settings_defaults">প্ৰচেছিং ডিফল্ট</string>
+    <string name="settings_default_quality">ডিফল্ট কোৱালিটি: %1$d</string>
+    <string name="settings_default_format">ডিফল্ট ফৰ্মেট</string>
+    <string name="settings_general">সাধাৰণ</string>
+    <string name="settings_language">ভাষা</string>
+    <string name="settings_language_sub">Android প্ৰতি-এপ ভাষা ছেটিংছ ব্যৱহাৰ কৰে</string>
+    <string name="settings_rate">ShrinkIt-ক ৰেটিং দিয়ক</string>
+    <string name="settings_rate_sub">এপটো ভাল পালে? Play Store-ত ৰিভিউ দিয়ক</string>
+    <string name="settings_about">বিষয়ে</string>
+    <string name="settings_about_sub">সংস্কৰণ, গোপনীয়তা নীতি আৰু অধিক</string>
+    <string name="about_version">সংস্কৰণ %1$s</string>
+    <string name="about_body">সকলোৰে বাবে বিনামূলীয়া, ব্যক্তিগত, অন-ডিভাইচ ছবি ৰিছাইজিং।</string>
+    <string name="about_privacy">গোপনীয়তা নীতি</string>
+
+    <!-- Crop editor -->
+    <string name="crop_title">ক্ৰপ</string>
+    <string name="crop_apply">প্ৰয়োগ কৰক</string>
+    <string name="crop_reset">ক্ৰপ আঁতৰাওক</string>
+    <string name="crop_hint">স্থানান্তৰৰ বাবে টানক, জুমৰ বাবে পিঞ্চ কৰক। উজ্জ্বল অংশ ৰখা হ\'ব।</string>
+    <string name="crop_ratio_1_1">1:1</string>
+    <string name="crop_ratio_4_5">4:5</string>
+    <string name="crop_ratio_3_4">3:4</string>
+    <string name="crop_ratio_16_9">16:9</string>
+    <string name="crop_ratio_original">মূল</string>
+
+    <!-- Result card -->
+    <string name="badge_cropped">ক্ৰপ কৰা</string>
+    <string name="action_compare">আগত / পিছত তুলনা কৰক</string>
+    <string name="action_rotate">90° ঘূৰাওক</string>
+    <string name="action_crop">ক্ৰপ</string>
+    <string name="compare_before">আগত</string>
+    <string name="compare_after">পিছত</string>
 </resources>

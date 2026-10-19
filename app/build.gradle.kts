@@ -83,6 +83,12 @@ dependencies {
     implementation(libs.coil3.compose)
     implementation(libs.androidx.exifinterface)
 
+    // Local Persistence (History) & Preferences
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.preferences)
+    ksp(libs.androidx.room.compiler)
+
     // Background Processing
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.kotlinx.coroutines.android)

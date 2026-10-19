@@ -104,4 +104,98 @@
     <!-- Status -->
     <string name="status_processing">प्रोसेसिंग %1$d / %2$d</string>
     <string name="section_advanced">उन्नत विकल्प</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_home">होम</string>
+    <string name="tab_history">इतिहास</string>
+    <string name="tab_settings">सेटिंग्स</string>
+    <string name="action_back">वापस</string>
+    <string name="action_delete">हटाएं</string>
+    <string name="action_cancel">रद्द करें</string>
+    <string name="action_close">बंद करें</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_privacy_title">100% प्राइवेट, हमेशा</string>
+    <string name="onboarding_privacy_body">हर फोटो आपके फोन पर ही रीसाइज़ होती है। कुछ भी अपलोड, ट्रैक या शेयर नहीं होता।</string>
+    <string name="onboarding_target_title">बिल्कुल सही फाइल साइज़</string>
+    <string name="onboarding_target_body">फॉर्म के लिए बिल्कुल 20 KB चाहिए? स्मार्ट कंप्रेशन अपने आप आपके टारगेट साइज़ पर पहुंचता है।</string>
+    <string name="onboarding_batch_title">सेकंडों में बैच</string>
+    <string name="onboarding_batch_body">एक साथ 50 फोटो कंप्रेस करें, फॉर्मेट बदलें और सीधे गैलरी में सेव करें।</string>
+    <string name="onboarding_skip">छोड़ें</string>
+    <string name="onboarding_next">आगे</string>
+    <string name="onboarding_get_started">शुरू करें</string>
+
+    <!-- Home -->
+    <string name="home_tagline">फोटो रीसाइज़, कंप्रेस और कन्वर्ट करें — मुफ्त, प्राइवेट, ऑन-डिवाइस।</string>
+    <string name="home_quick_actions">त्वरित कार्य</string>
+    <string name="home_action_compress_title">फोटो कंप्रेस करें</string>
+    <string name="home_action_compress_sub">इमेज चुनें और अपने तरीके से छोटा करें</string>
+    <string name="home_action_camera_title">फोटो लें</string>
+    <string name="home_action_camera_sub">तुरंत कैप्चर करके कंप्रेस करें</string>
+    <string name="home_action_20kb_title">फॉर्म के लिए 20 KB</string>
+    <string name="home_action_20kb_sub">परीक्षा और नौकरी फॉर्म के लिए वन-टैप प्रीसेट</string>
+    <string name="home_action_history_title">मेरा इतिहास</string>
+    <string name="home_action_history_sub">पुराने रिजल्ट देखें, शेयर या हटाएं</string>
+    <string name="home_how_it_works">यह कैसे काम करता है</string>
+    <string name="home_step1_title">चुनें या कैप्चर करें</string>
+    <string name="home_step1_body">गैलरी से फोटो चुनें या नई फोटो लें।</string>
+    <string name="home_step2_title">साइज़ और फॉर्मेट सेट करें</string>
+    <string name="home_step2_body">डाइमेंशन, क्वालिटी या बिल्कुल सही KB टारगेट चुनें।</string>
+    <string name="home_step3_title">सेव और शेयर करें</string>
+    <string name="home_step3_body">एक्सपोर्ट Pictures/ShrinkIt में सेव होते हैं, शेयर के लिए तैयार।</string>
+    <string name="home_why_shrinkit">ShrinkIt क्यों</string>
+    <string name="home_feat_privacy_title">डिज़ाइन से प्राइवेट</string>
+    <string name="home_feat_privacy_body">EXIF और GPS स्क्रबिंग के साथ ऑन-डिवाइस प्रोसेसिंग।</string>
+    <string name="home_feat_exact_title">बिल्कुल सही टारगेट</string>
+    <string name="home_feat_exact_body">बाइनरी-सर्च इंजन 20 KB, 50 KB और अधिक पर पहुंचता है।</string>
+    <string name="home_feat_lang_title">आपकी भाषा</string>
+    <string name="home_feat_lang_body">अंग्रेज़ी, हिंदी और असमिया पहले से मौजूद।</string>
+    <string name="error_camera_permission">फोटो लेने के लिए कैमरा परमिशन चाहिए।</string>
+
+    <!-- History -->
+    <string name="history_title">इतिहास</string>
+    <string name="history_clear_all">सभी साफ़ करें</string>
+    <string name="history_empty_title">अभी कुछ नहीं है</string>
+    <string name="history_empty_body">प्रोसेस की गई फोटो यहां दिखेंगी — तुरंत शेयर और हटाने के लिए।</string>
+    <string name="history_clear_title">इतिहास साफ़ करें?</string>
+    <string name="history_clear_body">इससे सभी इतिहास रिकॉर्ड हट जाएंगे। गैलरी में सेव फोटो रहेंगी।</string>
+
+    <!-- Settings -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="settings_appearance">दिखावट</string>
+    <string name="theme_system">सिस्टम डिफ़ॉल्ट</string>
+    <string name="theme_light">लाइट</string>
+    <string name="theme_dark">डार्क</string>
+    <string name="settings_defaults">प्रोसेसिंग डिफ़ॉल्ट</string>
+    <string name="settings_default_quality">डिफ़ॉल्ट क्वालिटी: %1$d</string>
+    <string name="settings_default_format">डिफ़ॉल्ट फॉर्मेट</string>
+    <string name="settings_general">सामान्य</string>
+    <string name="settings_language">भाषा</string>
+    <string name="settings_language_sub">Android प्रति-ऐप भाषा सेटिंग्स का उपयोग करता है</string>
+    <string name="settings_rate">ShrinkIt को रेट करें</string>
+    <string name="settings_rate_sub">ऐप पसंद आया? Play Store पर रिव्यू दें</string>
+    <string name="settings_about">बारे में</string>
+    <string name="settings_about_sub">वर्ज़न, प्राइवेसी पॉलिसी और अधिक</string>
+    <string name="about_version">वर्ज़न %1$s</string>
+    <string name="about_body">सभी के लिए मुफ्त, प्राइवेट, ऑन-डिवाइस इमेज रीसाइज़िंग।</string>
+    <string name="about_privacy">प्राइवेसी पॉलिसी</string>
+
+    <!-- Crop editor -->
+    <string name="crop_title">क्रॉप</string>
+    <string name="crop_apply">लागू करें</string>
+    <string name="crop_reset">क्रॉप हटाएं</string>
+    <string name="crop_hint">हिलाने के लिए ड्रैग करें, ज़ूम के लिए पिंच करें। चमकीला हिस्सा रखा जाएगा।</string>
+    <string name="crop_ratio_1_1">1:1</string>
+    <string name="crop_ratio_4_5">4:5</string>
+    <string name="crop_ratio_3_4">3:4</string>
+    <string name="crop_ratio_16_9">16:9</string>
+    <string name="crop_ratio_original">मूल</string>
+
+    <!-- Result card -->
+    <string name="badge_cropped">क्रॉप किया</string>
+    <string name="action_compare">पहले / बाद में तुलना करें</string>
+    <string name="action_rotate">90° घुमाएं</string>
+    <string name="action_crop">क्रॉप</string>
+    <string name="compare_before">पहले</string>
+    <string name="compare_after">बाद में</string>
 </resources>
