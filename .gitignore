@@ -11,3 +11,8 @@
 *.apk
 *.aab
 /app/build
+
+# Release signing: never commit keys or their passwords
+/keystore.properties
+*.jks
+*.keystore
