@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.RelativeCropRect
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 import com.dusrel.shrinkit.presentation.theme.BrandBlue
