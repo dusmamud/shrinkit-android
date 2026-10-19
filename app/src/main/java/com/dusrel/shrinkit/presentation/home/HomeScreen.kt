@@ -265,6 +265,7 @@ fun HomeScreen(
 
         item { Spacer(Modifier.height(8.dp)) }
     }
+    }
 }
 
 private fun launchCamera(
@@ -375,7 +376,6 @@ private fun HowItWorksRow(step: String, title: String, body: String) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
     }
 }
 
