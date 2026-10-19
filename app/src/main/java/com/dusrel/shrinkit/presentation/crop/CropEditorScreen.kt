@@ -2,12 +2,8 @@ package com.dusrel.shrinkit.presentation.crop
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculateCentroidSize
-import androidx.compose.foundation.gestures.calculatePan
-import androidx.compose.foundation.gestures.calculateZoom
-import androidx.compose.ui.input.pointer.awaitPointerEvent
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,13 +64,14 @@ import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 
 private data class CropAspect(val labelRes: Int, val ratio: Float?)
 
-/** Visual corner handle for Free-mode crop window.
- * Dragging is handled by the parent gesture arena (hit-tests corners
- * before pan/zoom) — this is visual only. */
+/** Corner handle for Free-mode crop window.
+ * Lives in a sibling overlay above the pan/zoom layer, so its drags
+ * never race the transform gesture (the original bug). */
 @Composable
 private fun CornerHandle(
     xPx: Float,
     yPx: Float,
+    onDrag: (dx: Float, dy: Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
@@ -89,7 +86,13 @@ private fun CornerHandle(
                     )
                 }
             }
-            .size(touchTarget),
+            .size(touchTarget)
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    onDrag(dragAmount.x, dragAmount.y)
+                }
+            },
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -244,19 +247,6 @@ fun CropEditorScreen(
     }
     val winRight = winLeft + winW
     val winBottom = winTop + winH
-    // Latest corner positions + hit-test state for the unified gesture arena.
-    val density = LocalDensity.current
-    val cornerHitRadiusPx = with(density) { 48.dp.toPx() }
-    val latestCorners by rememberUpdatedState(
-        listOf(
-            Offset(winLeft, winTop),
-            Offset(winRight, winTop),
-            Offset(winLeft, winBottom),
-            Offset(winRight, winBottom)
-        )
-    )
-    val latestFreeMode by rememberUpdatedState(isFreeMode && freeInit)
-    val latestHitRadius by rememberUpdatedState(cornerHitRadiusPx)
     // Minimum scale so the image always covers the window.
     val minScale = if (dispW > 0 && dispH > 0) {
         maxOf(winW / dispW, winH / dispH, 1f)
@@ -434,6 +424,9 @@ fun CropEditorScreen(
             }
         }
     ) { innerPadding ->
+        // Two sibling layers: (1) image + dim + window with pan/zoom,
+        // (2) free-mode corner handles on top. Siblings (not parent/child)
+        // so handle drags never race the transform gesture.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -443,133 +436,78 @@ fun CropEditorScreen(
                         boxSize = newSize
                     }
                 }
-                .pointerInput(Unit) {
-                    // Unified gesture arena: corner handles win over pan/zoom.
-                    // (Previously the parent transform gesture consumed drags
-                    // meant for the handles, so Free-mode resize never worked.)
-                    awaitEachGesture {
-                        val down = awaitFirstDown()
-                        var corner = -1
-                        if (latestFreeMode) {
-                            val hitR = latestHitRadius
-                            corner = latestCorners.indexOfFirst {
-                                (it - down.position).getDistance() <= hitR
-                            }
-                        }
-                        if (corner >= 0) {
-                            // Drag the crop-window corner.
-                            var prevPos = down.position
-                            var event: androidx.compose.ui.input.pointer.PointerEvent
-                            do {
-                                event = awaitPointerEvent()
-                                val change = event.changes.firstOrNull { it.id == down.id }
-                                if (change == null) break
-                                val dx = change.position.x - prevPos.x
-                                val dy = change.position.y - prevPos.y
-                                prevPos = change.position
-                                if (dx != 0f || dy != 0f) {
-                                    dragCorner(corner, dx, dy)
-                                    change.consume()
-                                }
-                            } while (event.changes.any { it.pressed })
-                        } else {
-                            // Pan / pinch-zoom (touch-slop aware, like
-                            // detectTransformGestures).
-                            val touchSlop = viewConfiguration.touchSlop
-                            var zoom = 1f
-                            var pan = Offset.Zero
-                            var pastTouchSlop = false
-                            var event: androidx.compose.ui.input.pointer.PointerEvent
-                            do {
-                                event = awaitPointerEvent()
-                                val canceled = event.changes.any { it.isConsumed }
-                                if (!canceled) {
-                                    val zoomChange = event.calculateZoom()
-                                    val panChange = event.calculatePan()
-                                    if (!pastTouchSlop) {
-                                        zoom *= zoomChange
-                                        pan += panChange
-                                        val centroidSize =
-                                            event.calculateCentroidSize(useCurrent = false)
-                                        val zoomMotion =
-                                            kotlin.math.abs(1 - zoom) * centroidSize
-                                        val panMotion = pan.getDistance()
-                                        if (zoomMotion > touchSlop || panMotion > touchSlop) {
-                                            pastTouchSlop = true
-                                        }
-                                    }
-                                    if (pastTouchSlop) {
-                                        scale = (scale * zoomChange).coerceIn(
-                                            latestMinScale,
-                                            6f
-                                        )
-                                        offsetX += panChange.x
-                                        offsetY += panChange.y
-                                        clampOffsets()
-                                        event.changes.forEach { it.consume() }
-                                    }
-                                }
-                            } while (event.changes.any { it.pressed })
-                        }
-                    }
-                },
-            contentAlignment = Alignment.Center
         ) {
             if (boxW > 0 && boxH > 0) {
-                AsyncImage(
-                    model = item.uri,
-                    contentDescription = item.filename,
-                    contentScale = ContentScale.Fit,
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                            translationX = offsetX
-                            translationY = offsetY
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, pan, zoom, _ ->
+                                scale = (scale * zoom).coerceIn(latestMinScale, 6f)
+                                offsetX += pan.x
+                                offsetY += pan.y
+                                clampOffsets()
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = item.uri,
+                        contentDescription = item.filename,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                                translationX = offsetX
+                                translationY = offsetY
+                            }
+                    )
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        val dim = Color.Black.copy(alpha = 0.55f)
+                        // Dim everything outside the window (4 rects).
+                        drawRect(dim, Offset.Zero, Size(winLeft, boxH))
+                        drawRect(dim, Offset(winRight, 0f), Size(boxW - winRight, boxH))
+                        drawRect(dim, Offset(winLeft, 0f), Size(winW, winTop))
+                        drawRect(
+                            dim,
+                            Offset(winLeft, winBottom),
+                            Size(winW, boxH - winBottom)
+                        )
+                        // Window border + thirds grid.
+                        drawRect(
+                            Color.White,
+                            Offset(winLeft, winTop),
+                            Size(winW, winH),
+                            style = Stroke(width = 3f)
+                        )
+                        val thirdW = winW / 3f
+                        val thirdH = winH / 3f
+                        for (i in 1..2) {
+                            drawLine(
+                                Color.White.copy(alpha = 0.5f),
+                                Offset(winLeft + thirdW * i, winTop),
+                                Offset(winLeft + thirdW * i, winBottom),
+                                strokeWidth = 1.5f
+                            )
+                            drawLine(
+                                Color.White.copy(alpha = 0.5f),
+                                Offset(winLeft, winTop + thirdH * i),
+                                Offset(winRight, winTop + thirdH * i),
+                                strokeWidth = 1.5f
+                            )
                         }
-                )
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val dim = Color.Black.copy(alpha = 0.55f)
-                    // Dim everything outside the window (4 rects).
-                    drawRect(dim, Offset.Zero, Size(winLeft, boxH))
-                    drawRect(dim, Offset(winRight, 0f), Size(boxW - winRight, boxH))
-                    drawRect(dim, Offset(winLeft, 0f), Size(winW, winTop))
-                    drawRect(
-                        dim,
-                        Offset(winLeft, winBottom),
-                        Size(winW, boxH - winBottom)
-                    )
-                    // Window border + thirds grid.
-                    drawRect(
-                        Color.White,
-                        Offset(winLeft, winTop),
-                        Size(winW, winH),
-                        style = Stroke(width = 3f)
-                    )
-                    val thirdW = winW / 3f
-                    val thirdH = winH / 3f
-                    for (i in 1..2) {
-                        drawLine(
-                            Color.White.copy(alpha = 0.5f),
-                            Offset(winLeft + thirdW * i, winTop),
-                            Offset(winLeft + thirdW * i, winBottom),
-                            strokeWidth = 1.5f
-                        )
-                        drawLine(
-                            Color.White.copy(alpha = 0.5f),
-                            Offset(winLeft, winTop + thirdH * i),
-                            Offset(winRight, winTop + thirdH * i),
-                            strokeWidth = 1.5f
-                        )
                     }
                 }
-                // Free-mode corner handles (visual; drag handled by parent arena).
+                // Layer 2: free-mode corner handles (sibling overlay).
                 if (isFreeMode && freeInit) {
-                    CornerHandle(winLeft, winTop)
-                    CornerHandle(winRight, winTop)
-                    CornerHandle(winLeft, winBottom)
-                    CornerHandle(winRight, winBottom)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CornerHandle(winLeft, winTop, onDrag = { dx, dy -> dragCorner(0, dx, dy) })
+                        CornerHandle(winRight, winTop, onDrag = { dx, dy -> dragCorner(1, dx, dy) })
+                        CornerHandle(winLeft, winBottom, onDrag = { dx, dy -> dragCorner(2, dx, dy) })
+                        CornerHandle(winRight, winBottom, onDrag = { dx, dy -> dragCorner(3, dx, dy) })
+                    }
                 }
             }
         }
