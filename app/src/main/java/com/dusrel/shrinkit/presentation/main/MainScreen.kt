@@ -100,20 +100,30 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
+        // The tab screens' headers (ScreenTopBar) apply the status-bar
+        // inset themselves (like M3 TopAppBar does), so exclude the top
+        // here to avoid double padding. Bottom/start/end still come from
+        // the outer Scaffold (bottom nav + gesture insets).
+        val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
+        val tabModifier = Modifier.padding(
+            start = innerPadding.calculateStartPadding(layoutDirection),
+            end = innerPadding.calculateEndPadding(layoutDirection),
+            bottom = innerPadding.calculateBottomPadding()
+        )
         when (selectedTab) {
             0 -> HomeScreen(
                 toolViewModel = toolViewModel,
                 onOpenTool = onOpenTool,
                 onOpenHistory = { selectedTab = 1 },
                 onOpenTools = onOpenTools,
-                modifier = Modifier.padding(innerPadding)
+                modifier = tabModifier
             )
             1 -> HistoryScreen(
-                modifier = Modifier.padding(innerPadding)
+                modifier = tabModifier
             )
             else -> SettingsScreen(
                 onNavigate = onOpenSettingsDetail,
-                modifier = Modifier.padding(innerPadding)
+                modifier = tabModifier
             )
         }
     }
