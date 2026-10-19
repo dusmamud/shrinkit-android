@@ -2,6 +2,7 @@
 agp = "9.4.0"
 kotlin = "2.4.10"
 ksp = "2.3.10"
+appcompat = "1.8.0"
 coreKtx = "1.19.1"
 coreSplashscreen = "1.2.0"
 lifecycleRuntimeKtx = "2.10.0"
@@ -24,6 +25,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 
 [libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }

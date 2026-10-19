@@ -14,6 +14,7 @@ import com.dusrel.shrinkit.domain.engine.BinarySearchCompressor
 import com.dusrel.shrinkit.domain.engine.DimensionField
 import com.dusrel.shrinkit.domain.engine.ExifSanitizer
 import com.dusrel.shrinkit.domain.engine.Limits
+import com.dusrel.shrinkit.domain.engine.LimitCheck
 import com.dusrel.shrinkit.domain.engine.ResizeEngine
 import com.dusrel.shrinkit.domain.engine.SafeBitmapDecoder
 import com.dusrel.shrinkit.domain.engine.SizeUnits
