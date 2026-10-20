@@ -11,6 +11,14 @@
     <!-- Camera Capture (optional: take a photo straight into the tool) -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- No foreground service is used anywhere in this app (batch work runs
+         in the ViewModel): strip the FGS permission that the WorkManager
+         library manifest would otherwise merge in, so the final APK carries
+         no FGS permission and Play requires no FGS declaration. -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
+
     <!-- Legacy Storage for Android 7.0–9.0 (Scoped Storage on Android 10+ requires no permissions) -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -56,6 +64,12 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
+
+        <!-- No foreground service is used: strip the WorkManager library's
+             SystemForegroundService from the merged manifest as well. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            tools:node="remove" />
 
         <!-- Remove default WorkManager init: ShrinkItApplication provides a custom
              Configuration (HiltWorkerFactory) via on-demand initialization -->
