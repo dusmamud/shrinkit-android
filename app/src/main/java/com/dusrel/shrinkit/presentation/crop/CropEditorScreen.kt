@@ -392,6 +392,10 @@ fun CropEditorScreen(
                     // Custom W:H inputs.
                     if (selectedAspect.ratio == -1f) {
                         Spacer(Modifier.height(8.dp))
+                        // Ratio parts must be 1..999 (fields cap at 3 digits,
+                        // so only 0 can fall outside once non-empty).
+                        val customWInvalid = customW.isNotEmpty() && customW.toIntOrNull() == 0
+                        val customHInvalid = customH.isNotEmpty() && customH.toIntOrNull() == 0
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -402,7 +406,11 @@ fun CropEditorScreen(
                                 label = { Text(stringResource(R.string.label_width)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
-                                singleLine = true
+                                singleLine = true,
+                                isError = customWInvalid,
+                                supportingText = if (customWInvalid) {
+                                    { Text(stringResource(R.string.error_ratio_limit)) }
+                                } else null
                             )
                             Text(":", style = MaterialTheme.typography.titleLarge)
                             OutlinedTextField(
@@ -411,7 +419,11 @@ fun CropEditorScreen(
                                 label = { Text(stringResource(R.string.label_height)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
-                                singleLine = true
+                                singleLine = true,
+                                isError = customHInvalid,
+                                supportingText = if (customHInvalid) {
+                                    { Text(stringResource(R.string.error_ratio_limit)) }
+                                } else null
                             )
                         }
                     }

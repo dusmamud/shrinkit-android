@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.domain.engine.Limits
 import com.dusrel.shrinkit.domain.model.CompressMode
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import com.dusrel.shrinkit.domain.model.SizeUnit
@@ -309,6 +310,9 @@ fun CropWizardScreen(
                 if (item.cropRect != null) {
                     item {
                         ToolSection(title = stringResource(R.string.wizard_output_size)) {
+                            // W/H here are pixels: web limit 1..12000px.
+                            val widthInvalid = options.width < 1f || options.width > 12000f
+                            val heightInvalid = options.height < 1f || options.height > 12000f
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
@@ -321,7 +325,19 @@ fun CropWizardScreen(
                                     label = { Text(stringResource(R.string.label_width)) },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                     modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    singleLine = true,
+                                    isError = widthInvalid,
+                                    supportingText = if (widthInvalid) {
+                                        {
+                                            Text(
+                                                stringResource(
+                                                    R.string.error_width_limit,
+                                                    "1px",
+                                                    "12,000px"
+                                                )
+                                            )
+                                        }
+                                    } else null
                                 )
                                 SymbolIcon(
                                     name = "lock",
@@ -336,7 +352,19 @@ fun CropWizardScreen(
                                     label = { Text(stringResource(R.string.label_height)) },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                     modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    singleLine = true,
+                                    isError = heightInvalid,
+                                    supportingText = if (heightInvalid) {
+                                        {
+                                            Text(
+                                                stringResource(
+                                                    R.string.error_height_limit,
+                                                    "1px",
+                                                    "12,000px"
+                                                )
+                                            )
+                                        }
+                                    } else null
                                 )
                             }
                         }
@@ -345,6 +373,9 @@ fun CropWizardScreen(
                     if (showTargetSize) {
                         item {
                             ToolSection(title = stringResource(R.string.tool_target_size)) {
+                                val kbVal = targetKbText.toIntOrNull()
+                                val kbInvalid = kbVal != null &&
+                                    (kbVal < Limits.TARGET_KB_MIN || kbVal > Limits.TARGET_KB_MAX)
                                 OutlinedTextField(
                                     value = targetKbText,
                                     onValueChange = { str ->
@@ -354,7 +385,11 @@ fun CropWizardScreen(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.fillMaxWidth(),
                                     singleLine = true,
-                                    suffix = { Text("KB") }
+                                    suffix = { Text("KB") },
+                                    isError = kbInvalid,
+                                    supportingText = if (kbInvalid) {
+                                        { Text(stringResource(R.string.error_target_kb_limit)) }
+                                    } else null
                                 )
                             }
                         }

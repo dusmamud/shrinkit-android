@@ -107,6 +107,10 @@
     <string name="error_no_images">कृपया कम से कम एक इमेज चुनें।</string>
     <string name="error_decode_failed">इमेज फ़ाइल डिकोड करने में विफल।</string>
     <string name="error_file_too_large">इमेज का आकार सुरक्षित सीमा से अधिक है।</string>
+    <string name="error_width_limit">चौड़ाई %1$s और %2$s के बीच होनी चाहिए।</string>
+    <string name="error_height_limit">ऊंचाई %1$s और %2$s के बीच होनी चाहिए।</string>
+    <string name="error_target_kb_limit">टारगेट साइज़ 1 KB और 2,000 KB के बीच होना चाहिए।</string>
+    <string name="error_ratio_limit">अनुपात का मान 1 और 999 के बीच होना चाहिए।</string>
 
     <!-- Status -->
     <string name="status_processing">प्रोसेसिंग %1$d / %2$d</string>

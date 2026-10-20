@@ -1,9 +1,14 @@
 package com.dusrel.shrinkit.domain.engine
 
+import com.dusrel.shrinkit.domain.model.SizeUnit
+
 sealed class LimitCheck {
     data class Ok(val warn: Boolean) : LimitCheck()
     data class Error(val reason: LimitErrorReason) : LimitCheck()
 }
+
+/** Per-unit W/H input range (web parity: limits.ts). */
+data class UnitLimit(val min: Float, val max: Float, val suffix: String)
 
 enum class LimitErrorReason {
     TOO_LARGE,
@@ -25,6 +30,20 @@ object Limits {
 
     /** Maximum images in a single batch */
     const val MAX_BATCH = 50
+
+    /** W/H input limits per unit (web parity: limits.ts) */
+    val UNIT_LIMITS: Map<SizeUnit, UnitLimit> = mapOf(
+        SizeUnit.PERCENT to UnitLimit(1f, 500f, "%"),
+        SizeUnit.PIXELS to UnitLimit(1f, 12000f, "px"),
+        SizeUnit.CM to UnitLimit(0.1f, 400f, "cm"),
+        SizeUnit.INCHES to UnitLimit(0.1f, 160f, "in")
+    )
+
+    /** Target-size tools accept 1..2000 KB (web parity) */
+    const val TARGET_KB_MIN = 1
+
+    /** Largest target size the KB tools accept */
+    const val TARGET_KB_MAX = 2000
 
     fun checkInputDimensions(width: Int, height: Int): LimitCheck {
         if (width <= 0 || height <= 0) {

@@ -107,6 +107,10 @@
     <string name="error_no_images">Please select at least one image.</string>
     <string name="error_decode_failed">Failed to decode image file.</string>
     <string name="error_file_too_large">Image dimensions exceed safe limit.</string>
+    <string name="error_width_limit">Width must be between %1$s and %2$s.</string>
+    <string name="error_height_limit">Height must be between %1$s and %2$s.</string>
+    <string name="error_target_kb_limit">Target size must be between 1 KB and 2,000 KB.</string>
+    <string name="error_ratio_limit">Ratio values must be between 1 and 999.</string>
 
     <!-- Status -->
     <string name="status_processing">Processing %1$d / %2$d</string>

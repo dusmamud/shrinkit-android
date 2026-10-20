@@ -231,13 +231,16 @@ fun HistoryScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                items(history, key = { it.id }) { entity ->
+                items(
+                    history,
+                    key = { it.id },
+                    contentType = { "history_item" }
+                ) { entity ->
                     HistoryRow(
                         entity = entity,
                         onOpen = { fullscreenEntity = entity },
                         onShare = { viewModel.share(entity) },
-                        onDelete = { viewModel.delete(entity) },
-                        modifier = Modifier.animateItem()
+                        onDelete = { viewModel.delete(entity) }
                     )
                 }
             }
@@ -251,13 +254,16 @@ fun HistoryScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(history, key = { it.id }) { entity ->
+                items(
+                    history,
+                    key = { it.id },
+                    contentType = { "history_item" }
+                ) { entity ->
                     HistoryTile(
                         entity = entity,
                         onOpen = { fullscreenEntity = entity },
                         onShare = { viewModel.share(entity) },
-                        onDelete = { viewModel.delete(entity) },
-                        modifier = Modifier.animateItem()
+                        onDelete = { viewModel.delete(entity) }
                     )
                 }
             }
@@ -307,6 +313,13 @@ private fun HistoryRow(
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val request = remember(entity.contentUri) {
+        ImageRequest.Builder(context)
+            .data(Uri.parse(entity.contentUri))
+            .size(Size(200, 200))
+            .build()
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -315,10 +328,7 @@ private fun HistoryRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(Uri.parse(entity.contentUri))
-                .size(Size(200, 200))
-                .build(),
+            model = request,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -399,13 +409,17 @@ private fun HistoryTile(
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val request = remember(entity.contentUri) {
+        ImageRequest.Builder(context)
+            .data(Uri.parse(entity.contentUri))
+            .size(Size(600, 360))
+            .build()
+    }
     Column(modifier = modifier) {
         Box {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(Uri.parse(entity.contentUri))
-                    .size(Size(600, 360))
-                    .build(),
+                model = request,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

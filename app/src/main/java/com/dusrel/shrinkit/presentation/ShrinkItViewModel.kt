@@ -32,14 +32,19 @@ import com.dusrel.shrinkit.domain.model.SizeUnit
 import com.dusrel.shrinkit.domain.model.TargetFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 data class ShrinkItUiState(
@@ -78,47 +83,73 @@ class ShrinkItViewModel @Inject constructor(
             val availableSlots = Limits.MAX_BATCH - currentCount
             val urisToAdd = uris.take(availableSlots.coerceAtLeast(0))
 
-            val newItems = mutableListOf<ImageItem>()
-            var skippedTooLarge = 0
+            val skippedTooLarge = AtomicInteger(0)
+            // Bound concurrent resolver round trips so one big pick does not
+            // open dozens of content-provider connections at the same time.
+            val resolverGate = Semaphore(8)
 
-            for (uri in urisToAdd) {
-                val bounds = SafeBitmapDecoder.decodeBounds(application, uri)
+            coroutineScope {
+                // Metadata loads in parallel, but the deferreds stay in picker
+                // order so the list order matches the selection exactly.
+                val deferreds = urisToAdd.map { uri ->
+                    async {
+                        resolverGate.withPermit {
+                            val bounds = SafeBitmapDecoder.decodeBounds(application, uri)
 
-                // Enforce memory-safety limits: refuse images that would OOM on decode.
-                if (Limits.checkInputDimensions(bounds.width, bounds.height) is LimitCheck.Error) {
-                    skippedTooLarge++
-                    continue
+                            // Enforce memory-safety limits: refuse images that would OOM on decode.
+                            if (Limits.checkInputDimensions(bounds.width, bounds.height) is LimitCheck.Error) {
+                                skippedTooLarge.incrementAndGet()
+                                return@withPermit null
+                            }
+
+                            val fileSize = application.contentResolver.openFileDescriptor(uri, "r")?.use {
+                                it.statSize
+                            } ?: 0L
+
+                            val displayName = queryDisplayName(uri) ?: "image_${System.currentTimeMillis()}.jpg"
+
+                            ImageItem(
+                                id = UUID.randomUUID().toString(),
+                                uri = uri,
+                                filename = displayName,
+                                originalSizeBytes = fileSize,
+                                originalWidth = bounds.width,
+                                originalHeight = bounds.height,
+                                mimeType = bounds.mimeType
+                            )
+                        }
+                    }
                 }
 
-                val fileSize = application.contentResolver.openFileDescriptor(uri, "r")?.use {
-                    it.statSize
-                } ?: 0L
+                // Collect in picker order: each item is appended as soon as its
+                // own metadata is ready instead of waiting for the whole batch.
+                val pendingFlush = mutableListOf<ImageItem>()
+                for (deferred in deferreds) {
+                    deferred.await()?.let { pendingFlush.add(it) }
+                    if (pendingFlush.size >= 8) {
+                        val batch = pendingFlush.toList()
+                        pendingFlush.clear()
+                        _uiState.update { current ->
+                            current.copy(images = current.images + batch)
+                        }
+                    }
+                }
 
-                val displayName = queryDisplayName(uri) ?: "image_${System.currentTimeMillis()}.jpg"
-
-                newItems.add(
-                    ImageItem(
-                        id = UUID.randomUUID().toString(),
-                        uri = uri,
-                        filename = displayName,
-                        originalSizeBytes = fileSize,
-                        originalWidth = bounds.width,
-                        originalHeight = bounds.height,
-                        mimeType = bounds.mimeType
+                // Final flush + verdict message, computed exactly as the old
+                // single end-of-batch update computed it. This also runs when
+                // nothing could be added (no free slots), preserving the
+                // limit_max_batch message for that case.
+                _uiState.update { current ->
+                    val message = when {
+                        skippedTooLarge.get() > 0 -> application.getString(R.string.error_file_too_large)
+                        uris.size > availableSlots -> application.getString(R.string.limit_max_batch, Limits.MAX_BATCH)
+                        else -> null
+                    }
+                    current.copy(
+                        images = current.images + pendingFlush,
+                        userMessage = message
                     )
-                )
-            }
-
-            _uiState.update { current ->
-                val message = when {
-                    skippedTooLarge > 0 -> application.getString(R.string.error_file_too_large)
-                    uris.size > availableSlots -> application.getString(R.string.limit_max_batch, Limits.MAX_BATCH)
-                    else -> null
                 }
-                current.copy(
-                    images = current.images + newItems,
-                    userMessage = message
-                )
             }
         }
     }

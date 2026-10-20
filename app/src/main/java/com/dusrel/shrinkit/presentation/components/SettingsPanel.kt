@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.domain.engine.Limits
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.domain.model.BackgroundColor
 import com.dusrel.shrinkit.domain.model.ProcessingOptions
@@ -64,6 +65,15 @@ fun SettingsPanel(
     val showResizeMode = !options.keepAspectRatio && options.width != options.height
     // Web rule: quality slider only applies to JPEG/WebP (PNG/GIF force 100).
     val showQuality = options.format == TargetFormat.JPEG || options.format == TargetFormat.WEBP
+
+    // Web parity (limits.ts): flag W/H outside the active unit's range.
+    val unitLimit = Limits.UNIT_LIMITS[options.unit]
+    val widthInvalid = unitLimit != null &&
+        (options.width < unitLimit.min || options.width > unitLimit.max)
+    val heightInvalid = unitLimit != null &&
+        (options.height < unitLimit.min || options.height > unitLimit.max)
+    val limitMinLabel = unitLimit?.let { formatLimitLabel(it.min, it.suffix) } ?: ""
+    val limitMaxLabel = unitLimit?.let { formatLimitLabel(it.max, it.suffix) } ?: ""
 
     Card(
         modifier = modifier
@@ -100,7 +110,19 @@ fun SettingsPanel(
                     label = { Text(stringResource(R.string.label_width)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    isError = widthInvalid,
+                    supportingText = if (widthInvalid) {
+                        {
+                            Text(
+                                stringResource(
+                                    R.string.error_width_limit,
+                                    limitMinLabel,
+                                    limitMaxLabel
+                                )
+                            )
+                        }
+                    } else null
                 )
 
                 IconButton(
@@ -122,7 +144,19 @@ fun SettingsPanel(
                     label = { Text(stringResource(R.string.label_height)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    isError = heightInvalid,
+                    supportingText = if (heightInvalid) {
+                        {
+                            Text(
+                                stringResource(
+                                    R.string.error_height_limit,
+                                    limitMinLabel,
+                                    limitMaxLabel
+                                )
+                            )
+                        }
+                    } else null
                 )
             }
 
@@ -288,4 +322,14 @@ fun SettingsPanel(
             }
         }
     }
+}
+
+/** "1px" / "0.1cm" / "12,000px" — whole numbers grouped, decimals plain. */
+private fun formatLimitLabel(value: Float, suffix: String): String {
+    val number = if (value % 1 == 0f) {
+        String.format("%,d", value.toLong())
+    } else {
+        value.toString()
+    }
+    return number + suffix
 }

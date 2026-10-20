@@ -107,6 +107,10 @@
     <string name="error_no_images">অনুগ্ৰহ কৰি কমেও এখন ছবি নিৰ্বাচন কৰক।</string>
     <string name="error_decode_failed">ছবি ফাইল ডিকোড কৰাত ব্যৰ্থ।</string>
     <string name="error_file_too_large">ছবিৰ আকাৰ সুৰক্ষিত সীমা অতিক্ৰম কৰিছে।</string>
+    <string name="error_width_limit">প্ৰস্থ %1$s আৰু %2$s ৰ ভিতৰত হ\'ব লাগিব।</string>
+    <string name="error_height_limit">উচ্চতা %1$s আৰু %2$s ৰ ভিতৰত হ\'ব লাগিব।</string>
+    <string name="error_target_kb_limit">লক্ষ্য আকাৰ 1 KB আৰু 2,000 KB ৰ ভিতৰত হ\'ব লাগিব।</string>
+    <string name="error_ratio_limit">অনুপাতৰ মান 1 আৰু 999 ৰ ভিতৰত হ\'ব লাগিব।</string>
 
     <!-- Status -->
     <string name="status_processing">প্ৰচেছিং %1$d / %2$d</string>

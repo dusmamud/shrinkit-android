@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.dusrel.shrinkit.R
+import com.dusrel.shrinkit.domain.engine.Limits
 import com.dusrel.shrinkit.domain.model.ProcessingStatus
 import com.dusrel.shrinkit.domain.model.BackgroundColor
 import com.dusrel.shrinkit.domain.model.TargetFormat
@@ -275,6 +276,9 @@ fun KbToolScreen(
                             }
                         }
                         Spacer(Modifier.height(8.dp))
+                        val customKbVal = customKb.toIntOrNull()
+                        val customKbInvalid = customKbVal != null &&
+                            (customKbVal < Limits.TARGET_KB_MIN || customKbVal > Limits.TARGET_KB_MAX)
                         OutlinedTextField(
                             value = customKb,
                             onValueChange = { str ->
@@ -285,7 +289,11 @@ fun KbToolScreen(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
-                            suffix = { Text("KB") }
+                            suffix = { Text("KB") },
+                            isError = customKbInvalid,
+                            supportingText = if (customKbInvalid) {
+                                { Text(stringResource(R.string.error_target_kb_limit)) }
+                            } else null
                         )
                     }
                 }
