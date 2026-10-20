@@ -59,6 +59,7 @@ import coil3.size.Size
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.data.local.ProcessedImageEntity
 import com.dusrel.shrinkit.presentation.components.HeaderIconButton
+import com.dusrel.shrinkit.presentation.components.FullscreenImageViewer
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.theme.LocalSuccessBg
@@ -80,6 +81,7 @@ fun HistoryScreen(
     val history by viewModel.history.collectAsState()
     val userMessage by viewModel.userMessage.collectAsState()
     var showClearConfirm by remember { mutableStateOf(false) }
+    var fullscreenEntity by remember { mutableStateOf<ProcessedImageEntity?>(null) }
     var showHeaderMenu by remember { mutableStateOf(false) }
     var view by rememberSaveable { mutableStateOf(HistoryView.LIST) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -232,6 +234,7 @@ fun HistoryScreen(
                 items(history, key = { it.id }) { entity ->
                     HistoryRow(
                         entity = entity,
+                        onOpen = { fullscreenEntity = entity },
                         onShare = { viewModel.share(entity) },
                         onDelete = { viewModel.delete(entity) },
                         modifier = Modifier.animateItem()
@@ -251,6 +254,7 @@ fun HistoryScreen(
                 items(history, key = { it.id }) { entity ->
                     HistoryTile(
                         entity = entity,
+                        onOpen = { fullscreenEntity = entity },
                         onShare = { viewModel.share(entity) },
                         onDelete = { viewModel.delete(entity) },
                         modifier = Modifier.animateItem()
@@ -258,6 +262,14 @@ fun HistoryScreen(
                 }
             }
         }
+    }
+
+    fullscreenEntity?.let { entity ->
+        FullscreenImageViewer(
+            uri = Uri.parse(entity.contentUri),
+            onDismiss = { fullscreenEntity = null },
+            onShare = { viewModel.share(entity) }
+        )
     }
 
     if (showClearConfirm) {
@@ -289,6 +301,7 @@ fun HistoryScreen(
 @Composable
 private fun HistoryRow(
     entity: ProcessedImageEntity,
+    onOpen: () -> Unit,
     onShare: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -297,6 +310,7 @@ private fun HistoryRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable { onOpen() }
             .padding(horizontal = 2.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -379,6 +393,7 @@ private fun HistoryRow(
 @Composable
 private fun HistoryTile(
     entity: ProcessedImageEntity,
+    onOpen: () -> Unit,
     onShare: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -398,6 +413,7 @@ private fun HistoryTile(
                     .height(118.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable { onOpen() }
             )
             Box(
                 modifier = Modifier

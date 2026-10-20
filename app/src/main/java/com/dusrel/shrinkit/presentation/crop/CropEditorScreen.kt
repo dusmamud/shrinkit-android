@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -342,7 +343,13 @@ fun CropEditorScreen(
             )
         },
         bottomBar = {
-            Column(modifier = Modifier.padding(16.dp)) {
+            // imePadding lifts the bar (incl. custom W:H inputs) above the
+            // keyboard — edge-to-edge apps must handle IME insets manually.
+            Column(
+                modifier = Modifier
+                    .imePadding()
+                    .padding(16.dp)
+            ) {
                 Text(
                     text = stringResource(R.string.crop_hint),
                     style = MaterialTheme.typography.bodySmall,

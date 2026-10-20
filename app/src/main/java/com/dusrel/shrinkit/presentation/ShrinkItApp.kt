@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -133,6 +134,7 @@ fun ShrinkItApp(
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .border(
                             width = 1.dp,
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
@@ -195,7 +197,8 @@ fun ShrinkItApp(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .imePadding(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item { headerContent() }
