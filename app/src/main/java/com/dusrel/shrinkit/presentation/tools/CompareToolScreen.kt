@@ -33,7 +33,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,6 +63,7 @@ import com.dusrel.shrinkit.domain.engine.SafeBitmapDecoder
 import com.dusrel.shrinkit.domain.model.TargetFormat
 import com.dusrel.shrinkit.presentation.ShrinkItViewModel
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
+import com.dusrel.shrinkit.presentation.components.AppSlider
 import com.dusrel.shrinkit.presentation.components.SymbolIcon
 import com.dusrel.shrinkit.presentation.theme.LocalButtonContainer
 import kotlinx.coroutines.Dispatchers
@@ -282,11 +282,14 @@ fun CompareToolScreen(
             } else {
                 // Quality slider (web parity: 10–95, default 65, live re-compress).
                 item {
-                    ToolSection(title = stringResource(R.string.tool_compare_quality, quality.toInt())) {
-                        Slider(
+                    ToolSection(title = stringResource(R.string.label_quality)) {
+                        AppSlider(
+                            valueText = "${quality.toInt()}%",
                             value = quality,
                             onValueChange = { quality = it },
-                            valueRange = 10f..95f
+                            valueRange = 10f..95f,
+                            minHint = "10",
+                            maxHint = "95"
                         )
                     }
                 }

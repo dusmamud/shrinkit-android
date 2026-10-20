@@ -177,6 +177,7 @@
     <string name="theme_dark">Dark</string>
     <string name="settings_defaults">Processing defaults</string>
     <string name="settings_default_quality">Default quality: %1$d</string>
+    <string name="settings_default_quality_label">Default quality</string>
     <string name="settings_default_format">Default format</string>
     <string name="settings_general">General</string>
     <string name="settings_language">Language</string>

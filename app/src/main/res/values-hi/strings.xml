@@ -177,6 +177,7 @@
     <string name="theme_dark">डार्क</string>
     <string name="settings_defaults">प्रोसेसिंग डिफ़ॉल्ट</string>
     <string name="settings_default_quality">डिफ़ॉल्ट क्वालिटी: %1$d</string>
+    <string name="settings_default_quality_label">डिफ़ॉल्ट क्वालिटी</string>
     <string name="settings_default_format">डिफ़ॉल्ट फॉर्मेट</string>
     <string name="settings_general">सामान्य</string>
     <string name="settings_language">भाषा</string>

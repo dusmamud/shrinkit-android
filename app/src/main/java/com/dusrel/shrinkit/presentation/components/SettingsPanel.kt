@@ -17,7 +17,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -256,23 +255,15 @@ fun SettingsPanel(
 
             // Section 5: Quality — web rule: JPEG/WebP only
             if (showQuality) {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "${stringResource(R.string.label_quality)}: ${options.quality}%",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    Slider(
-                        value = options.quality.toFloat(),
-                        onValueChange = { onQualityChanged(it.toInt()) },
-                        valueRange = 1f..100f
-                    )
-                }
+                AppSlider(
+                    label = stringResource(R.string.label_quality),
+                    valueText = "${options.quality}%",
+                    value = options.quality.toFloat(),
+                    onValueChange = { onQualityChanged(it.toInt()) },
+                    valueRange = 1f..100f,
+                    minHint = "1",
+                    maxHint = "100"
+                )
             }
 
             // Section 6: Background Color

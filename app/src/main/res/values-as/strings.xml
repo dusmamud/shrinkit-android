@@ -177,6 +177,7 @@
     <string name="theme_dark">আন্ধাৰ</string>
     <string name="settings_defaults">প্ৰচেছিং ডিফল্ট</string>
     <string name="settings_default_quality">ডিফল্ট কোৱালিটি: %1$d</string>
+    <string name="settings_default_quality_label">ডিফল্ট কোৱালিটি</string>
     <string name="settings_default_format">ডিফল্ট ফৰ্মেট</string>
     <string name="settings_general">সাধাৰণ</string>
     <string name="settings_language">ভাষা</string>

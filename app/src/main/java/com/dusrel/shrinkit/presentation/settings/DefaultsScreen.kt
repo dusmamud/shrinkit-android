@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.dusrel.shrinkit.R
 import com.dusrel.shrinkit.domain.model.TargetFormat
 import com.dusrel.shrinkit.presentation.components.ScreenTopBar
+import com.dusrel.shrinkit.presentation.components.AppSlider
 import kotlinx.coroutines.launch
 
 /** Dedicated Defaults page: default quality slider + default format chips. */
@@ -62,15 +62,9 @@ fun DefaultsScreen(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(
-                    R.string.settings_default_quality,
-                    prefs.defaultQuality
-                ),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
-            )
-            Slider(
+            AppSlider(
+                label = stringResource(R.string.settings_default_quality_label),
+                valueText = "${qualitySliderValue.toInt()}%",
                 value = qualitySliderValue,
                 onValueChange = { qualitySliderValue = it },
                 onValueChangeFinished = {
@@ -79,7 +73,8 @@ fun DefaultsScreen(
                     }
                 },
                 valueRange = 1f..100f,
-                steps = 98
+                minHint = "1",
+                maxHint = "100"
             )
             Spacer(Modifier.height(16.dp))
             Text(
