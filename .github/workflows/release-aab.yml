@@ -1,0 +1,59 @@
+name: Release Play Store AAB
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle-release:
+    name: Build & Sign Release AAB
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Configure Keystore & Properties
+        env:
+          KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > shrinkit-upload.jks
+          cat <<EOF > keystore.properties
+          storeFile=shrinkit-upload.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: Build signed AAB
+        run: ./gradlew bundleRelease --stacktrace
+
+      - name: Verify AAB signature
+        run: |
+          "$JAVA_HOME/bin/jarsigner" -verify -certs -verbose:summary app/build/outputs/bundle/release/app-release.aab | head -30
+
+      - name: Upload Play Store AAB
+        uses: actions/upload-artifact@v6
+        with:
+          name: shrinkit-release-aab
+          path: app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+
+      - name: Clean up sensitive files
+        if: always()
+        run: rm -f shrinkit-upload.jks keystore.properties
