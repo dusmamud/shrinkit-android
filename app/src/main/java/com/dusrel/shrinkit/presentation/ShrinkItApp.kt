@@ -29,6 +29,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -91,6 +93,10 @@ fun ShrinkItApp(
     }
 
     LaunchedEffect(Unit) {
+        // Main workspace default: unit = percent (web /resize parity).
+        // Tool screens set PIXELS etc. on the shared options — reset here so
+        // the main screen always opens on percent.
+        viewModel.updateUnit(com.dusrel.shrinkit.domain.model.SizeUnit.PERCENT)
         activity?.let { InAppUpdateManager.checkForUpdates(it) }
     }
 
@@ -103,8 +109,13 @@ fun ShrinkItApp(
 
     // Trigger review flow + results navigation when batch successfully finishes.
     // Results get their own screen (best practice) — they never replace inputs.
+    // Guarded by the processing transition so recreating this screen (e.g.
+    // back from results) does not navigate again.
+    var wasProcessing by remember { mutableStateOf(false) }
     LaunchedEffect(isProcessing) {
-        if (!isProcessing && images.isNotEmpty() && images.all { it.status == ProcessingStatus.COMPLETED }) {
+        val justFinished = wasProcessing && !isProcessing
+        wasProcessing = isProcessing
+        if (justFinished && images.isNotEmpty() && images.all { it.status == ProcessingStatus.COMPLETED }) {
             activity?.let { InAppReviewManager.requestReview(it) }
             onProcessComplete?.invoke()
         }

@@ -2,4 +2,6 @@
 <paths>
     <!-- Temp camera captures, shared only with the camera app -->
     <cache-path name="camera" path="camera/" />
+    <!-- Compare-tool results shared with the share sheet -->
+    <cache-path name="results" path="results/" />
 </paths>

@@ -97,6 +97,16 @@ fun CropWizardScreen(
     // NOTE: fresh state is prepared at navigation time (prepareWizardTool).
     // No clearing here — the screen is recreated on crop return.
 
+    // Auto-open the crop screen right after an image is picked (user spec:
+    // "image select karte hi turant crop screen show hona chahiye").
+    var pendingAutoCrop by remember { mutableStateOf(false) }
+    LaunchedEffect(item?.id) {
+        if (pendingAutoCrop && item != null) {
+            pendingAutoCrop = false
+            onOpenCropLocked(item.id, selectedPreset.ratio, selectedPreset.ratioLabel)
+        }
+    }
+
     // Navigate to the result screen once, on the completing transition.
     var wasProcessing by remember { mutableStateOf(false) }
     val isProcessingNow = uiState.isProcessing
@@ -141,6 +151,8 @@ fun CropWizardScreen(
             toolViewModel.updateWidth(selectedPreset.defaultWidth.toFloat())
             toolViewModel.updateHeight(selectedPreset.defaultHeight.toFloat())
             toolViewModel.updateFormat(TargetFormat.JPEG)
+            // Crop opens automatically once the item is decoded.
+            pendingAutoCrop = true
         }
     }
 
