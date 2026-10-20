@@ -87,8 +87,6 @@
     <!-- Notifications -->
     <string name="notif_channel_name">इमेज प्रोसेसिंग सूचनाएं</string>
     <string name="notif_channel_desc">इमेज कंप्रेस करने की प्रगति और समाप्ति सूचनाएं</string>
-    <string name="notification_processing_title">इमेज कंप्रेस हो रही हैं (%1$d/%2$d)</string>
-    <string name="notification_processing_desc">प्रोसेसिंग: %1$s</string>
     <string name="notification_done_title">कंप्रेशन पूरा हुआ!</string>
     <string name="notification_done_desc">%1$d इमेज सुरक्षित की गईं। कुल बचत: %2$s</string>
 

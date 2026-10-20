@@ -11,10 +11,6 @@
     <!-- Camera Capture (optional: take a photo straight into the tool) -->
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- WorkManager Resilient Foreground Execution (Android 14+) -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
     <!-- Legacy Storage for Android 7.0–9.0 (Scoped Storage on Android 10+ requires no permissions) -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -60,12 +56,6 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
-
-        <!-- WorkManager Foreground Service for Batch Processing -->
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync"
-            tools:node="merge" />
 
         <!-- Remove default WorkManager init: ShrinkItApplication provides a custom
              Configuration (HiltWorkerFactory) via on-demand initialization -->

@@ -87,8 +87,6 @@
     <!-- Notifications -->
     <string name="notif_channel_name">ছবি প্ৰচেছিং সূচনা</string>
     <string name="notif_channel_desc">ছবি সংকোচনৰ অগ্ৰগতি আৰু সমাপ্তিৰ জাননী</string>
-    <string name="notification_processing_title">ছবি সংকুচিত কৰা হৈছে (%1$d/%2$d)</string>
-    <string name="notification_processing_desc">প্ৰচেছিং: %1$s</string>
     <string name="notification_done_title">সংকোচন সম্পূৰ্ণ হ\'ল!</string>
     <string name="notification_done_desc">%1$d খন ছবি সংৰক্ষণ কৰা হ\'ল। মুঠ সংৰক্ষণ: %2$s</string>
 
