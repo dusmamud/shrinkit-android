@@ -259,8 +259,8 @@
     <string name="tool_compare_desc">Process a photo, then tap Compare on the result to inspect quality.</string>
     <string name="tool_target_upto">Up to %1$d KB</string>
     <string name="history_count">%1$d images</string>
-    <string name="settings_defaults_sub">Quality %1$d%% Â· Format</string>
-    <string name="settings_privacy_note">100% on-device Â· No account Â· No ads</string>
+    <string name="settings_defaults_sub">Quality %1$d%% · Format</string>
+    <string name="settings_privacy_note">100% on-device · No account · No ads</string>
     <string name="settings_appearance_hint">System follows your phoneâs dark-mode schedule. Applies instantly across the app.</string>
     <string name="settings_default_format_hint">Auto keeps each photoâs original format.</string>
     <string name="home_action_tools_title">All Tools</string>
