@@ -19,8 +19,8 @@
     <string name="results_title">ফলাফল (%1$d)</string>
     <string name="results_summary">%1$d খন ছবি · %2$s ৰাহি</string>
     <string name="results_new_batch">নতুন বেচ</string>
-    <string name="action_done">সম্পূৰ্ণ হ'ল</string>
-    <string name="toast_saved_gallery">Pictures / ShrinkIt-ত সংৰক্ষণ কৰা হ'ল</string>
+    <string name="action_done">সম্পূৰ্ণ হ\'ল</string>
+    <string name="toast_saved_gallery">Pictures / ShrinkIt-ত সংৰক্ষণ কৰা হ\'ল</string>
     <string name="action_share">শ্বেয়াৰ কৰক</string>
 
     <!-- Settings Controls -->
@@ -42,7 +42,7 @@
     <string name="mode_fit">ফিট (সম্পূৰ্ণ ফ্ৰেম)</string>
 
     <!-- Compression Mode -->
-    <string name="section_compression">কম্প্ৰেছন ম'ড</string>
+    <string name="section_compression">কম্প্ৰেছন ম\'ড</string>
     <string name="mode_quality">গুণমান শ্লাইডাৰ (%)</string>
     <string name="mode_target_kb">লক্ষ্য আকাৰ (KB)</string>
     <string name="label_quality">গুণমান</string>
@@ -61,7 +61,7 @@
     <!-- Background Color -->
     <string name="section_background">পটভূমিৰ ৰং (Fit / JPG)</string>
     <string name="bg_white">বগা</string>
-    <string name="bg_black">ক'লা</string>
+    <string name="bg_black">ক\'লা</string>
 
     <!-- Privacy & Metadata -->
     <string name="section_privacy">গোপনীয়তা আৰু EXIF ডাটা</string>
@@ -71,24 +71,24 @@
     <!-- Quick Presets -->
     <string name="preset_header">দ্ৰুত প্ৰিচেট</string>
     <string name="preset_exam_signature">চহী / স্বাক্ষৰ (২০ KB)</string>
-    <string name="preset_passport">পাছপ'ৰ্ট (৩৫×৪৫ mm)</string>
+    <string name="preset_passport">পাছপ\'ৰ্ট (৩৫×৪৫ mm)</string>
     <string name="preset_us_visa">ইউএছ ভিছা (২×২ in)</string>
     <string name="preset_insta_square">ইনষ্টাগ্ৰাম (১:১)</string>
-    <string name="preset_insta_story">ষ্ট'ৰি (৯:১৬)</string>
+    <string name="preset_insta_story">ষ্ট\'ৰি (৯:১৬)</string>
     <string name="preset_yt_thumb">ইউটিউব থাম্বনেইল (১৬:৯)</string>
 
     <!-- Results -->
-    <string name="result_saved_to_gallery">Pictures/ShrinkIt-ত সংৰক্ষণ কৰা হ'ল</string>
+    <string name="result_saved_to_gallery">Pictures/ShrinkIt-ত সংৰক্ষণ কৰা হ\'ল</string>
     <string name="result_reduction_badge">-%1$d%%</string>
     <string name="result_size_summary">%1$s → %2$s</string>
-    <string name="status_done">সকলো ছবি সফলতাৰে প্ৰচেছ কৰা হ'ল!</string>
+    <string name="status_done">সকলো ছবি সফলতাৰে প্ৰচেছ কৰা হ\'ল!</string>
     <string name="limit_max_batch">এবাৰত সৰ্বোচ্চ %1$d খন ছবি বাছনি কৰিব পাৰিব।</string>
 
     <!-- Notifications -->
     <string name="notif_channel_name">ছবি প্ৰচেছিং সতৰ্কবাৰ্তা</string>
     <string name="notif_channel_desc">ছবি কম্প্ৰেছ হোৱাৰ অগ্ৰগতি আৰু সমাপ্তিৰ জাননী</string>
-    <string name="notification_done_title">কম্প্ৰেছন সম্পূৰ্ণ হ'ল!</string>
-    <string name="notification_done_desc">%1$d খন ছবি সংৰক্ষণ কৰা হ'ল। মুঠ ৰাহি: %2$s</string>
+    <string name="notification_done_title">কম্প্ৰেছন সম্পূৰ্ণ হ\'ল!</string>
+    <string name="notification_done_desc">%1$d খন ছবি সংৰক্ষণ কৰা হ\'ল। মুঠ ৰাহি: %2$s</string>
 
     <!-- External Links -->
     <string name="link_privacy_policy">গোপনীয়তা নীতি</string>
@@ -105,12 +105,12 @@
 
     <!-- Errors -->
     <string name="error_no_images">অনুগ্ৰহ কৰি কমেও এখন ছবি বাছক।</string>
-    <string name="error_decode_failed">ছবি ফাইল লোড কৰাত ব্যৰ্থ হ'ল। ফাইলটো নষ্ট হ'ব পাৰে।</string>
+    <string name="error_decode_failed">ছবি ফাইল লোড কৰাত ব্যৰ্থ হ\'ল। ফাইলটো নষ্ট হ\'ব পাৰে।</string>
     <string name="error_file_too_large">ছবিৰ আকাৰ সুৰক্ষিত সীমা অতিক্ৰম কৰিছে।</string>
-    <string name="error_width_limit">প্ৰস্থ %1$s আৰু %2$s ৰ ভিতৰত হ'ব লাগিব।</string>
-    <string name="error_height_limit">উচ্চতা %1$s আৰু %2$s ৰ ভিতৰত হ'ব লাগিব।</string>
-    <string name="error_target_kb_limit">লক্ষ্য আকাৰ 1 KB আৰু 2,000 KB ৰ ভিতৰত হ'ব লাগিব।</string>
-    <string name="error_ratio_limit">অনুপাতৰ মান 1 আৰু 999 ৰ ভিতৰত হ'ব লাগিব।</string>
+    <string name="error_width_limit">প্ৰস্থ %1$s আৰু %2$s ৰ ভিতৰত হ\'ব লাগিব।</string>
+    <string name="error_height_limit">উচ্চতা %1$s আৰু %2$s ৰ ভিতৰত হ\'ব লাগিব।</string>
+    <string name="error_target_kb_limit">লক্ষ্য আকাৰ 1 KB আৰু 2,000 KB ৰ ভিতৰত হ\'ব লাগিব।</string>
+    <string name="error_ratio_limit">অনুপাতৰ মান 1 আৰু 999 ৰ ভিতৰত হ\'ব লাগিব।</string>
 
     <!-- Status -->
     <string name="status_processing">প্ৰচেছিং %1$d / %2$d</string>
@@ -154,7 +154,7 @@
     <string name="home_step2_body">ডাইমেনচন, কোৱালিটি বা নিখুঁত KB লক্ষ্য নিৰ্ধাৰণ কৰক।</string>
     <string name="home_step3_title">ছেভ আৰু শ্বেয়াৰ কৰক</string>
     <string name="home_step3_body">ফাইলসমূহ Pictures/ShrinkIt-ত সংৰক্ষণ হয়, শ্বেয়াৰৰ বাবে সাজু।</string>
-    <string name="home_why_shrinkit">কিয় ShrinkIt বাছি ল'ব</string>
+    <string name="home_why_shrinkit">কিয় ShrinkIt বাছি ল\'ব</string>
     <string name="home_feat_privacy_title">সম্পূৰ্ণৰূপে ব্যক্তিগত</string>
     <string name="home_feat_privacy_body">EXIF আৰু GPS তথ্য আঁতৰাই ১০০% অন-ডিভাইচ প্ৰচেছিং।</string>
     <string name="home_feat_exact_title">নিখুঁত লক্ষ্য আকাৰ</string>
@@ -196,7 +196,7 @@
     <string name="crop_title">ক্ৰপ কৰক</string>
     <string name="crop_apply">প্ৰয়োগ কৰক</string>
     <string name="crop_reset">ক্ৰপ ৰিছেট কৰক</string>
-    <string name="crop_hint">স্থানান্তৰ কৰিবলৈ টানক, জুমৰ বাবে পিঞ্চ কৰক। হাইলাইট কৰা অংশ ৰখা হ'ব।</string>
+    <string name="crop_hint">স্থানান্তৰ কৰিবলৈ টানক, জুমৰ বাবে পিঞ্চ কৰক। হাইলাইট কৰা অংশ ৰখা হ\'ব।</string>
     <string name="crop_ratio_1_1">1:1</string>
     <string name="crop_ratio_4_5">4:5</string>
     <string name="crop_ratio_3_4">3:4</string>
@@ -230,28 +230,28 @@
     <string name="content_desc_menu">মেনু</string>
 
     <!-- Camera -->
-    <string name="error_camera_failed">কেমেৰা খুলিব পৰা নগ'ল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।</string>
+    <string name="error_camera_failed">কেমেৰা খুলিব পৰা নগ\'ল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।</string>
 
     <!-- History feedback -->
-    <string name="history_deleted">হিষ্ট্ৰীৰ পৰা মচা হ'ল</string>
-    <string name="history_delete_failed">মচিব পৰা নগ'ল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।</string>
-    <string name="history_share_failed">এই ফটো শ্বেয়াৰ কৰিব পৰা নগ'ল।</string>
+    <string name="history_deleted">হিষ্ট্ৰীৰ পৰা মচা হ\'ল</string>
+    <string name="history_delete_failed">মচিব পৰা নগ\'ল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।</string>
+    <string name="history_share_failed">এই ফটো শ্বেয়াৰ কৰিব পৰা নগ\'ল।</string>
 
     <string name="history_view_list">তালিকা দৃশ্য</string>
     <string name="history_view_grid">গ্ৰিড দৃশ্য</string>
     <string name="history_options">বিকল্প</string>
     <string name="settings_notifications">জাননী (Notifications)</string>
-    <string name="settings_notifications_sub">বেচ কম্প্ৰেছন সম্পূৰ্ণ হ'লে সতৰ্কবাৰ্তা</string>
+    <string name="settings_notifications_sub">বেচ কম্প্ৰেছন সম্পূৰ্ণ হ\'লে সতৰ্কবাৰ্তা</string>
     <string name="tools_title">সঁজুলি</string>
     <string name="tools_subtitle">এক টেপত বিশেষ কাম</string>
     <string name="tool_kb50_title">50 KB লৈ কম্প্ৰেছ কৰক</string>
     <string name="tool_kb50_desc">UPSC, SSC, IBPS আৰু বেংক পৰীক্ষাৰ বাবে স্পষ্টভাৱে 50 KB ৰ তললৈ কম্প্ৰেছ কৰক।</string>
     <string name="tool_kb20_title">20 KB লৈ কম্প্ৰেছ কৰক</string>
     <string name="tool_kb20_desc">চহী আৰু বুঢ়া আঙুলিৰ ছাপ স্পষ্টভাৱে 20 KB ৰ তললৈ কম্প্ৰেছ কৰক।</string>
-    <string name="tool_passport_title">পাছপ'ৰ্ট ফটো মেকাৰ</string>
-    <string name="tool_passport_desc">পাছপ'ৰ্ট আৰু চৰকাৰী ফৰ্মৰ বাবে বগা পটভূমিৰে প্ৰস্তুত কৰক।</string>
-    <string name="tool_social_title">ছ'চিয়েল মিডিয়া ৰিচাইজাৰ</string>
-    <string name="tool_social_desc">প্ৰতিটো ছ'চিয়েল প্লেটফৰ্মৰ বাবে এক টেপত সঠিক আকাৰ।</string>
+    <string name="tool_passport_title">পাছপ\'ৰ্ট ফটো মেকাৰ</string>
+    <string name="tool_passport_desc">পাছপ\'ৰ্ট আৰু চৰকাৰী ফৰ্মৰ বাবে বগা পটভূমিৰে প্ৰস্তুত কৰক।</string>
+    <string name="tool_social_title">ছ\'চিয়েল মিডিয়া ৰিচাইজাৰ</string>
+    <string name="tool_social_desc">প্ৰতিটো ছ\'চিয়েল প্লেটফৰ্মৰ বাবে এক টেপত সঠিক আকাৰ।</string>
     <string name="tool_compare_title">আগৰ আৰু পিছৰ তুলনা</string>
     <string name="tool_compare_desc">ফটো কম্প্ৰেছ কৰাৰ পিছত, গুণমান পৰীক্ষা কৰিবলৈ তুলনা কৰক।</string>
     <string name="tool_target_upto">%1$d KB লৈকে</string>
@@ -261,7 +261,7 @@
     <string name="settings_appearance_hint">ছিষ্টেমে আপোনাৰ ফোনৰ ডাৰ্ক-ম’ড অনুসূচী অনুসৰণ কৰে।</string>
     <string name="settings_default_format_hint">অ’টো মোডে প্ৰতিখন ফটোৰ মূল ফৰ্মেট অক্ষুণ্ণ ৰাখে।</string>
     <string name="home_action_tools_title">সকলো সঁজুলি</string>
-    <string name="home_action_tools_sub">50 KB, পাছপ'ৰ্ট, ছ'চিয়েল — এক টেপত</string>
+    <string name="home_action_tools_sub">50 KB, পাছপ\'ৰ্ট, ছ\'চিয়েল — এক টেপত</string>
     <string name="home_hero_title">ছবি সৰু কৰক,
 মান অক্ষুণ্ণ ৰাখক।</string>
     <string name="home_hero_subtitle">বেচত ৰিছাইজ আৰু কম্প্ৰেছ কৰক।
@@ -272,13 +272,13 @@
     <string name="home_row_camera_sub">কেমেৰা → তৎক্ষণাৎ কম্প্ৰেছ কৰক</string>
     <string name="home_row_exam_title">পৰীক্ষা আৰু ফৰ্মৰ ফটো</string>
     <string name="home_row_exam_badge">20 KB</string>
-    <string name="home_row_exam_sub">পাছপ'ৰ্ট / চহী এক টেপত</string>
+    <string name="home_row_exam_sub">পাছপ\'ৰ্ট / চহী এক টেপত</string>
     <string name="home_row_history_title">হিষ্ট্ৰী</string>
     <string name="home_row_tools_title">সকলো সঁজুলি</string>
-    <string name="home_row_tools_sub">50 KB · পাছপ'ৰ্ট · ছ'চিয়েল · তুলনা</string>
+    <string name="home_row_tools_sub">50 KB · পাছপ\'ৰ্ট · ছ\'চিয়েল · তুলনা</string>
     <string name="home_how_step1">1 · এবাৰত 50 খনলৈকে ছবি বাছক</string>
     <string name="home_how_step2">2 · প্ৰিছেট বাছক বা আকাৰ নিজে ঠিক কৰক</string>
-    <string name="home_how_step3">3 · প্ৰচেছ কৰক — ফাইল Pictures / ShrinkIt ত জমা হ'ব</string>
+    <string name="home_how_step3">3 · প্ৰচেছ কৰক — ফাইল Pictures / ShrinkIt ত জমা হ\'ব</string>
     <string name="tool_select_image">ছবি বাছক</string>
     <string name="tool_cropped_badge">ক্ৰপ কৰা</string>
     <string name="tool_target_size">লক্ষ্য আকাৰ</string>
@@ -294,7 +294,7 @@
     <string name="wizard_crop_hint">নিৰ্দিষ্ট অনুপাতেৰে ফ্ৰেম কৰিবলৈ ক্ৰপ টিপক</string>
     <string name="wizard_output_size">আউটপুট আকাৰ</string>
     <string name="wizard_process_action">কম্প্ৰেছ কৰক</string>
-    <string name="wizard_saved">Pictures / ShrinkIt-ত সংৰক্ষণ কৰা হ'ল</string>
+    <string name="wizard_saved">Pictures / ShrinkIt-ত সংৰক্ষণ কৰা হ\'ল</string>
     <string name="tool_compare_quality">গুণমান: %1$d%%</string>
     <string name="tool_compare_before">আগত</string>
     <string name="tool_compare_after">পিছত</string>
